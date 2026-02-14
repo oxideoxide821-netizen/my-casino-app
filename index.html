@@ -4,1214 +4,875 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <title>ELITE DEB CASINO</title>
+  <title>ELITE DEB CASINO • NFT BATTLE</title>
   <style>
-    :root {
-      --gold: #f3ba2f;
-      --bg: #050608;
-      --card: #101219;
-      --accent: #00f2ff;
-      --red: #ff4757;
-      --text-soft: #a9b3c1;
-      --rare: #4dd0e1;
-      --epic: #ce93d8;
-      --legend: #f3ba2f;
-      --myth: #ff7675;
-    }
-    * { box-sizing: border-box; }
-    body {
+    * {
       margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-      background: radial-gradient(circle at top, #151827 0, #050608 55%);
-      color: #fff;
-      height: 100vh;
-      overflow: hidden;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
 
+    :root {
+      --bg-dark: #0a0b0e;
+      --bg-card: #14151c;
+      --gold: #f0b90b;
+      --gold-light: #fcd535;
+      --silver: #a0a0a0;
+      --bronze: #cd7f32;
+      --common: #9ca3af;
+      --rare: #4ade80;
+      --epic: #a78bfa;
+      --legend: #fbbf24;
+      --myth: #f87171;
+      --text: #ffffff;
+      --text-secondary: #9ca3af;
+    }
+
+    body {
+      background: var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Анимированный фон */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 30% 30%, rgba(240, 185, 11, 0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 80%, rgba(100, 100, 255, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* Хедер */
     .header {
-      padding: 14px 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      background: rgba(20, 21, 28, 0.95);
       backdrop-filter: blur(10px);
-      background: linear-gradient(to right, rgba(10,12,20,.95), rgba(10,12,20,.8));
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       position: sticky;
       top: 0;
       z-index: 100;
     }
-    .brand {
-      font-weight: 800;
-      letter-spacing: .08em;
-      font-size: 11px;
-      text-transform: uppercase;
-      color: var(--text-soft);
-    }
-    .brand span { color: var(--accent); }
-    .bal-box {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      font-size: 11px;
-    }
-    .bal-main {
-      font-size: 18px;
-      font-weight: 900;
-      color: var(--gold);
-      text-shadow: 0 0 8px rgba(243,186,47,.4);
-    }
-    .bal-sub { color: var(--text-soft); font-size: 10px; }
 
-    .page {
-      height: calc(100vh - 80px);
-      padding: 14px 14px 100px;
-      overflow-y: auto;
-      display: none;
-    }
-    .page.active { display: block; }
-
-    /* УЛУЧШИТЕЛЬ NFT */
-    .upgrader-modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.9);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 350;
-    }
-    .upgrader {
-      width: 90vw;
-      max-width: 380px;
-      background: linear-gradient(145deg, #111321, #05060c);
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,0.08);
-      padding: 20px;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-    .upgrader-header {
-      text-align: center;
-      margin-bottom: 16px;
-    }
-    .upgrader-title { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
-    .upgrade-circle {
-      width: 140px;
-      height: 140px;
-      border-radius: 50%;
-      margin: 0 auto 20px;
-      position: relative;
-      background: radial-gradient(circle, rgba(243,186,47,0.2) 0%, transparent 70%);
-      border: 4px solid rgba(243,186,47,0.4);
-    }
-    .circle-fill {
-      position: absolute;
-      inset: 8px;
-      border-radius: 50%;
-      background: conic-gradient(#f3ba2f 0deg var(--success-deg, 0deg), rgba(243,186,47,0.2) var(--success-deg, 0deg) 360deg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      font-weight: 900;
-      color: #000;
-      text-shadow: 0 1px 2px rgba(255,255,255,0.5);
-    }
-    .upgrade-nft {
-      width: 100px;
-      height: 100px;
-      border-radius: 16px;
-      margin: 0 auto 12px;
-      background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.15), transparent 50%);
-      position: relative;
-      overflow: hidden;
-      border: 2px solid rgba(243,186,47,0.6);
-      box-shadow: 0 8px 24px rgba(243,186,47,0.3);
-    }
-    .upgrade-nft::before {
-      content: "✨";
-      position: absolute;
-      font-size: 24px;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
-    .upgrade-btns {
-      display: flex;
-      gap: 8px;
-      margin: 16px 0;
-    }
-    .btn-upgrade {
-      flex: 1;
-      border-radius: 12px;
-      padding: 12px;
-      border: none;
-      font-size: 13px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #f3ba2f, #ffe38b);
-      color: #000;
-    }
-    .upgrade-cost { 
-      text-align: center; 
-      font-size: 12px; 
-      color: var(--gold); 
-      font-weight: 600;
-      margin: 8px 0;
-    }
-    .upgrade-risk { 
-      text-align: center; 
-      font-size: 11px; 
-      color: var(--red); 
-      margin-bottom: 16px;
-    }
-
-    /* CASES GRID - УЛУЧШЕННЫЙ ДИЗАЙН КЕЙСОВ */
-    .case-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: 12px;
-      margin-top: 8px;
-    }
-
-    .case3d-wrap {
-      perspective: 900px;
-    }
-
-    .case-card {
-      position: relative;
-      border-radius: 20px;
-      padding: 12px;
-      border: 1px solid rgba(255,255,255,0.06);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.85);
-      transform-style: preserve-3d;
-      transform: rotateY(0deg) rotateX(0deg);
-      transition: transform .28s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow .28s ease, border-color .28s ease;
-      overflow: hidden;
-      background: linear-gradient(145deg, #1a1d2a, #0a0c14);
-    }
-    .case-card::before {
-      content: "";
-      position: absolute;
-      inset: -50%;
-      background: conic-gradient(from 220deg, rgba(0,242,255,0.35), transparent, rgba(243,186,47,0.45), transparent);
-      opacity: 0;
-      transition: .28s;
-      mix-blend-mode: screen;
-      animation: rotateGlow 8s linear infinite;
-    }
-    @keyframes rotateGlow {
-      to { transform: rotate(360deg); }
-    }
-    .case-card:hover {
-      transform: rotateY(12deg) rotateX(-6deg) translateY(-4px);
-      box-shadow: 0 28px 55px rgba(0,0,0,0.98), 0 0 30px rgba(243,186,47,0.4);
-      border-color: rgba(243,186,47,0.8);
-    }
-    .case-card:hover::before { opacity: 1; }
-
-    /* КЕЙС - РЕАЛИСТИЧНЫЙ */
-    .case-top {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-
-    .case-box3d {
-      width: 60px;
-      height: 60px;
-      position: relative;
-      transform-style: preserve-3d;
-      transform: rotateX(-20deg) rotateY(-28deg) translateZ(10px);
-      transition: transform .3s ease;
-    }
-    .case-card:hover .case-box3d {
-      transform: rotateX(-14deg) rotateY(-10deg) translateZ(16px);
-    }
-    .case-face {
-      position: absolute;
-      inset: 0;
-      border-radius: 12px;
-      background: linear-gradient(145deg, #22263c, #090b12);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.9), inset 0 1px 3px rgba(255,255,255,0.1);
-      backface-visibility: hidden;
-    }
-    .case-top-face {
-      transform: rotateX(90deg) translateZ(30px);
-      background: linear-gradient(135deg, #2a314b, #151827);
-      border-radius: 12px 12px 0 0;
-    }
-    .case-front-face {
-      transform: translateZ(30px);
-      border-radius: 0 12px 12px 12px;
-    }
-    .case-left-face {
-      transform: rotateY(-90deg) translateZ(30px);
-      border-radius: 12px 0 12px 12px;
-    }
-    .case-right-face {
-      transform: rotateY(90deg) translateZ(30px);
-      border-radius: 0 12px 12px 12px;
-    }
-    
-    /* КЛЮЧИ И ЗАМКИ НА КЕЙСЕ */
-    .case-lock {
-      position: absolute;
-      width: 16px;
-      height: 20px;
-      background: #8b4513;
-      border-radius: 3px 3px 8px 8px;
-      top: 12px;
-      right: 8px;
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.6), 0 2px 4px rgba(0,0,0,0.4);
-    }
-    .case-lock::before {
-      content: "";
-      position: absolute;
-      width: 20px;
-      height: 8px;
-      background: #654321;
-      border-radius: 4px;
-      top: -6px;
-      left: -2px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.4);
-    }
-    .case-keyhole {
-      position: absolute;
-      width: 4px;
-      height: 6px;
-      background: #333;
-      border-radius: 1px;
-      bottom: 4px;
-      left: 6px;
-    }
-
-    .case-meta { flex: 1; transform: translateZ(14px); }
-    .case-title {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      color: #cfd6ff;
-      margin-bottom: 2px;
-    }
-    .case-name { 
-      font-size: 14px; 
-      font-weight: 800; 
-      margin-bottom: 2px;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-    }
-    .case-rarity { 
-      font-size: 10px; 
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 12px;
-      display: inline-block;
-      border: 1px solid;
-    }
-    .case-card[data-tier="COMMON"] .case-rarity { color: #9ca3af; border-color: #9ca3af; }
-    .case-card[data-tier="RARE"] .case-rarity { color: var(--rare); border-color: var(--rare); }
-    .case-card[data-tier="EPIC"] .case-rarity { color: var(--epic); border-color: var(--epic); }
-    .case-card[data-tier="LEGEND"] .case-rarity { color: var(--legend); border-color: var(--legend); }
-    .case-card[data-tier="MYTH"] .case-rarity { color: var(--myth); border-color: var(--myth); }
-
-    .case-price {
-      margin-top: 8px;
-      font-size: 13px;
-      font-weight: 800;
-      color: var(--gold);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-    }
-    .case-price span { 
-      font-size: 10px; 
-      color: var(--text-soft); 
-      opacity: 0.9;
-    }
-
-    .case-footer {
-      margin-top: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 10px;
-      color: var(--text-soft);
-    }
-    .case-btn {
-      border-radius: 20px;
-      padding: 6px 14px;
-      border: none;
-      background: linear-gradient(135deg, #f3ba2f, #ffdf7f);
-      color: #000;
-      font-size: 10px;
-      font-weight: 900;
-      box-shadow: 0 4px 12px rgba(243,186,47,0.4);
-      text-transform: uppercase;
-      letter-spacing: .05em;
-    }
-    .case-btn:active {
-      transform: scale(0.95);
-    }
-
-    .stat-card {
-      background: linear-gradient(135deg,#151728,#0a0c14);
-      border-radius: 20px;
-      padding: 16px;
-      border: 1px solid rgba(255,255,255,0.04);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.7);
-      margin-bottom: 16px;
-    }
-
-    .small { font-size: 11px; color: var(--text-soft); }
-
-    .profile-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-    .avatar {
-      width: 44px;
-      height: 44px;
-      border-radius: 999px;
-      background: radial-gradient(circle at top, #1f2340, #090b12);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .logo {
       font-size: 20px;
       font-weight: 800;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
-    }
-    .profile-name { font-size: 14px; font-weight: 800; }
-    .profile-tag { font-size: 11px; color: var(--text-soft); }
-    .badge {
-      font-size: 10px;
-      padding: 4px 10px;
-      border-radius: 20px;
-      border: 1px solid rgba(243,186,47,.8);
-      color: var(--gold);
-      background: rgba(243,186,47,.15);
-      font-weight: 700;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 1px;
     }
 
-    .nft-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: 12px;
-      margin-top: 12px;
+    .balance {
+      background: linear-gradient(135deg, #2a2b35, #1e1f28);
+      padding: 8px 16px;
+      border-radius: 30px;
+      border: 1px solid var(--gold);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
-    .nft-card {
-      border-radius: 18px;
-      padding: 10px;
-      border: 1px solid rgba(255,255,255,0.06);
-      box-shadow: 0 16px 35px rgba(0,0,0,0.85);
-      position: relative;
-      overflow: hidden;
-      background: radial-gradient(circle at top, #181a2c, #090b13);
+
+    .balance span {
+      color: var(--gold);
+      font-size: 18px;
+    }
+
+    /* Навигация */
+    .nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(20, 21, 28, 0.95);
+      backdrop-filter: blur(10px);
+      display: flex;
+      justify-content: space-around;
+      padding: 12px 16px 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-secondary);
+      font-size: 12px;
+      transition: 0.3s;
       cursor: pointer;
-      transition: transform .2s ease, box-shadow .2s ease;
     }
-    .nft-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 24px 50px rgba(0,0,0,0.95);
+
+    .nav-item.active {
+      color: var(--gold);
+      transform: translateY(-5px);
     }
-    .nft-card.upgradable {
-      border-color: rgba(243,186,47,0.6);
-      box-shadow: 0 16px 35px rgba(243,186,47,0.3);
+
+    .nav-item i {
+      font-size: 24px;
     }
-    .nft-inner {
-      border-radius: 14px;
-      padding: 12px;
-      background: radial-gradient(circle at top, #20223a, #06070f);
+
+    /* Страницы */
+    .page {
+      height: calc(100vh - 140px);
+      overflow-y: auto;
+      padding: 20px;
+      display: none;
+      scrollbar-width: none;
+    }
+
+    .page::-webkit-scrollbar {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    /* Кейсы по редкостям */
+    .rarity-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 4px 0 12px;
+      scrollbar-width: none;
+    }
+
+    .rarity-tab {
+      padding: 8px 16px;
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid transparent;
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: 0.3s;
+      cursor: pointer;
+    }
+
+    .rarity-tab.active {
+      background: rgba(240, 185, 11, 0.15);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .cases-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    /* Карточка кейса */
+    .case-card {
+      background: linear-gradient(145deg, var(--bg-card), #1a1b24);
+      border-radius: 20px;
+      padding: 16px;
+      border: 2px solid transparent;
+      transition: 0.3s;
       position: relative;
       overflow: hidden;
+      cursor: pointer;
     }
-    .nft-bg-shape {
+
+    .case-card::before {
+      content: '';
       position: absolute;
-      inset: -40%;
-      background: conic-gradient(from 180deg, rgba(0,242,255,0.45), transparent, rgba(243,186,47,0.35), transparent);
-      opacity: 0.7;
-      mix-blend-mode: screen;
-      animation: nftRotate 12s linear infinite;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(transparent, var(--card-color), transparent 30%);
+      animation: rotate 4s linear infinite;
+      opacity: 0;
+      transition: 0.3s;
     }
-    @keyframes nftRotate {
+
+    .case-card:hover::before {
+      opacity: 0.3;
+    }
+
+    .case-card[data-rarity="COMMON"] { --card-color: var(--common); }
+    .case-card[data-rarity="RARE"] { --card-color: var(--rare); }
+    .case-card[data-rarity="EPIC"] { --card-color: var(--epic); }
+    .case-card[data-rarity="LEGEND"] { --card-color: var(--legend); }
+    .case-card[data-rarity="MYTH"] { --card-color: var(--myth); }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
     }
-    .nft-figure {
-      position: relative;
-      width: 100%;
-      height: 80px;
-      border-radius: 12px;
-      background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.2), transparent 60%);
-      overflow: hidden;
-      margin-bottom: 8px;
-    }
-    .nft-stripe {
-      position: absolute;
-      width: 180%;
-      height: 24px;
-      background: linear-gradient(90deg, rgba(255,255,255,0.7), transparent);
-      transform: rotate(-25deg);
-      top: 12px;
-      left: -50%;
-      animation: stripeMove 3s linear infinite;
-    }
-    @keyframes stripeMove {
-      to { transform: translateX(100%) rotate(-25deg); }
-    }
-    .nft-stripe:nth-child(2) { top: 40px; animation-delay: 1s; opacity: .6; }
-    .nft-stripe:nth-child(3) { top: 65px; animation-delay: 2s; opacity: .3; }
 
-    .nft-name { 
-      font-size: 13px; 
-      font-weight: 700; 
-      margin-bottom: 4px;
-      position: relative;
-      z-index: 1;
+    .case-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      border: 2px solid var(--card-color);
+      box-shadow: 0 0 20px var(--card-color);
     }
-    .nft-meta { 
-      font-size: 11px; 
-      color: var(--text-soft); 
+
+    .case-name {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .case-price {
+      color: var(--gold);
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    /* NFT карточка */
+    .nft-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+    }
+
+    .nft-card {
+      background: linear-gradient(145deg, var(--bg-card), #1a1b24);
+      border-radius: 16px;
+      padding: 12px;
+      border: 2px solid transparent;
+      transition: 0.3s;
+      cursor: pointer;
       position: relative;
-      z-index: 1;
+    }
+
+    .nft-card[data-rarity="COMMON"] { border-color: var(--common); }
+    .nft-card[data-rarity="RARE"] { border-color: var(--rare); }
+    .nft-card[data-rarity="EPIC"] { border-color: var(--epic); }
+    .nft-card[data-rarity="LEGEND"] { border-color: var(--legend); }
+    .nft-card[data-rarity="MYTH"] { border-color: var(--myth); }
+
+    .nft-icon {
+      width: 100%;
+      aspect-ratio: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+    }
+
+    .nft-name {
       font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .nft-level {
+      font-size: 12px;
+      color: var(--text-secondary);
     }
 
     .upgrade-badge {
       position: absolute;
       top: 8px;
       right: 8px;
-      background: rgba(243,186,47,0.9);
+      background: var(--gold);
       color: #000;
       padding: 4px 8px;
-      border-radius: 12px;
-      font-size: 9px;
-      font-weight: 900;
-      text-transform: uppercase;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
     }
 
-    .nav {
+    /* Модалки */
+    .modal {
       position: fixed;
-      left: 14px;
-      right: 14px;
-      bottom: 18px;
-      background: rgba(8,9,16,0.97);
-      border-radius: 24px;
-      border: 1px solid rgba(255,255,255,0.1);
-      box-shadow: 0 24px 50px rgba(0,0,0,0.95);
-      display: flex;
-      justify-content: space-around;
-      padding: 12px 10px;
-      z-index: 200;
-    }
-    .nav-i {
-      font-size: 22px;
-      opacity: 0.5;
-      transition: .25s;
-      padding: 8px;
-      border-radius: 16px;
-    }
-    .nav-i.active {
-      opacity: 1;
-      color: var(--gold);
-      transform: translateY(-4px) scale(1.08);
-      background: rgba(243,186,47,0.15);
-    }
-
-    .modal-back {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.85);
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(5px);
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 300;
-      backdrop-filter: blur(8px);
+      z-index: 1000;
     }
-    .modal {
-      width: 92%;
-      max-width: 380px;
-      background: linear-gradient(145deg, #111321, #05060c);
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--bg-card);
       border-radius: 24px;
-      border: 1px solid rgba(255,255,255,0.08);
-      box-shadow: 0 30px 60px rgba(0,0,0,0.95);
-      padding: 20px;
-      max-height: 85vh;
+      padding: 24px;
+      max-width: 90%;
+      width: 400px;
+      max-height: 80vh;
       overflow-y: auto;
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
+
+    /* Улучшатель */
+    .upgrader-circle {
+      width: 180px;
+      height: 180px;
+      margin: 20px auto;
+      position: relative;
     }
-    .modal-title { font-size: 16px; font-weight: 800; }
-    .pill {
-      font-size: 11px;
-      padding: 4px 12px;
-      border-radius: 20px;
-      background: rgba(0,242,255,0.2);
-      color: var(--accent);
-      font-weight: 700;
-      border: 1px solid rgba(0,242,255,0.4);
+
+    .progress-ring {
+      transform: rotate(-90deg);
     }
-    .modal-actions {
-      margin-top: 16px;
-      display: flex;
-      gap: 12px;
+
+    .progress-ring__circle {
+      transition: stroke-dashoffset 0.3s;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
     }
-    .btn {
-      flex: 1;
-      border-radius: 20px;
-      padding: 12px;
-      border: none;
-      font-size: 13px;
+
+    .upgrade-percent {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 32px;
       font-weight: 800;
-      transition: all .2s ease;
+      color: var(--gold);
     }
-    .btn-primary {
-      background: linear-gradient(135deg, #f3ba2f, #ffe38b);
-      color: #000;
-      box-shadow: 0 8px 24px rgba(243,186,47,0.4);
-    }
-    .btn-primary:active { transform: scale(0.96); }
-    .btn-ghost {
-      background: transparent;
-      border: 1px solid rgba(255,255,255,0.25);
-      color: #fff;
-      backdrop-filter: blur(10px);
-    }
-    .btn-ghost:active { transform: scale(0.96); }
 
-    .pack-row {
+    /* Кнопки */
+    .btn {
+      padding: 12px 24px;
+      border-radius: 30px;
+      border: none;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: #000;
+      width: 100%;
+    }
+
+    .btn:active {
+      transform: scale(0.95);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+    }
+
+    /* Анимация открытия */
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(720deg); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .opening-animation {
+      animation: spin 1s ease-in-out, pulse 0.5s ease-in-out 3;
+    }
+
+    /* Топ лидеров */
+    .leader-item {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-      border-radius: 16px;
-      background: rgba(21,23,39,0.8);
-      margin-bottom: 10px;
-      font-size: 12px;
-      cursor: pointer;
-      transition: all .2s ease;
-      border: 1px solid rgba(255,255,255,0.08);
+      gap: 12px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+      margin-bottom: 8px;
     }
-    .pack-row:hover, .pack-row.selected {
-      background: rgba(243,186,47,0.15);
-      border-color: rgba(243,186,47,0.4);
-      transform: translateY(-1px);
-    }
-    .pack-title { font-weight: 800; }
-    .pack-coins { color: var(--gold); font-weight: 800; font-size: 14px; }
-    .pack-tag { font-size: 10px; color: var(--text-soft); }
 
-    /* АДМИН ПАНЕЛЬ - ВСЕГДА ВИДИМА ДЛЯ ТЕБЯ */
-    #admin-panel {
-      background: linear-gradient(135deg, #1a0d2a, #0a0514) !important;
-      border: 2px solid rgba(243,186,47,0.8) !important;
-      box-shadow: 0 0 40px rgba(243,186,47,0.6) !important;
+    .leader-rank {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+    }
+
+    .leader-rank.gold { background: var(--gold); }
+    .leader-rank.silver { background: var(--silver); }
+    .leader-rank.bronze { background: var(--bronze); }
+
+    /* Обмен */
+    .trade-input {
+      width: 100%;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      color: #fff;
+      margin: 12px 0;
+    }
+
+    .nft-select {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin: 12px 0;
+      max-height: 300px;
+      overflow-y: auto;
     }
   </style>
 </head>
 <body>
   <div class="header">
-    <div class="brand">ELITE <span>DEB</span></div>
-    <div class="bal-box">
-      <div class="bal-main"><span id="balance">15 000</span> 🪙</div>
-      <div class="bal-sub" id="event-label">🔥 Огненная неделя</div>
+    <div class="logo">⚡ ELITE DEB</div>
+    <div class="balance">
+      <span>🪙</span>
+      <span id="balance">15000</span>
     </div>
   </div>
 
-  <!-- SHOP -->
-  <div class="page active" id="p-shop">
-    <div class="stat-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div style="font-size:14px;font-weight:800;">🎰 КЕЙСЫ</div>
-        <button class="btn btn-primary" style="font-size:11px;padding:8px 16px;border-radius:20px;" onclick="openTopupModal()">⭐ ДОДЕП</button>
-      </div>
-      <div class="small">🎁 Реалистичные кейсы с замками/ключами. 100% CSS.</div>
+  <!-- Страницы -->
+  <div class="page active" id="shop">
+    <div class="rarity-tabs">
+      <div class="rarity-tab active" data-rarity="ALL">Все</div>
+      <div class="rarity-tab" data-rarity="COMMON">Обычные</div>
+      <div class="rarity-tab" data-rarity="RARE">Редкие</div>
+      <div class="rarity-tab" data-rarity="EPIC">Эпические</div>
+      <div class="rarity-tab" data-rarity="LEGEND">Легендарные</div>
+      <div class="rarity-tab" data-rarity="MYTH">Мифические</div>
     </div>
-    <div class="case-grid" id="case-container"></div>
+    <div class="cases-grid" id="casesGrid"></div>
   </div>
 
-  <!-- INVENTORY -->
-  <div class="page" id="p-inv">
-    <div class="stat-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-size:14px;font-weight:800;">🎒 МОЙ ИНВЕНТАРЬ</div>
-        <button class="btn btn-primary" style="font-size:11px;padding:6px 12px;border-radius:16px;" onclick="craftItems()">⚗️ КРАФТ 3→1</button>
-      </div>
-      <div class="small">NFT с возможностью улучшения (как в Play's NFT Battle)</div>
+  <div class="page" id="inventory">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h3>🎒 Инвентарь</h3>
+      <button class="btn" style="width: auto; padding: 8px 16px;" onclick="craftItems()">🔨 Крафт 3→1</button>
     </div>
-    <div id="inventory-empty" class="small" style="margin-top:12px;text-align:center;opacity:0.7;">Пока пусто. Открой пару кейсов!</div>
-    <div class="nft-grid" id="inventory-grid"></div>
+    <div class="nft-grid" id="inventoryGrid"></div>
   </div>
 
-  <!-- PROFILE -->
-  <div class="page" id="p-prof">
-    <div class="stat-card">
-      <div class="profile-head">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <div class="avatar"><span id="prof-initial">M</span></div>
-          <div>
-            <div class="profile-name" id="prof-name">Игрок</div>
-            <div class="profile-tag" id="prof-username">@user</div>
-          </div>
+  <div class="page" id="profile">
+    <div style="background: var(--bg-card); border-radius: 20px; padding: 20px; margin-bottom: 16px;">
+      <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+        <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-light)); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; color: #000;">
+          <span id="profileInitial">M</span>
         </div>
-        <div><div class="badge" id="prof-title">Новичок</div></div>
-      </div>
-      <div class="small">
-        Всего кейсов: <span id="prof-cases">0</span> • Лучший дроп: <span id="prof-best">–</span>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-size:14px;font-weight:800;">📆 ЕЖЕДНЕВНЫЙ БОНУС</div>
-        <span class="pill" id="daily-pill">Доступен</span>
-      </div>
-      <div class="small">Бонус + ивент шансы!</div>
-      <button class="btn btn-primary" style="margin-top:12px;" onclick="claimDaily()">ЗАБРАТЬ 🪙</button>
-    </div>
-
-    <!-- АДМИН ПАНЕЛЬ - ТЕПЕРЬ ВСЕГДА ВИДИМА ДЛЯ ТЕБЯ -->
-    <div class="stat-card" id="admin-panel">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <div style="font-size:14px;font-weight:800;color:var(--gold);">👑 АДМИН ПАНЕЛЬ</div>
-        <span class="pill" style="background:rgba(243,186,47,0.3);color:var(--gold);">MAX POWER</span>
-      </div>
-      <div class="modal-actions" style="gap:8px;margin-top:8px;">
-        <button class="btn btn-primary" onclick="adminAddBalance()">+1M 🪙</button>
-        <button class="btn btn-primary" onclick="adminSetRich()">ВСЕМ 10M</button>
-        <button class="btn btn-primary" onclick="toggleEvent()">🔥 ТОГГЛ ИВЕНТ</button>
-      </div>
-      <div class="small" style="margin-top:12px;opacity:.9;">Полный контроль - всё локально ✅</div>
-    </div>
-  </div>
-
-  <!-- SETTINGS -->
-  <div class="page" id="p-set">
-    <div class="stat-card">
-      <div style="font-size:14px;font-weight:800;margin-bottom:12px;">⚙️ НАСТРОЙКИ</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <span class="small">Вибрация</span>
-        <input type="checkbox" id="set-vibrate" checked>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-        <span class="small">Звуки</span>
-        <input type="checkbox" id="set-sound" checked>
-      </div>
-      <button class="btn btn-ghost" style="margin-top:16px;" onclick="tg?.close()">❌ ВЫЙТИ</button>
-    </div>
-  </div>
-
-  <!-- NFT DROP MODAL -->
-  <div class="modal-back" id="drop-modal">
-    <div class="modal">
-      <div class="modal-header">
-        <div class="modal-title">✨ Новый NFT-дроп</div>
-        <span class="pill" id="drop-rarity-pill">RARE</span>
-      </div>
-      <div class="nft-inner" style="margin:0 0 16px 0;padding:20px;border-radius:20px;">
-        <div class="nft-bg-shape"></div>
-        <div class="nft-figure" style="height:120px;">
-          <div class="nft-stripe" style="animation-duration:2s;"></div>
-          <div class="nft-stripe" style="animation-duration:2.5s;"></div>
-          <div class="nft-stripe" style="animation-duration:3s;"></div>
-        </div>
-      </div>
-      <div style="font-size:16px;font-weight:800;text-align:center;margin-bottom:6px;" id="drop-name">Virus Core #001</div>
-      <div class="small" style="text-align:center;margin-bottom:20px;" id="drop-desc">Редкий артефакт!</div>
-      <div class="modal-actions">
-        <button class="btn btn-ghost" onclick="rejectDrop()">❌ Отказаться</button>
-        <button class="btn btn-primary" onclick="acceptDrop()">✅ В инвентарь</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- УЛУЧШИТЕЛЬ NFT MODAL -->
-  <div class="upgrader-modal" id="upgrader-modal">
-    <div class="upgrader">
-      <div class="upgrader-header">
-        <div class="upgrader-title">⚡ УЛУЧШИТЕЛЬ NFT</div>
-        <div class="upgrade-circle">
-          <div class="circle-fill" id="upgrade-progress">0%</div>
-        </div>
-        <div class="upgrade-nft" id="upgrade-nft-preview"></div>
-      </div>
-      <div class="upgrade-cost" id="upgrade-cost">Улучшение: 5 000 🪙</div>
-      <div class="upgrade-risk">⚠️ Риск потери NFT: <span id="upgrade-risk">15%</span></div>
-      <div class="upgrade-btns">
-        <button class="btn btn-ghost" onclick="closeUpgrader()">❌ Отмена</button>
-        <button class="btn btn-primary" onclick="performUpgrade()">🚀 УЛУЧШИТЬ</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- TOPUP MODAL -->
-  <div class="modal-back" id="topup-modal">
-    <div class="modal">
-      <div class="modal-header">
-        <div class="modal-title">💎 Касса ELITE DEB</div>
-        <span class="pill">NFT BATTLE</span>
-      </div>
-      <div class="small" style="margin-bottom:16px;">Выбери пакет монет (локально)</div>
-      <div class="pack-row" onclick="selectPack(10000)">
         <div>
-          <div class="pack-title">Starter</div>
-          <div class="pack-tag">Для разгона</div>
+          <div style="font-weight: 700; font-size: 18px;" id="profileName">Игрок</div>
+          <div style="color: var(--text-secondary);" id="profileUsername">@user</div>
         </div>
-        <div class="pack-coins">10 000 🪙</div>
       </div>
-      <div class="pack-row" onclick="selectPack(50000)">
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; text-align: center;">
         <div>
-          <div class="pack-title">Grinder</div>
-          <div class="pack-tag">Кейсы 24/7</div>
+          <div style="color: var(--gold); font-weight: 700; font-size: 20px;" id="profileCases">0</div>
+          <div style="color: var(--text-secondary); font-size: 12px;">Кейсов</div>
         </div>
-        <div class="pack-coins">50 000 🪙</div>
-      </div>
-      <div class="pack-row" onclick="selectPack(250000)">
         <div>
-          <div class="pack-title">Whale</div>
-          <div class="pack-tag">NFT‑империя</div>
+          <div style="color: var(--gold); font-weight: 700; font-size: 20px;" id="profileNFTs">0</div>
+          <div style="color: var(--text-secondary); font-size: 12px;">NFT</div>
         </div>
-        <div class="pack-coins">250 000 🪙</div>
+        <div>
+          <div style="color: var(--gold); font-weight: 700; font-size: 20px;" id="profileBest">-</div>
+          <div style="color: var(--text-secondary); font-size: 12px;">Лучший</div>
+        </div>
       </div>
-      <div class="small" id="topup-selected" style="margin-top:12px;">Пакет не выбран</div>
-      <div class="modal-actions">
-        <button class="btn btn-ghost" onclick="closeTopupModal()">ЗАКРЫТЬ</button>
-        <button class="btn btn-primary" onclick="applyTopup()">ПОПОЛНИТЬ</button>
-      </div>
+    </div>
+
+    <div style="background: var(--bg-card); border-radius: 20px; padding: 20px;">
+      <h3 style="margin-bottom: 16px;">🏆 Топ лидеров</h3>
+      <div id="leaderboard"></div>
     </div>
   </div>
 
+  <div class="page" id="trade">
+    <div style="background: var(--bg-card); border-radius: 20px; padding: 20px;">
+      <h3 style="margin-bottom: 16px;">🤝 Обмен с игроками</h3>
+      <input type="text" class="trade-input" id="tradeUsername" placeholder="Username игрока">
+      <div style="margin: 16px 0;">
+        <h4>Выберите NFT для обмена:</h4>
+        <div class="nft-select" id="tradeNFTs"></div>
+      </div>
+      <button class="btn" onclick="sendTrade()">Отправить предложение</button>
+    </div>
+  </div>
+
+  <!-- Навигация -->
   <div class="nav">
-    <div class="nav-i active" onclick="openTab('p-shop', this)">📦</div>
-    <div class="nav-i" onclick="openTab('p-inv', this)">🎒</div>
-    <div class="nav-i" onclick="openTab('p-prof', this)">👑</div>
-    <div class="nav-i" onclick="openTab('p-set', this)">⚙️</div>
+    <div class="nav-item active" onclick="switchPage('shop', this)">
+      <i>📦</i>
+      <span>Кейсы</span>
+    </div>
+    <div class="nav-item" onclick="switchPage('inventory', this)">
+      <i>🎒</i>
+      <span>Инвентарь</span>
+    </div>
+    <div class="nav-item" onclick="switchPage('profile', this)">
+      <i>👑</i>
+      <span>Профиль</span>
+    </div>
+    <div class="nav-item" onclick="switchPage('trade', this)">
+      <i>🤝</i>
+      <span>Обмен</span>
+    </div>
   </div>
 
-  <audio id="snd-spin" src="https://cdn.freesound.org/previews/341/341695_6261196-lq.mp3"></audio>
-  <audio id="snd-drop" src="https://cdn.freesound.org/previews/235/235909_3982175-lq.mp3"></audio>
-  <audio id="snd-upgrade" src="https://cdn.freesound.org/previews/387/387739_4175099-lq.mp3"></audio>
+  <!-- Модалка дропа NFT -->
+  <div class="modal" id="dropModal">
+    <div class="modal-content">
+      <h2 style="text-align: center; margin-bottom: 20px;">✨ Новый NFT!</h2>
+      <div style="text-align: center;">
+        <div style="font-size: 80px; margin-bottom: 16px;" id="dropIcon">🎨</div>
+        <div style="font-weight: 700; font-size: 20px; margin-bottom: 8px;" id="dropName"></div>
+        <div style="color: var(--text-secondary); margin-bottom: 16px;" id="dropDesc"></div>
+        <div style="padding: 8px; border-radius: 20px; display: inline-block; background: rgba(240, 185, 11, 0.1); margin-bottom: 20px;" id="dropRarity">Редкость</div>
+      </div>
+      <button class="btn" onclick="acceptDrop()">Забрать</button>
+      <button class="btn btn-secondary" style="margin-top: 8px;" onclick="closeDropModal()">Отказаться</button>
+    </div>
+  </div>
+
+  <!-- Модалка улучшения -->
+  <div class="modal" id="upgradeModal">
+    <div class="modal-content">
+      <h2 style="text-align: center; margin-bottom: 20px;">⚡ Улучшение NFT</h2>
+      
+      <div class="upgrader-circle">
+        <svg class="progress-ring" width="180" height="180">
+          <circle class="progress-ring__circle" stroke="var(--gold)" stroke-width="8" fill="transparent" r="70" cx="90" cy="90"/>
+        </svg>
+        <div class="upgrade-percent" id="upgradePercent">0%</div>
+      </div>
+
+      <div style="text-align: center; margin: 20px 0;" id="upgradeNFTInfo"></div>
+      
+      <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 16px; margin: 16px 0;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span>Стоимость:</span>
+          <span style="color: var(--gold); font-weight: 700;" id="upgradeCost">5000 🪙</span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span>Риск потери:</span>
+          <span style="color: #f87171; font-weight: 700;" id="upgradeRisk">15%</span>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px;" id="nftSelection"></div>
+
+      <button class="btn" onclick="performUpgrade()">🚀 Улучшить</button>
+      <button class="btn btn-secondary" style="margin-top: 8px;" onclick="closeUpgradeModal()">Отмена</button>
+    </div>
+  </div>
 
   <script>
     const tg = window.Telegram?.WebApp;
-    if (tg) tg.expand();
+    tg?.expand();
+    tg?.ready();
 
-    const ADMIN_USERNAME = "Random06"; // ТВОЙ ЮЗЕРНЕЙМ
-    const STORAGE_KEY = "elite_deb_state_css3d_v2";
+    // NFT база с иконками
+    const NFT_TEMPLATES = [
+      { id: 'n1', name: 'Cyber Dragon', icon: '🐉', rarity: 'MYTH', baseChance: 1 },
+      { id: 'n2', name: 'Neon Samurai', icon: '⚔️', rarity: 'LEGEND', baseChance: 3 },
+      { id: 'n3', name: 'Quantum Core', icon: '💎', rarity: 'EPIC', baseChance: 8 },
+      { id: 'n4', name: 'Hologram Wolf', icon: '🐺', rarity: 'RARE', baseChance: 15 },
+      { id: 'n5', name: 'Digital Ghost', icon: '👻', rarity: 'COMMON', baseChance: 30 },
+      { id: 'n6', name: 'Plasma Sword', icon: '⚡', rarity: 'EPIC', baseChance: 8 },
+      { id: 'n7', name: 'Crystal Skull', icon: '💀', rarity: 'LEGEND', baseChance: 3 },
+      { id: 'n8', name: 'Neon Mask', icon: '🎭', rarity: 'RARE', baseChance: 15 },
+      { id: 'n9', name: 'Golden Eye', icon: '👁️', rarity: 'MYTH', baseChance: 1 },
+      { id: 'n10', name: 'Matrix Glitch', icon: '📟', rarity: 'COMMON', baseChance: 30 }
+    ];
+
+    // Кейсы по редкостям
+    const CASES = [
+      { id: 'c1', name: 'Обычный кейс', rarity: 'COMMON', price: 1000, icon: '📦', color: '#9ca3af' },
+      { id: 'c2', name: 'Редкий кейс', rarity: 'RARE', price: 5000, icon: '🔮', color: '#4ade80' },
+      { id: 'c3', name: 'Эпический кейс', rarity: 'EPIC', price: 15000, icon: '💫', color: '#a78bfa' },
+      { id: 'c4', name: 'Легендарный кейс', rarity: 'LEGEND', price: 50000, icon: '👑', color: '#fbbf24' },
+      { id: 'c5', name: 'Мифический кейс', rarity: 'MYTH', price: 150000, icon: '🔥', color: '#f87171' }
+    ];
 
     let state = {
-      bal: 15000,
-      inv: [],
-      totalCases: 0,
-      bestDropName: null,
-      bestDropRarity: null,
+      balance: 15000,
+      inventory: [],
+      casesOpened: 0,
+      bestDrop: null,
       lastDaily: null,
-      eventFireWeek: true
+      eventActive: true
     };
 
-    let currentUpgradingNFT = null;
-    let selectedPack = null;
-
+    // Загрузка состояния
     function loadState() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) state = Object.assign(state, JSON.parse(raw));
-      } catch(e) { console.log("Load state error:", e); }
-    }
-    function saveState() {
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+      const saved = localStorage.getItem('eliteDebState');
+      if (saved) {
+        try {
+          state = JSON.parse(saved);
+        } catch (e) {}
+      }
     }
     loadState();
 
-    const RARITY = [
-      {code: "COMMON", label: "ОБЫЧНЫЙ", color:"#9ca3af", weight:1},
-      {code: "RARE", label:"РАРЕ", color:"#4dd0e1", weight:2},
-      {code: "EPIC", label:"ЭПИК", color:"#ce93d8", weight:3},
-      {code: "LEGEND", label:"ЛЕГЕНДАРНЫЙ", color:"#f3ba2f", weight:4},
-      {code: "MYTH", label:"МИФИЧЕСКИЙ", color:"#ff7675", weight:5}
-    ];
+    // Сохранение
+    function saveState() {
+      localStorage.setItem('eliteDebState', JSON.stringify(state));
+    }
 
-    const NFTS = [
-      { id:1, name:"Virus Core #001", rarity:"RARE", desc:"Сердце вируса", upgradeLevel: 0 },
-      { id:2, name:"Toxic Blade #07", rarity:"EPIC", desc:"Токсичное лезвие", upgradeLevel: 0 },
-      { id:3, name:"Crown of Glitch", rarity:"LEGEND", desc:"Корона сбоя", upgradeLevel: 0 },
-      { id:4, name:"Neon Chip", rarity:"COMMON", desc:"Неоновый чип", upgradeLevel: 0 },
-      { id:5, name:"Quantum Shard", rarity:"MYTH", desc:"Квантовый осколок", upgradeLevel: 0 }
-    ];
+    // Обновление баланса
+    function updateBalance() {
+      document.getElementById('balance').textContent = state.balance.toLocaleString();
+    }
 
-    let CASES = [];
-    const CASE_TEMPLATES = [
-      { tier:"COMMON", basePrice: 1500, previewNFTs: [NFTS[3]] },
-      { tier:"RARE", basePrice: 7500, previewNFTs: [NFTS[0]] },
-      { tier:"EPIC", basePrice: 25000, previewNFTs: [NFTS[1]] },
-      { tier:"LEGEND", basePrice: 120000, previewNFTs: [NFTS[2]] },
-      { tier:"MYTH", basePrice: 400000, previewNFTs: [NFTS[4]] }
-    ];
+    // Рендер кейсов
+    function renderCases(filter = 'ALL') {
+      const grid = document.getElementById('casesGrid');
+      grid.innerHTML = '';
+      
+      CASES.filter(c => filter === 'ALL' || c.rarity === filter).forEach(c => {
+        const card = document.createElement('div');
+        card.className = 'case-card';
+        card.setAttribute('data-rarity', c.rarity);
+        card.innerHTML = `
+          <div class="case-icon" style="border-color: ${c.color}">${c.icon}</div>
+          <div class="case-name">${c.name}</div>
+          <div class="case-price">${c.price.toLocaleString()} 🪙</div>
+        `;
+        card.onclick = () => openCase(c);
+        grid.appendChild(card);
+      });
+    }
 
-    function genCases() {
-      CASES = [];
-      let id = 1;
-      for (let t of CASE_TEMPLATES) {
-        for (let i = 0; i < 20; i++) {
-          if (id > 100) break;
-          CASES.push({
-            id, name: `Кейс #${id}`, tier: t.tier,
-            price: t.basePrice * (1 + i * 0.2),
-            previewNFTs: t.previewNFTs
-          });
-          id++;
-        }
+    // Открытие кейса
+    function openCase(caseItem) {
+      if (state.balance < caseItem.price) {
+        alert('❌ Недостаточно монет!');
+        tg?.HapticFeedback?.notificationOccurred('error');
+        return;
       }
-      for (; id <= 220; id++) {
-        const t = CASE_TEMPLATES[Math.floor(Math.random() * CASE_TEMPLATES.length)];
-        CASES.push({
-          id, name: `Кейс #${id}`, tier: t.tier,
-          price: t.basePrice * (1 + Math.random() * 5),
-          previewNFTs: t.previewNFTs
-        });
+
+      state.balance -= caseItem.price;
+      state.casesOpened++;
+      updateBalance();
+      saveState();
+
+      tg?.HapticFeedback?.impactOccurred('medium');
+
+      // Анимация
+      const caseIcon = event.currentTarget.querySelector('.case-icon');
+      caseIcon.style.animation = 'spin 1s ease-in-out';
+
+      setTimeout(() => {
+        caseIcon.style.animation = '';
+        
+        // Шансы на дроп
+        let pool = NFT_TEMPLATES;
+        if (state.eventActive) {
+          // Ивент - увеличенные шансы на редкие
+          pool = NFT_TEMPLATES.flatMap(n => 
+            Array(n.rarity === 'MYTH' ? 3 : n.rarity === 'LEGEND' ? 5 : 1).fill(n)
+          );
+        }
+
+        const rolled = Math.random() * 100;
+        let chanceSum = 0;
+        let dropped = pool[Math.floor(Math.random() * pool.length)];
+
+        // Копируем NFT с уникальным ID
+        const newNFT = {
+          ...dropped,
+          uid: Date.now() + Math.random(),
+          level: 0
+        };
+
+        showDropModal(newNFT);
+        tg?.HapticFeedback?.notificationOccurred('success');
+      }, 1000);
+    }
+
+    // Показать дроп
+    function showDropModal(nft) {
+      const modal = document.getElementById('dropModal');
+      document.getElementById('dropIcon').textContent = nft.icon;
+      document.getElementById('dropName').textContent = nft.name;
+      document.getElementById('dropDesc').textContent = `Уровень ${nft.level}`;
+      document.getElementById('dropRarity').textContent = nft.rarity;
+      document.getElementById('dropRarity').style.color = getRarityColor(nft.rarity);
+      
+      modal.classList.add('active');
+      window.currentDrop = nft;
+    }
+
+    // Принять дроп
+    function acceptDrop() {
+      if (window.currentDrop) {
+        state.inventory.push(window.currentDrop);
+        
+        // Проверка лучшего дропа
+        const rarityWeight = { 'COMMON': 1, 'RARE': 2, 'EPIC': 3, 'LEGEND': 4, 'MYTH': 5 };
+        if (!state.bestDrop || rarityWeight[window.currentDrop.rarity] > rarityWeight[state.bestDrop]) {
+          state.bestDrop = window.currentDrop.rarity;
+        }
+        
+        saveState();
+        renderInventory();
+        updateProfile();
+        closeDropModal();
+        tg?.HapticFeedback?.impactOccurred('light');
       }
     }
-    genCases();
 
-    function formatCoins(n) { return Math.floor(n).toLocaleString("ru-RU"); }
+    function closeDropModal() {
+      document.getElementById('dropModal').classList.remove('active');
+      window.currentDrop = null;
+    }
 
-    function drawCases() {
-      const cont = document.getElementById("case-container");
-      cont.innerHTML = CASES.map(c => `
-        <div class="case3d-wrap">
-          <div class="case-card" data-tier="${c.tier}" onclick="openCase(${c.id})">
-            <div class="case-top">
-              <div class="case-box3d">
-                <div class="case-face case-top-face"></div>
-                <div class="case-face case-front-face">
-                  <div class="case-lock"></div>
-                  <div class="case-keyhole"></div>
-                </div>
-                <div class="case-face case-left-face"></div>
-                <div class="case-face case-right-face"></div>
-              </div>
-              <div class="case-meta">
-                <div class="case-title">КЕЙС</div>
-                <div class="case-name">${c.name}</div>
-                <div class="case-rarity">${RARITY.find(r=>r.code===c.tier)?.label || c.tier}</div>
-              </div>
-            </div>
-            <div class="case-price">
-              <div>${formatCoins(c.price)} 🪙</div>
-              <span>${c.previewNFTs[0]?.name.split(" ")[0] || "NFT"}</span>
-            </div>
-            <div class="case-footer">
-              <span>🔓 Открыть</span>
-              <button class="case-btn">КРУТИТЬ!</button>
-            </div>
-          </div>
+    // Рендер инвентаря
+    function renderInventory() {
+      const grid = document.getElementById('inventoryGrid');
+      const empty = document.getElementById('inventory-empty');
+      
+      if (state.inventory.length === 0) {
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">Инвентарь пуст</div>';
+        return;
+      }
+
+      grid.innerHTML = state.inventory.map((nft, index) => `
+        <div class="nft-card" data-rarity="${nft.rarity}" onclick="openUpgradeModal(${index})">
+          <div class="nft-icon">${nft.icon}</div>
+          <div class="nft-name">${nft.name}</div>
+          <div class="nft-level">Ур. ${nft.level}</div>
+          ${nft.level < 5 ? '<div class="upgrade-badge">⚡</div>' : ''}
         </div>
       `).join('');
     }
 
-    function hapticImpact(style = "light") {
-      if (!document.getElementById("set-vibrate").checked) return;
-      try { tg?.HapticFeedback?.impactOccurred(style); } catch(e) {}
-    }
-    function playSound(id) {
-      if (!document.getElementById("set-sound").checked) return;
-      const el = document.getElementById(id);
-      if (el) { el.currentTime = 0; el.play().catch(() => {}); }
-    }
+    // Улучшение NFT
+    let selectedUpgradeNFT = null;
 
-    let pendingDrop = null;
-    function openCase(id) {
-      const c = CASES.find(x => x.id === id);
-      if (!c || state.bal < c.price) {
-        if (state.bal < c.price) alert("💸 Недостаточно монет!");
-        hapticImpact("heavy");
-        return;
-      }
-      state.bal -= c.price;
-      state.totalCases++;
-      updateBalance();
-      saveState();
-      hapticImpact("light");
-      playSound("snd-spin");
-      setTimeout(() => {
-        let pool = NFTS;
-        if (state.eventFireWeek) {
-          pool = [...NFTS, ...NFTS.filter(n => ["RARE", "EPIC", "LEGEND"].includes(n.rarity))];
-        }
-        const drop = { ...pool[Math.floor(Math.random() * pool.length)], id: Date.now() };
-        pendingDrop = drop;
-        showDropModal(drop);
-        hapticImpact("heavy");
-        playSound("snd-drop");
-      }, 1200);
-    }
+    function openUpgradeModal(index) {
+      selectedUpgradeNFT = state.inventory[index];
+      if (!selectedUpgradeNFT) return;
 
-    function showDropModal(drop) {
-      document.getElementById("drop-name").textContent = drop.name;
-      document.getElementById("drop-desc").textContent = drop.desc;
-      const pill = document.getElementById("drop-rarity-pill");
-      const r = RARITY.find(x => x.code === drop.rarity);
-      pill.textContent = r.label;
-      pill.style.color = r.color;
-      pill.style.borderColor = r.color;
-      pill.style.backgroundColor = r.color + "44";
-      document.getElementById("drop-modal").style.display = "flex";
-    }
-
-    function acceptDrop() {
-      if (!pendingDrop) return closeDropModal();
-      state.inv.push(pendingDrop);
-      const dropRarityWeight = RARITY.find(r => r.code === pendingDrop.rarity)?.weight || 0;
-      const bestWeight = RARITY.find(r => r.code === state.bestDropRarity)?.weight || 0;
-      if (dropRarityWeight > bestWeight) {
-        state.bestDropRarity = pendingDrop.rarity;
-        state.bestDropName = pendingDrop.name;
-      }
-      pendingDrop = null;
-      saveState();
-      renderInventory();
-      updateProfile();
-      closeDropModal();
-      hapticImpact("light");
-    }
-    function rejectDrop() { pendingDrop = null; closeDropModal(); hapticImpact("medium"); }
-    function closeDropModal() { document.getElementById("drop-modal").style.display = "none"; }
-
-    function renderInventory() {
-      const grid = document.getElementById("inventory-grid");
-      const empty = document.getElementById("inventory-empty");
-      if (!state.inv.length) {
-        grid.innerHTML = "";
-        empty.style.display = "block";
-        return;
-      }
-      empty.style.display = "none";
-      grid.innerHTML = state.inv.map((nft, i) => {
-        const r = RARITY.find(x => x.code === nft.rarity);
-        const canUpgrade = nft.upgradeLevel < 5;
-        return `
-          <div class="nft-card ${canUpgrade ? 'upgradable' : ''}" onclick="${canUpgrade ? `openUpgrader(${i})` : 'inspectNFT(' + i + ')'}" data-rarity="${nft.rarity}">
-            ${canUpgrade ? '<div class="upgrade-badge">⚡ LV.' + (nft.upgradeLevel + 1) + '</div>' : ''}
-            <div class="nft-inner">
-              <div class="nft-bg-shape"></div>
-              <div class="nft-figure">
-                <div class="nft-stripe"></div><div class="nft-stripe"></div><div class="nft-stripe"></div>
-              </div>
-              <div class="nft-name">${nft.name}</div>
-              <div class="nft-meta">${r?.label || nft.rarity} ${nft.upgradeLevel > 0 ? `(+${nft.upgradeLevel})` : ''}</div>
-            </div>
-          </div>`;
-      }).join('');
-    }
-
-    function openUpgrader(idx) {
-      currentUpgradingNFT = state.inv[idx];
-      if (!currentUpgradingNFT) return;
+      const modal = document.getElementById('upgradeModal');
+      const percent = (selectedUpgradeNFT.level / 5) * 100;
       
-      const level = currentUpgradingNFT.upgradeLevel;
-      const progress = (level / 5) * 100;
-      const cost = 5000 * (level + 1);
-      const risk = 15 + (level * 5); // 15-40%
+      // Рисуем круг прогресса
+      const circle = document.querySelector('.progress-ring__circle');
+      const radius = circle.r.baseVal.value;
+      const circumference = radius * 2 * Math.PI;
+      circle.style.strokeDasharray = `${circumference} ${circumference}`;
+      circle.style.strokeDashoffset = circumference - (percent / 100) * circumference;
       
-      document.getElementById("upgrade-progress").textContent = `${progress.toFixed(0)}%`;
-      document.getElementById("upgrade-progress").style.setProperty('--success-deg', progress + 'deg');
-      document.getElementById("upgrade-nft-preview").style.borderColor = RARITY.find(r => r.code === currentUpgradingNFT.rarity)?.color || '#f3ba2f';
-      document.getElementById("upgrade-cost").textContent = `Улучшение: ${formatCoins(cost)} 🪙`;
-      document.getElementById("upgrade-risk").innerHTML = `⚠️ Риск потери: <strong>${risk}%</strong>`;
-      
-      document.getElementById("upgrader-modal").style.display = "flex";
-      hapticImpact("medium");
+      document.getElementById('upgradePercent').textContent = Math.round(percent) + '%';
+      document.getElementById('upgradeNFTInfo').innerHTML = `
+        <div style="font-size: 40px;">${selectedUpgradeNFT.icon}</div>
+        <div style="font-weight: 700;">${selectedUpgradeNFT.name}</div>
+        <div style="color: var(--text-secondary);">Уровень ${selectedUpgradeNFT.level}/5</div>
+      `;
+
+      const cost = 5000 * (selectedUpgradeNFT.level + 1);
+      const risk = 15 + (selectedUpgradeNFT.level * 5);
+
+      document.getElementById('upgradeCost').innerHTML = `${cost.toLocaleString()} 🪙`;
+      document.getElementById('upgradeRisk').textContent = risk + '%';
+
+      // Показываем другие NFT для выбора
+      const selection = document.getElementById('nftSelection');
+      selection.innerHTML = state.inventory
+        .filter((_, i) => i !== index)
+        .slice(0, 3)
+        .map(nft => `
+          <div class="nft-card" style="cursor: pointer;" onclick="selectUpgradeNFT('${nft.uid}')">
+            <div class="nft-icon">${nft.icon}</div>
+            <div style="font-size: 10px;">${nft.name}</div>
+          </div>
+        `).join('') || '<div style="grid-column: 1/-1; text-align: center;">Нет других NFT</div>';
+
+      modal.classList.add('active');
     }
 
-    function closeUpgrader() {
-      document.getElementById("upgrader-modal").style.display = "none";
-      currentUpgradingNFT = null;
+    function selectUpgradeNFT(uid) {
+      const nft = state.inventory.find(n => n.uid === uid);
+      if (nft) {
+        alert(`Выбрано: ${nft.name} для объединения`);
+        // Логика объединения
+      }
+    }
+
+    function closeUpgradeModal() {
+      document.getElementById('upgradeModal').classList.remove('active');
+      selectedUpgradeNFT = null;
     }
 
     function performUpgrade() {
-      if (!currentUpgradingNFT || state.bal < 5000 * (currentUpgradingNFT.upgradeLevel + 1)) {
-        alert("💸 Недостаточно монет для улучшения!");
+      if (!selectedUpgradeNFT) return;
+      
+      const cost = 5000 * (selectedUpgradeNFT.level + 1);
+      const risk = 15 + (selectedUpgradeNFT.level * 5);
+
+      if (state.balance < cost) {
+        alert('❌ Недостаточно монет!');
         return;
       }
-      
-      const cost = 5000 * (currentUpgradingNFT.upgradeLevel + 1);
-      const risk = 15 + (currentUpgradingNFT.upgradeLevel * 5);
-      
-      state.bal -= cost;
-      
+
+      state.balance -= cost;
+
       if (Math.random() * 100 < risk) {
-        // Потеря NFT
-        const idx = state.inv.indexOf(currentUpgradingNFT);
-        if (idx > -1) state.inv.splice(idx, 1);
-        alert("💥 NFT УНИЧТОЖЕН! Риск не прошёл...");
-        playSound("snd-spin");
-        hapticImpact("heavy");
+        // Неудача
+        const index = state.inventory.findIndex(n => n.uid === selectedUpgradeNFT.uid);
+        if (index > -1) state.inventory.splice(index, 1);
+        alert('💥 NFT уничтожен!');
+        tg?.HapticFeedback?.notificationOccurred('error');
       } else {
         // Успех
-        currentUpgradingNFT.upgradeLevel++;
-        if (currentUpgradingNFT.upgradeLevel >= 5) {
-          currentUpgradingNFT.rarity = RARITY[Math.min(4, RARITY.findIndex(r => r.code === currentUpgradingNFT.rarity) + 1)]?.code || "MYTH";
+        selectedUpgradeNFT.level++;
+        if (selectedUpgradeNFT.level >= 5) {
+          // Повышение редкости
+          const rarities = ['COMMON', 'RARE', 'EPIC', 'LEGEND', 'MYTH'];
+          const currentIndex = rarities.indexOf(selectedUpgradeNFT.rarity);
+          if (currentIndex < rarities.length - 1) {
+            selectedUpgradeNFT.rarity = rarities[currentIndex + 1];
+          }
         }
-        alert("🚀 УСПЕХ! NFT улучшен!");
-        playSound("snd-upgrade");
-        hapticImpact("light");
+        alert('🚀 Улучшение успешно!');
+        tg?.HapticFeedback?.notificationOccurred('success');
       }
-      
+
       updateBalance();
       saveState();
       renderInventory();
-      updateProfile();
-      closeUpgrader();
+      closeUpgradeModal();
     }
 
-    function inspectNFT(idx) {
-      const nft = state.inv[idx];
-      if (!nft) return;
-      pendingDrop = nft;
-      showDropModal(nft);
-    }
-
+    // Крафт
     function craftItems() {
-      if (state.inv.length < 3) return alert("Нужно 3+ NFT для крафта!");
-      const first = state.inv[0];
-      const better = {
-        id: Date.now(),
-        name: first.name + " ★",
-        rarity: RARITY[Math.min(4, RARITY.findIndex(r => r.code === first.rarity) + 1)]?.code || "MYTH",
-        desc: "Крафтовый шедевр!",
-        upgradeLevel: 0
-      };
-      state.inv.splice(0, 3);
-      state.inv.push(better);
-      pendingDrop = better;
-      showDropModal(better);
-      renderInventory();
-      saveState();
-    }
-
-    function claimDaily() {
-      const today = new Date().toDateString();
-      if (state.lastDaily === today) return alert("✅ Бонус уже забран сегодня!");
-      const reward = 3000 + (state.eventFireWeek ? 2500 : 1500) * Math.random();
-      state.bal += reward;
-      state.lastDaily = today;
-      updateBalance();
-      saveState();
-      updateDailyUI();
-      alert(`🎁 +${formatCoins(reward)} 🪙`);
-      hapticImpact("light");
-    }
-
-    function updateDailyUI() {
-      const pill = document.getElementById("daily-pill");
-      const today = new Date().toDateString();
-      if (state.lastDaily === today) {
-        pill.textContent = "Забран";
-        pill.style.background = "rgba(192,202,216,0.2)";
-        pill.style.color = "#9ca3af";
-        pill.style.borderColor = "#9ca3af";
-      } else {
-        pill.textContent = "Доступен";
-        pill.style.background = "rgba(0,242,255,0.25)";
-        pill.style.color = "#00f2ff";
-        pill.style.borderColor = "#00f2ff";
+      if (state.inventory.length < 3) {
+        alert('❌ Нужно минимум 3 NFT');
+        return;
       }
-    }
 
-    function updateBalance() {
-      document.getElementById("balance").textContent = formatCoins(state.bal);
-    }
-
-    function updateProfile() {
-      const user = tg?.initDataUnsafe?.user;
-      document.getElementById("prof-name").textContent = user?.first_name || "Игрок";
-      document.getElementById("prof-username").textContent = user?.username ? "@" + user.username : "@user";
-      document.getElementById("prof-initial").textContent = (user?.first_name || "M")[0]?.toUpperCase() || "M";
-      document.getElementById("prof-cases").textContent = state.totalCases;
-      document.getElementById("prof-best").textContent = state.bestDropName || "–";
-      
-      // АДМИН ПАНЕЛЬ ВСЕГДА ВИДИМА
-      document.getElementById("admin-panel").style.display = "block";
-
-      const rarity = state.bestDropRarity;
-      const titles = ["Новичок", "Коллекционер", "Охотник", "Легенда", "Миф"];
-      document.getElementById("prof-title").textContent = titles[RARITY.findIndex(r => r.code === rarity)] || "Новичок";
-    }
-
-    function updateEventLabel() {
-      document.getElementById("event-label").textContent = state.eventFireWeek ? "🔥 Огненная неделя" : "🎲 Обычный режим";
-    }
-
-    function openTab(id, el) {
-      document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-      document.getElementById(id).classList.add("active");
-      document.querySelectorAll(".nav-i").forEach(i => i.classList.remove("active"));
-      el.classList.add("active");
-      hapticImpact("light");
-    }
-
-    // АДМИН ФУНКЦИИ
-    function adminAddBalance() {
-      state.bal += 1000000;
-      updateBalance();
-      saveState();
-      hapticImpact("heavy");
-      alert("💰 +1M добавлено!");
-    }
-    function adminSetRich() {
-      state.bal = 10000000;
-      updateBalance();
-      saveState();
-      hapticImpact("heavy");
-      alert("👑 Все теперь богачи!");
-    }
-    function toggleEvent() {
-      state.eventFireWeek = !state.eventFireWeek;
-      updateEventLabel();
-      saveState();
-      hapticImpact("medium");
-      alert(state.eventFireWeek ? "🔥 Ивент включен!" : "🎲 Ивент выключен");
-    }
-
-    // ТОПАП ФУНКЦИИ
-    function openTopupModal() {
-      document.getElementById("topup-modal").style.display = "flex";
-      selectedPack = null;
-      document.getElementById("topup-selected").textContent = "Пакет не выбран";
-      document.querySelectorAll(".pack-row").forEach(r => r.classList.remove("selected"));
-    }
-    function closeTopupModal() { document.getElementById("topup-modal").style.display = "none"; }
-    function selectPack(amount) {
-      selectedPack = amount;
-      document.getElementById("topup-selected").textContent = `Готово: ${formatCoins(amount)} 🪙`;
-      document.querySelectorAll(".pack-row").forEach(r => r.classList.remove("selected"));
-      event.currentTarget.classList.add("selected");
-      hapticImpact("light");
-    }
-    function applyTopup() {
-      if (!selectedPack) return alert("Выбери пакет!");
-      state.bal += selectedPack;
-      updateBalance();
-      saveState();
-      closeTopupModal();
-      hapticImpact("heavy");
-      alert(`💎 Додеп: +${formatCoins(selectedPack)} 🪙`);
-    }
-
-    // ИНИЦИАЛИЗАЦИЯ
-    drawCases();
-    updateBalance();
-    renderInventory();
-    updateProfile();
-    updateDailyUI();
-    updateEventLabel();
-  </script>
-</body>
-</html>
+      const first = state.inventory[0];
+      const rarities = ['COMMON', 'RARE', 'EPIC', 'LEGEND', 'MYTH'];
+      const currentIndex = rarities.indexOf(first.rarity);
+      const newRarity = rar
