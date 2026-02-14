@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <script src="https://telegram.org"></script>
+    <link href="https://fonts.googleapis.com" rel="stylesheet">
+    <style>
+        :root { --gold: #f3ba2f; --bg: #05070a; --card: #151921; --accent: #2ed573; --fail: #ff4757; }
+        body { background: var(--bg); color: white; font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; overflow: hidden; height: 100vh; }
+        
+        /* Хедер */
+        .header { padding: 15px; display: flex; justify-content: space-between; align-items: center; background: #0d1117; border-bottom: 2px solid #1c2128; }
+        .balance { display: flex; align-items: center; gap: 8px; font-size: 22px; font-weight: 900; color: var(--gold); font-family: 'Orbitron'; }
+
+        /* Навигация */
+        .content { height: 72vh; overflow-y: auto; padding: 15px; display: none; }
+        .content.active { display: block; }
+
+        /* Кнопки меню с анимацией */
+        .nav { position: fixed; bottom: 0; width: 100%; background: #0d1117; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #1c2128; }
+        .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #57606a; font-size: 10px; transition: 0.3s; cursor: pointer; }
+        .nav-btn.active { color: var(--gold); transform: scale(1.1); }
+        .nav-btn:active { transform: scale(0.9); }
+
+        /* КЕЙСЫ */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .card { background: var(--card); border-radius: 15px; padding: 15px; text-align: center; border: 1px solid #1c2128; transition: 0.2s; }
+        .card:active { border-color: var(--gold); background: #1c222d; }
+
+        /* ДОДЕП (РУЛЕТКА ШАНСА) */
+        .dodep-box { text-align: center; padding: 20px; background: var(--card); border-radius: 20px; }
+        .circle-wrap { width: 200px; height: 200px; margin: 20px auto; position: relative; border-radius: 50%; background: conic-gradient(var(--accent) 0% 60%, var(--fail) 60% 100%); border: 5px solid #222; }
+        .arrow { position: absolute; top: 0; left: 50%; width: 4px; height: 100px; background: white; transform-origin: bottom center; transition: transform 3s cubic-bezier(0.1, 0, 0.1, 1); z-index: 5; }
+
+        /* РУЛЕТКА ВРАЩЕНИЯ (Кейсы) */
+        #roulette-ui { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .reel-container { width: 100%; height: 120px; overflow: hidden; position: relative; background: #0a0a0a; border: 2px solid #222; }
+        .reel { display: flex; position: absolute; transition: transform 6s cubic-bezier(0.1, 0, 0.1, 1); }
+        .item { min-width: 100px; height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-right: 1px solid #111; }
+        .pointer { position: absolute; left: 50%; width: 4px; height: 100%; background: var(--gold); z-index: 10; transform: translateX(-50%); box-shadow: 0 0 15px var(--gold); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="balance">🪙 <span id="bal">10000</span></div>
+        <div style="font-size:10px; color:#aaa">RANK: <span style="color:var(--gold)">DEB LORD</span></div>
+    </div>
+
+    <!-- ВКЛАДКА КЕЙСЫ -->
+    <div id="cases" class="content active">
+        <div class="grid">
+            <div class="card" onclick="openCase('BOMZH', 500)">📦<br>BOMZH<br><small>500 🪙</small></div>
+            <div class="card" onclick="openCase('HAMSTER', 2000)">🐹<br>HAMSTER<br><small>2000 🪙</small></div>
+            <div class="card" onclick="openCase('LAMBO', 10000)">🏎️<br>LAMBO<br><small>10K 🪙</small></div>
+            <div class="card" onclick="openCase('ADMIN', 50000)">👑<br>ADMIN<br><small>50K 🪙</small></div>
+        </div>
+    </div>
+
+    <!-- ВКЛАДКА ДОДЕП -->
+    <div id="dodep" class="content">
+        <div class="dodep-box">
+            <h2>🎰 ВА-БАНК (60% ШАНС)</h2>
+            <div class="circle-wrap"><div id="arrow" class="arrow"></div></div>
+            <button onclick="spinDodep()" style="padding:15px 40px; border-radius:10px; background:var(--gold); border:none; font-weight:900;">ДОДЕПАТЬ ВСЁ!</button>
+        </div>
+    </div>
+
+    <!-- ВКЛАДКА БОСС -->
+    <div id="boss" class="content">
+        <div style="text-align:center; padding:40px;">
+            <div style="font-size:80px;" onclick="clickBoss()">👹</div>
+            <h3>РЕЙД НА ПАВЛА</h3>
+            <p>Жми на босса, чтобы выбить монеты!</p>
+        </div>
+    </div>
+
+    <!-- ЭКРАН РУЛЕТКИ -->
+    <div id="roulette-ui">
+        <h2 id="r-status">ВРАЩЕНИЕ...</h2>
+        <div class="reel-container">
+            <div class="pointer"></div>
+            <div id="reel" class="reel"></div>
+        </div>
+        <button onclick="closeR()" id="close-btn" style="display:none; margin-top:30px; padding:15px 40px; background:var(--accent); border:none; border-radius:10px;">ЗАБРАТЬ</button>
+    </div>
+
+    <!-- МЕНЮ -->
+    <div class="nav">
+        <div class="nav-btn active" onclick="tab('cases', this)"><span>📦</span><span>Кейсы</span></div>
+        <div class="nav-btn" onclick="tab('dodep', this)"><span>🚀</span><span>Додеп</span></div>
+        <div class="nav-btn" onclick="tab('boss', this)"><span>👹</span><span>Рейд</span></div>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        let balance = 10000;
+
+        function tab(id, el) {
+            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            el.classList.add('active');
+            tg.HapticFeedback.impactOccurred('light');
+        }
+
+        function openCase(name, price) {
+            if (balance < price) { tg.showAlert("Мало монет для депа!"); return; }
+            balance -= price; updateB();
+            
+            document.getElementById('roulette-ui').style.display = 'flex';
+            let reel = document.getElementById('reel');
+            reel.innerHTML = ''; reel.style.transition = 'none'; reel.style.transform = 'translateX(0)';
+
+            // Генерируем 400 предметов!
+            for(let i=0; i<400; i++) {
+                let winChance = Math.random();
+                let icon = winChance > 0.9 ? '💎' : '🍕';
+                let txt = winChance > 0.9 ? 'LEGEND' : 'TRASH';
+                reel.innerHTML += `<div class="item"><span>${icon}</span><small>${txt}</small></div>`;
+            }
+
+            setTimeout(() => {
+                reel.style.transition = 'transform 6s cubic-bezier(0.1, 0, 0.1, 1)';
+                let move = 390 * 100;
+                reel.style.transform = `translateX(-${move}px)`;
+                tg.HapticFeedback.notificationOccurred('success');
+            }, 50);
+
+            setTimeout(() => {
+                let win = Math.floor(price * (Math.random() * 5));
+                balance += win; updateB();
+                document.getElementById('r-status').innerText = "ВЫИГРЫШ: " + win + " 🪙";
+                document.getElementById('close-btn').style.display = 'block';
+            }, 6200);
+        }
+
+        function spinDodep() {
+            let arrow = document.getElementById('arrow');
+            let deg = 1800 + Math.floor(Math.random() * 360);
+            arrow.style.transform = `rotate(${deg}deg)`;
+            
+            setTimeout(() => {
+                let finalDeg = deg % 360;
+                if (finalDeg <= 216) { // 60% от 360 это 216 градусов
+                    balance *= 2; tg.showAlert("🔥 УСПЕШНЫЙ ДОДЕП! X2");
+                } else {
+                    balance = 0; tg.showAlert("💀 СЛИЛ ВСЁ! Иди кликай босса.");
+                }
+                updateB();
+            }, 3200);
+        }
+
+        function clickBoss() { balance += 10; updateB(); tg.HapticFeedback.selectionChanged(); }
+        function updateB() { document.getElementById('bal').innerText = balance.toLocaleString(); }
+        function closeR() { document.getElementById('roulette-ui').style.display='none'; document.getElementById('close-btn').style.display='none'; }
+    </script>
+</body>
+</html>
