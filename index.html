@@ -10,36 +10,42 @@
       --bg-main:#020617;
       --bg-card:rgba(10,15,30,0.96);
       --bg-soft:rgba(15,23,42,0.9);
-      --accent-gold:linear-gradient(135deg,#f59e0b,#fbbf24,#f97316);
-      --accent-fire:linear-gradient(135deg,#ef4444,#f97316,#fbbf24);
-      --accent-blue:linear-gradient(135deg,#22c55e,#3b82f6,#6366f1);
+      --accent-main:linear-gradient(135deg,#f59e0b,#fbbf24,#f97316);
+      --accent-alt:linear-gradient(135deg,#22c55e,#3b82f6,#6366f1);
       --text-primary:#e5e7eb;
       --text-secondary:#9ca3af;
       --border-soft:rgba(148,163,184,0.4);
+      --glow-main:rgba(251,191,36,0.9);
       --glow-blue:rgba(59,130,246,0.8);
-      --glow-gold:rgba(251,191,36,0.9);
       --shadow-main:0 24px 48px rgba(0,0,0,0.9);
     }
-    /* ТЕМЫ (как в NFT Battle — смена цвета интерфейса) */
-    [data-theme="default"]{
+
+    /* Темы: логичные имена */
+    [data-theme="dark"]{
       --bg-main:#020617;
       --bg-card:rgba(10,15,30,0.96);
       --bg-soft:rgba(15,23,42,0.9);
-      --accent-gold:linear-gradient(135deg,#f59e0b,#fbbf24,#f97316);
+      --accent-main:linear-gradient(135deg,#f59e0b,#fbbf24,#f97316);
+      --accent-alt:linear-gradient(135deg,#22c55e,#3b82f6,#6366f1);
+      --glow-main:rgba(251,191,36,0.9);
       --glow-blue:rgba(59,130,246,0.9);
     }
     [data-theme="neon"]{
-      --bg-main:#020016;
-      --bg-card:rgba(6,8,30,0.98);
-      --bg-soft:rgba(12,14,52,0.96);
-      --accent-gold:linear-gradient(135deg,#10b981,#22c55e,#3b82f6);
+      --bg-main:#020013;
+      --bg-card:rgba(6,10,40,0.98);
+      --bg-soft:rgba(12,18,60,0.96);
+      --accent-main:linear-gradient(135deg,#22c55e,#14b8a6,#3b82f6);
+      --accent-alt:linear-gradient(135deg,#a855f7,#ec4899,#22c55e);
+      --glow-main:rgba(45,212,191,0.9);
       --glow-blue:rgba(56,189,248,0.9);
     }
     [data-theme="crimson"]{
       --bg-main:#090012;
       --bg-card:rgba(20,4,24,0.98);
       --bg-soft:rgba(36,5,32,0.96);
-      --accent-gold:linear-gradient(135deg,#dc2626,#fb923c,#facc15);
+      --accent-main:linear-gradient(135deg,#dc2626,#fb923c,#facc15);
+      --accent-alt:linear-gradient(135deg,#f97316,#facc15,#fb7185);
+      --glow-main:rgba(248,113,113,0.9);
       --glow-blue:rgba(248,113,113,0.9);
     }
 
@@ -77,6 +83,7 @@
       box-shadow:var(--shadow-main);
       position:relative;
       overflow:hidden;
+      transition:transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
     }
     .card::before{
       content:'';
@@ -89,6 +96,11 @@
     .card:hover::before{
       opacity:1;
       animation:cardShimmer 2s linear infinite;
+    }
+    .card:hover{
+      transform:translateY(-1px);
+      box-shadow:0 26px 50px rgba(0,0,0,0.95);
+      border-color:rgba(148,163,184,0.7);
     }
     @keyframes cardShimmer{0%{transform:translateX(-100%);}100%{transform:translateX(100%);}}
     .card-header{
@@ -150,6 +162,11 @@
       overflow:hidden;
       text-overflow:ellipsis;
       white-space:nowrap;
+      transition:transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+    }
+    .chip:hover{
+      transform:translateY(-1px);
+      box-shadow:0 0 10px rgba(148,163,184,0.6);
     }
     .streak-row{
       margin-top:6px;
@@ -178,13 +195,14 @@
       white-space:nowrap;
       cursor:pointer;
       flex-shrink:0;
-      transition:background 160ms ease, color 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+      transition:background 160ms ease, color 160ms ease, box-shadow 160ms ease, border-color 160ms ease, transform 120ms ease;
     }
     .filter-pill.active{
       background:var(--glow-blue);
       color:#020617;
       box-shadow:0 0 18px var(--glow-blue);
       border-color:transparent;
+      transform:translateY(-1px);
     }
     .case-grid{
       display:grid;
@@ -258,13 +276,18 @@
       text-transform:uppercase;
       letter-spacing:0.08em;
     }
+
+    /* расширенные редкости */
     .rarity-common{background:rgba(107,114,128,0.22);color:#9ca3af;}
+    .rarity-uncommon{background:rgba(34,197,94,0.18);color:#86efac;}
     .rarity-rare{background:rgba(59,130,246,0.25);color:#60a5fa;}
     .rarity-epic{background:rgba(168,85,247,0.28);color:#e9d5ff;}
     .rarity-legendary{background:rgba(251,191,36,0.32);color:#fef3c7;}
     .rarity-mythic{background:rgba(248,113,113,0.35);color:#fee2e2;}
+    .rarity-cosmic{background:rgba(56,189,248,0.32);color:#e0f2fe;}
+    .rarity-omega{background:rgba(244,114,182,0.4);color:#fdf2f8;}
 
-    /* анимация кейсов + трейд анимации */
+    /* анимация кейсов / режимов */
     .case-anim-overlay{
       position:fixed;
       inset:0;
@@ -313,7 +336,7 @@
     .case-anim-fill{
       height:100%;
       width:0%;
-      background:linear-gradient(90deg,#22c55e,#eab308,#f97316);
+      background:linear-gradient(90deg,#22c55e,#eab308,#f97316,#ef4444);
       box-shadow:0 0 16px rgba(234,179,8,0.7);
       transition:width 0.18s cubic-bezier(0.68,-0.55,0.265,1.55);
       position:relative;
@@ -336,6 +359,7 @@
       background:rgba(15,23,42,0.97);
       font-size:12px;
       box-shadow:0 0 26px rgba(251,191,36,0.8);
+      animation:reelBounce 0.65s ease-out;
     }
 
     /* рулетка NFT */
@@ -415,6 +439,12 @@
       color:#fbbf24;
       margin-top:2px;
     }
+    @keyframes reelBounce {
+      0%{transform:translateY(0);}
+      40%{transform:translateY(-10px);}
+      70%{transform:translateY(4px);}
+      100%{transform:translateY(0);}
+    }
 
     /* NFT */
     .nft-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
@@ -427,6 +457,7 @@
       display:flex;align-items:center;justify-content:center;
       font-size:22px;font-weight:800;
       position:relative;overflow:hidden;
+      transition:transform 140ms ease, box-shadow 140ms ease;
     }
     .nft-avatar::before{
       content:'';
@@ -438,6 +469,10 @@
     }
     @keyframes nftSpin{to{transform:rotate(360deg);}}
     .nft-avatar-inner{position:relative;z-index:1;text-shadow:0 0 16px rgba(129,140,248,0.9);}
+    .nft-avatar:hover{
+      transform:translateY(-1px) scale(1.03);
+      box-shadow:0 0 22px rgba(129,140,248,0.9);
+    }
     .nft-info h3{margin:0;font-size:14.5px;}
     .nft-info-sub{font-size:11.5px;color:var(--text-secondary);margin-top:2px;}
     .nft-meta-row{display:flex;gap:8px;margin-top:4px;font-size:10.5px;color:var(--text-secondary);}
@@ -464,11 +499,11 @@
     }
     .nft-row{
       padding:5px 7px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;
-      transition:background 140ms ease;
+      transition:background 140ms ease, transform 120ms ease;
     }
     .nft-row:nth-child(odd){background:rgba(15,23,42,0.95);}
     .nft-row:nth-child(even){background:rgba(15,23,42,0.8);}
-    .nft-row:hover{background:rgba(37,99,235,0.5);}
+    .nft-row:hover{background:rgba(37,99,235,0.5);transform:translateY(-1px);}
 
     /* магазин / топ / обмен / история */
     .pack-row{display:flex;gap:8px;margin-top:6px;}
@@ -476,7 +511,11 @@
       flex:1;padding:9px;border-radius:14px;background:var(--bg-soft);
       border:1px solid rgba(148,163,184,0.5);font-size:11.5px;cursor:pointer;transition:all 0.16s;
     }
-    .pack.selected{border-color:var(--glow-gold);box-shadow:0 0 20px var(--glow-gold);}
+    .pack:hover{
+      transform:translateY(-2px);
+      box-shadow:0 0 20px rgba(148,163,184,0.7);
+    }
+    .pack.selected{border-color:var(--glow-main);box-shadow:0 0 20px var(--glow-main);}
     .pack h4{margin-bottom:3px;font-size:12px;}
     .pack-desc{color:var(--text-secondary);}
     .leader-list{
@@ -493,6 +532,12 @@
       width:100%;min-height:60px;background:var(--bg-soft);
       border-radius:10px;border:1px solid rgba(148,163,184,0.6);color:var(--text-primary);
       font-size:11px;padding:6px;resize:vertical;
+      transition:border-color 120ms ease, box-shadow 120ms ease;
+    }
+    .textarea:focus{
+      outline:none;
+      border-color:var(--glow-blue);
+      box-shadow:0 0 14px var(--glow-blue);
     }
     .history-list{
       margin-top:5px;max-height:170px;overflow-y:auto;border-radius:12px;
@@ -516,8 +561,13 @@
     .task-row:nth-child(even){background:rgba(15,23,42,0.82);}
     .task-title{font-weight:600;}
     .task-meta{color:var(--text-secondary);font-size:10px;}
-    .task-btn{font-size:10.5px;padding:4px 8px;border-radius:999px;border:1px solid rgba(148,163,184,0.6);background:transparent;color:var(--text-primary);cursor:pointer;}
+    .task-btn{font-size:10.5px;padding:4px 8px;border-radius:999px;border:1px solid rgba(148,163,184,0.6);background:transparent;color:var(--text-primary);cursor:pointer;transition:transform 120ms ease, box-shadow 120ms ease, background 120ms ease;}
     .task-btn.done{border-color:#22c55e;color:#bbf7d0;}
+    .task-btn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 0 12px rgba(148,163,184,0.7);
+      background:rgba(15,23,42,0.9);
+    }
 
     /* нижняя навигация */
     .bottom-nav{
@@ -534,7 +584,10 @@
       display:flex;flex-direction:column;align-items:center;gap:1px;
       transition:all 0.16s;min-width:0;
     }
-    .nav-item-icon{font-size:18px;}
+    .nav-item-icon{font-size:18px;transition:transform 120ms ease;}
+    .nav-item:hover .nav-item-icon{
+      transform:translateY(-2px) scale(1.05);
+    }
     .nav-item.active{
       background:var(--glow-blue);color:#020617;box-shadow:0 0 22px var(--glow-blue);
     }
@@ -543,7 +596,7 @@
       .bottom-nav{max-width:900px;left:50%;transform:translateX(-50%);}
     }
 
-    /* кнопки */
+    /* кнопки с анимацией */
     .btn{
       border:none;
       border-radius:999px;
@@ -555,20 +608,35 @@
       align-items:center;
       justify-content:center;
       gap:6px;
-      transition:transform 140ms ease, box-shadow 140ms ease, background 140ms ease, color 140ms ease;
+      transition:transform 140ms ease, box-shadow 140ms ease, background 140ms ease, color 140ms ease, opacity 120ms ease;
       white-space:nowrap;
       min-height:40px;
       touch-action:manipulation;
+      position:relative;
+      overflow:hidden;
+    }
+    .btn::after{
+      content:'';
+      position:absolute;
+      inset:0;
+      background:radial-gradient(circle at 10% 0,rgba(255,255,255,0.18),transparent 55%);
+      opacity:0;
+      transition:opacity 160ms ease, transform 200ms ease;
+      transform:translateX(-40%);
+    }
+    .btn:hover::after{
+      opacity:1;
+      transform:translateX(0);
     }
     .btn-primary{
-      background:var(--accent-gold);
+      background:var(--accent-main);
       color:#0b1120;
-      box-shadow:0 8px 22px var(--glow-gold);
+      box-shadow:0 8px 22px var(--glow-main);
     }
     .btn-primary:hover,
     .btn-primary:active{
       transform:translateY(-1px);
-      box-shadow:0 10px 26px var(--glow-gold);
+      box-shadow:0 10px 26px var(--glow-main);
     }
     .btn-ghost{
       background:var(--bg-soft);
@@ -609,19 +677,20 @@
       70%{box-shadow:0 0 0 16px rgba(34,197,94,0);}
       100%{box-shadow:0 0 0 0 rgba(34,197,94,0);}
     }
+
   </style>
 </head>
-<body data-theme="default">
+<body data-theme="dark">
 <canvas id="sparksCanvas"></canvas>
 <div class="app">
   <main class="main">
-    <!-- КЕЙСЫ -->
+    <!-- КЕЙСЫ / РЕЖИМЫ -->
     <section id="screen-cases" class="screen active">
       <div class="grid-2">
         <div class="card">
           <div class="card-header">
             <div class="card-title">💎 Баланс</div>
-            <div class="badge" id="badgeEvent">🔥 Огненная неделя</div>
+            <div class="badge" id="badgeEvent">🔥 Ивент: Горячий дроп</div>
           </div>
           <div class="balance-main">
             <span id="balanceValue">15 000</span>
@@ -643,14 +712,17 @@
         </div>
         <div class="card">
           <div class="card-header">
-            <div class="card-title">📆 Ежедневный бонус</div>
-            <div class="badge">+ ивент шанс</div>
+            <div class="card-title">🎮 Режимы</div>
+            <div class="badge"><span id="activeModeLabel">Стандарт</span></div>
           </div>
-          <div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px;">
-            Один клик в день — и Макс подкинет монет. В ивент дроп сочнее.
+          <div class="sub-row">
+            <button class="btn btn-ghost btn-small mode-btn" data-mode="normal">🎲 Стандарт</button>
+            <button class="btn btn-ghost btn-small mode-btn" data-mode="highroll">🔥 Риск</button>
+            <button class="btn btn-ghost btn-small mode-btn" data-mode="jackpot">💥 Джекпот</button>
           </div>
-          <button id="btnDaily" class="btn btn-primary" style="width:100%;margin-bottom:4px;">Забрать бонус 🪙</button>
-          <button id="btnToggleEvent" class="btn btn-ghost btn-small" style="width:100%;">🔥 Переключить ивент (локально)</button>
+          <div style="font-size:11.5px;color:var(--text-secondary);margin-top:6px;" id="modeDesc">
+            Стандартный режим: сбалансированный рандом, без сюрпризов.
+          </div>
         </div>
       </div>
 
@@ -662,27 +734,42 @@
         <div class="case-filter-row" id="caseFilters">
           <div class="filter-pill active" data-filter="all">Все</div>
           <div class="filter-pill" data-filter="COMMON">Common</div>
+          <div class="filter-pill" data-filter="UNCOMMON">Uncommon</div>
           <div class="filter-pill" data-filter="RARE">Rare</div>
           <div class="filter-pill" data-filter="EPIC">Epic</div>
-          <div class="filter-pill" data-filter="LEGENDARY">Legend</div>
+          <div class="filter-pill" data-filter="LEGENDARY">Legendary</div>
           <div class="filter-pill" data-filter="MYTHIC">Mythic</div>
+          <div class="filter-pill" data-filter="COSMIC">Cosmic</div>
+          <div class="filter-pill" data-filter="OMEGA">Omega</div>
         </div>
         <div class="case-grid" id="caseGrid"></div>
       </div>
 
-      <!-- АДМИН ПАНЕЛЬ -->
+      <!-- КАЛЕНДАРЬ / БОНУСЫ / АДМИН -->
       <div class="card">
         <div class="card-header">
-          <div class="card-title">👑 АДМИН ПАНЕЛЬ</div>
-          <div class="badge">MAX POWER</div>
+          <div class="card-title">📆 Бонусы</div>
+          <div class="badge">ежедневные</div>
+        </div>
+        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px;">
+          Один клик в день — и монеты падают на баланс. В ивент шанс дропа поярче.
+        </div>
+        <button id="btnDaily" class="btn btn-primary" style="width:100%;margin-bottom:4px;">Забрать ежедневный бонус 🪙</button>
+        <button id="btnToggleEvent" class="btn btn-ghost btn-small" style="width:100%;">Сменить статус ивента (локально)</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">👑 Админ-панель</div>
+          <div class="badge">локальные тесты</div>
         </div>
         <div style="font-size:11.5px;color:var(--text-secondary);">
-          Только локально. Чисто для теста, мемов и разогрева.
+          Локальные инструменты для разогрева, баланса и проверки механик.
         </div>
         <div class="admin-row">
           <button id="btnAdminPlus1M" class="btn btn-ghost btn-small">+1M 🪙</button>
-          <button id="btnAdminAll10M" class="btn btn-ghost btn-small">ВСЕМ 10M</button>
-          <button id="btnAdminToggleEvent" class="btn btn-ghost btn-small">🔥 ТОГГЛ ИВЕНТ</button>
+          <button id="btnAdminAll10M" class="btn btn-ghost btn-small">Все 10M</button>
+          <button id="btnAdminToggleEvent" class="btn btn-ghost btn-small">Переключить ивент</button>
         </div>
       </div>
     </section>
@@ -696,7 +783,7 @@
         </div>
         <div id="nftMainBlock">
           <div style="font-size:12px;color:var(--text-secondary);">
-            NFT с возможностью улучшения. Пока пусто — разблокируй пару кейсов.
+            NFT с возможностью улучшения. Пока пусто — открой пару кейсов и собери стартовый сет.
           </div>
         </div>
       </div>
@@ -706,11 +793,11 @@
           <div class="badge">risk / reward</div>
         </div>
         <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:6px;">
-          3 NFT = новый, выше по редкости. Улучшатель — это уже азарт: либо герой, либо пепел.
+          3 NFT = новый, выше по редкости. Ускоритель — рискнуть ради уровня: либо герой, либо пепел.
         </div>
         <div class="sub-row">
-          <button id="btnCraft" class="btn btn-ghost btn-small">⚗️ КРАФТ 3→1</button>
-          <button id="btnUpgrade" class="btn btn-ghost btn-small">⚡ УЛУЧШИТЕЛЬ</button>
+          <button id="btnCraft" class="btn btn-ghost btn-small">⚗️ Объединить 3→1</button>
+          <button id="btnUpgrade" class="btn btn-ghost btn-small">⚡ Ускорить NFT</button>
         </div>
       </div>
     </section>
@@ -719,65 +806,65 @@
     <section id="screen-shop" class="screen">
       <div class="card">
         <div class="card-header">
-          <div class="card-title">💎 Касса ELITE DEB</div>
-          <div class="badge">NFT BATTLE STYLE</div>
+          <div class="card-title">💎 Касса</div>
+          <div class="badge">локальная экономика</div>
         </div>
         <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:4px;">
-          Пока всё локально. Потом сюда можно подвязать реальный донат и вывод через бота.
+          Сейчас всё работает только на устройстве. Позже сюда можно подвязать реальные платежи и вывод через бота.
         </div>
         <div class="pack-row">
           <div class="pack" data-pack="10k">
-            <h4>Starter</h4>
+            <h4>Старт</h4>
             <div class="pack-desc">Для разгона · +10 000 🪙</div>
           </div>
           <div class="pack" data-pack="50k">
-            <h4>Grinder</h4>
+            <h4>Фарм</h4>
             <div class="pack-desc">Кейсы нон-стоп · +50 000 🪙</div>
           </div>
         </div>
         <div class="pack-row">
           <div class="pack" data-pack="250k">
-            <h4>Whale</h4>
-            <div class="pack-desc">NFT‑империя · +250 000 🪙</div>
+            <h4>Коллекционер</h4>
+            <div class="pack-desc">Сборка NFT-сета · +250 000 🪙</div>
           </div>
           <div class="pack" data-pack="1m">
-            <h4>ELITE</h4>
-            <div class="pack-desc">Максимальный разгон · +1 000 000 🪙</div>
+            <h4>Магнат</h4>
+            <div class="pack-desc">Полный разгон · +1 000 000 🪙</div>
           </div>
         </div>
         <div style="margin-top:7px;font-size:11.5px;">
           Текущий выбор: <span id="packLabel" style="color:#fbbf24;">не выбран</span>
         </div>
         <div class="sub-row" style="margin-top:7px;">
-          <button id="btnFakeTopup" class="btn btn-ghost" style="flex:1;">⭐ Фейк-додеп (локально)</button>
+          <button id="btnFakeTopup" class="btn btn-ghost" style="flex:1;">Добавить монеты (локально)</button>
         </div>
       </div>
 
       <div class="card">
         <div class="card-header">
           <div class="card-title">💸 Вывод (демо)</div>
-          <div class="badge">soon™</div>
+          <div class="badge">пример логики</div>
         </div>
         <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:4px;">
-          Здесь будет реальный вывод через бота. Сейчас это чисто демонстрация.
+          Здесь будет реальный вывод через бота. Сейчас это только демонстрация интерфейса.
         </div>
         <div class="sub-row">
           <div class="chip" style="max-width:100%;">Доступно для вывода: <span id="withdrawAvailable">0</span> 🪙</div>
         </div>
-        <button id="btnFakeWithdraw" class="btn btn-primary" style="margin-top:6px;width:100%;">Запросить вывод (фейк)</button>
+        <button id="btnFakeWithdraw" class="btn btn-primary" style="margin-top:6px;width:100%;">Запросить вывод (пример)</button>
       </div>
 
       <div class="card">
         <div class="card-header">
-          <div class="card-title">👑 VIP-контракт с Максом</div>
+          <div class="card-title">👑 Премиум-контракт</div>
           <div class="badge">24 часа</div>
         </div>
         <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:4px;">
-          Отдаёшь 10% баланса Максу — получаешь 24 часа бустов: x1.2 к ценности NFT и повышенные шансы.
+          Отдаёшь 10% баланса — получаешь 24 часа бустов: x1.2 к ценности NFT и повышенные шансы в режимах.
         </div>
-        <button id="btnVip" class="btn btn-primary" style="width:100%;">✒️ Подписать контракт</button>
+        <button id="btnVip" class="btn btn-primary" style="width:100%;">Активировать премиум</button>
         <div id="vipStatus" style="margin-top:5px;font-size:11px;color:var(--text-secondary);">
-          Контракт не активен.
+          Премиум пока не активен.
         </div>
       </div>
     </section>
@@ -790,7 +877,7 @@
           <div class="badge">баланс / NFT</div>
         </div>
         <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:4px;">
-          Локальный зал славы. Каждый запуск мини‑аппа обновляет твой статус.
+          Локальный зал славы. Каждый запуск обновляет твою позицию.
         </div>
         <div style="font-size:10.5px;color:var(--text-secondary);margin-bottom:3px;">По балансу:</div>
         <div id="leadersBalance" class="leader-list"></div>
@@ -800,19 +887,19 @@
 
       <div class="card">
         <div class="card-header">
-          <div class="card-title">🔁 Обмен NFT</div>
-          <div class="badge">крутой трейд</div>
+          <div class="card-title">🔁 Обмен</div>
+          <div class="badge">через код</div>
         </div>
         <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:4px;">
-          Генерируешь код — кидаешь его другу. Он вставляет у себя и забирает предмет. Анимация — как будто ты реально отправляешь посылку.
+          Генерируешь код — кидаешь его другу. Он вставляет у себя и забирает предмет. Визуально — как отправка посылки.
         </div>
         <div style="font-size:10.5px;margin-bottom:3px;">Код для отправки (активный NFT):</div>
-        <textarea id="tradeCodeOut" class="textarea" readonly>нет NFT для отправки</textarea>
+        <textarea id="tradeCodeOut" class="textarea" readonly>Нет NFT для отправки</textarea>
         <div style="font-size:10.5px;margin-top:5px;">Вставить код от друга:</div>
         <textarea id="tradeCodeIn" class="textarea" placeholder="Вставь сюда код обмена..."></textarea>
         <div class="sub-row" style="margin-top:6px;">
-          <button id="btnGenTrade" class="btn btn-ghost btn-small">🎯 Сгенерировать код</button>
-          <button id="btnApplyTrade" class="btn btn-primary btn-small">✅ Принять NFT</button>
+          <button id="btnGenTrade" class="btn btn-ghost btn-small">Создать код</button>
+          <button id="btnApplyTrade" class="btn btn-primary btn-small">Принять NFT</button>
         </div>
       </div>
 
@@ -822,9 +909,9 @@
           <div class="badge">реферальная ссылка</div>
         </div>
         <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:4px;">
-          Делишься ссылкой, друг заходит — вы оба получаете бонус монет. Сейчас это демо, но логика как в полноценной рефералке.
+          Делишься ссылкой, друг заходит — вы оба получаете бонус монет. Сейчас это демо, но логика реферальной системы уже на месте.
         </div>
-        <textarea id="refLink" class="textarea" readonly>Реферальная ссылка появится после первого захода.</textarea>
+        <textarea id="refLink" class="textarea" readonly>Реферальная ссылка появится после первого запуска.</textarea>
       </div>
 
       <div class="card">
@@ -841,23 +928,23 @@
       <div class="card">
         <div class="card-header">
           <div class="card-title">✅ Задания</div>
-          <div class="badge">daily / hourly</div>
+          <div class="badge">daily / случайные</div>
         </div>
         <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:4px;">
-          Ежедневные и “почасовые” миссии. На деле таймер рандомный — иногда обновится через минуту, иногда через час.
+          Ежедневные и случайные миссии: иногда обновятся через минуту, иногда через час — чтобы было интересно возвращаться.
         </div>
         <div id="taskList" class="task-list"></div>
       </div>
 
       <div class="card">
         <div class="card-header">
-          <div class="card-title">🎨 Тема интерфейса</div>
-          <div class="badge">как в NFT Battle</div>
+          <div class="card-title">🎨 Оформление</div>
+          <div class="badge">темы интерфейса</div>
         </div>
         <div class="sub-row">
-          <button class="btn btn-ghost btn-small theme-btn" data-theme="default">Тёмная</button>
-          <button class="btn btn-ghost btn-small theme-btn" data-theme="neon">Неон</button>
-          <button class="btn btn-ghost btn-small theme-btn" data-theme="crimson">Кровь</button>
+          <button class="btn btn-ghost btn-small theme-btn" data-theme="dark">Тёмная</button>
+          <button class="btn btn-ghost btn-small theme-btn" data-theme="neon">Неоновая</button>
+          <button class="btn btn-ghost btn-small theme-btn" data-theme="crimson">Алая</button>
         </div>
       </div>
 
@@ -899,7 +986,7 @@
     </div>
     <div class="nav-item" data-screen="settings">
       <span class="nav-item-icon">⚙️</span>
-      <span class="nav-label">Задания</span>
+      <span class="nav-label">Настройки</span>
     </div>
   </nav>
 </div>
@@ -908,19 +995,16 @@
 <div id="caseAnimOverlay" class="case-anim-overlay">
   <div class="case-anim-box">
     <div class="case-anim-title" id="caseAnimTitle">Открываем кейс...</div>
-    <div class="case-anim-status" id="caseAnimStatus">Подключение к ELITE RNG...</div>
+    <div class="case-anim-status" id="caseAnimStatus">Система шансов просыпается...</div>
     <div class="case-anim-lock" id="caseAnimLock">🔒</div>
     <div class="case-anim-bar">
       <div class="case-anim-fill" id="caseAnimFill"></div>
     </div>
-
-    <!-- Рулетка NFT -->
     <div class="nft-reel-wrap">
       <div class="nft-reel-window">
         <div class="nft-reel" id="nftReel"></div>
       </div>
     </div>
-
     <div id="caseAnimDrop"></div>
   </div>
 </div>
@@ -929,7 +1013,7 @@
 const tg = window.Telegram?.WebApp;
 if (tg) tg.expand();
 
-/* === искры (canvas) === */
+/* === фоновые искры === */
 const canvas = document.getElementById("sparksCanvas");
 const ctx = canvas.getContext("2d");
 let sparks = [];
@@ -938,7 +1022,7 @@ function resizeCanvas(){
   canvas.height = window.innerHeight;
 }
 window.addEventListener("resize",resizeCanvas);
-function initSparks(count=80){
+function initSparks(count=90){
   sparks=[];
   for(let i=0;i<count;i++){
     sparks.push({
@@ -986,6 +1070,7 @@ let state = {
     streakWins:0
   },
   eventHot:true,
+  mode:"normal",
   nft:[],
   activeNftId:null,
   lastDailyTs:0,
@@ -994,33 +1079,38 @@ let state = {
   history:[],
   tasks:[],
   lastTaskRoll:0,
-  theme:"default",
+  theme:"dark",
   refCode:null
 };
 
-const RARITIES=["COMMON","RARE","EPIC","LEGENDARY","MYTHIC"];
+const RARITIES=["COMMON","UNCOMMON","RARE","EPIC","LEGENDARY","MYTHIC","COSMIC","OMEGA"];
 let CASES=[];
-const STORAGE_KEY="elite_deb_nft_battle_v3";
+const STORAGE_KEY="elite_deb_nft_battle_v4";
 
-/* утилиты */
 function fmt(n){return n.toLocaleString("ru-RU");}
 function rarCfg(r){
   switch(r){
     case"COMMON":return{label:"COMMON",class:"rarity-common",color:"#9ca3af",badge:"C"};
+    case"UNCOMMON":return{label:"UNCOMMON",class:"rarity-uncommon",color:"#86efac",badge:"U"};
     case"RARE":return{label:"RARE",class:"rarity-rare",color:"#60a5fa",badge:"R"};
     case"EPIC":return{label:"EPIC",class:"rarity-epic",color:"#e9d5ff",badge:"E"};
-    case"LEGENDARY":return{label:"LEGEND",class:"rarity-legendary",color:"#fef3c7",badge:"L"};
+    case"LEGENDARY":return{label:"LEGENDARY",class:"rarity-legendary",color:"#fef3c7",badge:"L"};
     case"MYTHIC":return{label:"MYTHIC",class:"rarity-mythic",color:"#fee2e2",badge:"M"};
+    case"COSMIC":return{label:"COSMIC",class:"rarity-cosmic",color:"#e0f2fe",badge:"C+"};
+    case"OMEGA":return{label:"OMEGA",class:"rarity-omega",color:"#f9a8d4",badge:"Ω"};
     default:return{label:r,class:"rarity-common",color:"#9ca3af",badge:"?"};
   }
 }
 function randomName(r){
   const map={
     COMMON:["Street Chip","Rusty Core","Old Drive","Dust Key","Cheap Fragment"],
+    UNCOMMON:["Steel Node","Urban Patch","Silent Frame","Grey Mask","Sidewalk Card"],
     RARE:["Virus Core","Neon Blade","Midnight Node","Cold Barrel","Blue Circuit"],
     EPIC:["Quantum Spike","Ghost Kernel","Stellar Mask","Abyss Dagger","Dark Beacon"],
     LEGENDARY:["Royal Matrix","Emperor Key","Crown Protocol","Gold Operator","Dragon Mask"],
-    MYTHIC:["Omega Singularity","Godlike Seed","Chaos Script","Zero Origin","Myth Core"]
+    MYTHIC:["Omega Singularity","Godlike Seed","Chaos Script","Zero Origin","Myth Core"],
+    COSMIC:["Starfall Relic","Void Fragment","Nova Crown","Orbit Shard","Galaxy Script"],
+    OMEGA:["Absolute Origin","Final Protocol","Zero Crown","Last Beacon","Endless Seed"]
   };
   const arr=map[r]||map["COMMON"];
   const base=arr[Math.floor(Math.random()*arr.length)];
@@ -1028,9 +1118,18 @@ function randomName(r){
   return `${base} #${num}`;
 }
 function estimateValue(nft){
-  const baseMap={COMMON:2000,RARE:8000,EPIC:25000,LEGENDARY:80000,MYTHIC:240000};
+  const baseMap={
+    COMMON:1500,
+    UNCOMMON:4000,
+    RARE:9000,
+    EPIC:28000,
+    LEGENDARY:90000,
+    MYTHIC:260000,
+    COSMIC:500000,
+    OMEGA:1200000
+  };
   const base=baseMap[nft.rarity]||2000;
-  let mult=1+nft.level*0.35;
+  let mult=1+nft.level*0.4;
   if(state.player.vipUntil>Date.now()) mult*=1.2;
   return Math.round(base*mult);
 }
@@ -1068,7 +1167,7 @@ function renderHistory(){
   const box=document.getElementById("historyList");
   if(!box) return;
   if(!state.history.length){
-    box.innerHTML=`<div style="padding:6px;color:var(--text-secondary);">Пока тихо. Открой пару кейсов — и тут оживёт.</div>`;
+    box.innerHTML=`<div style="padding:6px;color:var(--text-secondary);">Пока пусто. Открой пару кейсов — и лента оживёт.</div>`;
     return;
   }
   box.innerHTML=state.history.map(h=>`
@@ -1087,10 +1186,10 @@ function genRandomTasks(){
     state.tasks.push({
       id:"daily_"+now,
       type:"daily",
-      title:"Открой 5 кейсов",
+      title:"Открыть 5 кейсов",
       target:5,
       progress:0,
-      reward:5000,
+      reward:6000,
       done:false
     });
     state.tasks.push({
@@ -1099,7 +1198,7 @@ function genRandomTasks(){
       title:"Получить 1 EPIC+ NFT",
       target:1,
       progress:0,
-      reward:8000,
+      reward:9000,
       done:false
     });
   }
@@ -1107,9 +1206,9 @@ function genRandomTasks(){
   const elapsed = now - state.lastTaskRoll;
   if(needNew || elapsed>60*60*1000 || (elapsed>60*1000 && Math.random()<0.3)){
     const variants=[
-      {title:"Открой 3 любых кейса",target:3,reward:3000},
-      {title:"Сделай 1 крафт 3→1",target:1,reward:6000},
-      {title:"Попробуй 1 апгрейд NFT",target:1,reward:7000}
+      {title:"Открыть 3 любых кейса",target:3,reward:3500},
+      {title:"Сделать 1 крафт 3→1",target:1,reward:7000},
+      {title:"Попробовать 1 ускорение NFT",target:1,reward:8000}
     ];
     const pick=variants[Math.floor(Math.random()*variants.length)];
     state.tasks = state.tasks.filter(t=>t.type!=="hourly");
@@ -1130,17 +1229,16 @@ function renderTasks(){
   if(!box) return;
   genRandomTasks();
   if(!state.tasks.length){
-    box.innerHTML=`<div style="padding:6px;color:var(--text-secondary);">Заданий нет. Макс придёт позже с задачами.</div>`;
+    box.innerHTML=`<div style="padding:6px;color:var(--text-secondary);">Заданий нет. Позже сюда прилетят новые цели.</div>`;
     return;
   }
   box.innerHTML=state.tasks.map(t=>{
     const progress=`${t.progress}/${t.target}`;
-    const status=t.done?"Готово":"Награда: +"+fmt(t.reward)+" 🪙";
     return `
       <div class="task-row">
         <div>
           <div class="task-title">${t.title}</div>
-          <div class="task-meta">${t.type==="daily"?"Ежедневное":"Рандомное"} · ${progress}</div>
+          <div class="task-meta">${t.type==="daily"?"Ежедневное":"Случайное"} · ${progress}</div>
         </div>
         <button class="task-btn ${t.done?"done":""}" data-task-id="${t.id}">
           ${t.done?"Забрать":"..." }
@@ -1176,7 +1274,7 @@ function progressTask(kind){
     if(kind==="craft" && t.title.includes("крафт")){
       t.progress=Math.min(t.target,t.progress+1);
     }
-    if(kind==="upgrade" && t.title.includes("апгрейд")){
+    if(kind==="upgrade" && t.title.includes("ускорение")){
       t.progress=Math.min(t.target,t.progress+1);
     }
     if(kind==="epic_plus" && t.title.includes("EPIC")){
@@ -1197,27 +1295,30 @@ function progressTask(kind){
 /* генерация кейсов */
 function genCases(){
   const templates=[
-    {baseName:"Уличный",rarity:"COMMON",basePrice:800,desc:"Дешёвый грязный рандом."},
-    {baseName:"Подворотня",rarity:"COMMON",basePrice:1200,desc:"Мусор, но иногда блестит."},
-    {baseName:"Городской миф",rarity:"RARE",basePrice:4000,desc:"Редкие легенды спального района."},
-    {baseName:"Ночная смена",rarity:"RARE",basePrice:6000,desc:"Играть после полуночи — твой выбор."},
-    {baseName:"Кровавый рассвет",rarity:"EPIC",basePrice:13000,desc:"Солнце идёт, а банк гуляет."},
-    {baseName:"Лава",rarity:"EPIC",basePrice:17000,desc:"Может обжечь, может осветить."},
-    {baseName:"Трон удачи",rarity:"LEGENDARY",basePrice:55000,desc:"Для тех, кто не боится смотреть вниз."},
-    {baseName:"Олимп богов",rarity:"MYTHIC",basePrice:160000,desc:"Здесь RNG пишет законы."}
+    {baseName:"Уличный",rarity:"COMMON",basePrice:600,desc:"Минимальный вход, обычный риск."},
+    {baseName:"Дворовый",rarity:"UNCOMMON",basePrice:1200,desc:"Чуть выше ставки и немного удачи."},
+    {baseName:"Городская легенда",rarity:"RARE",basePrice:4500,desc:"Ходят слухи о редких находках."},
+    {baseName:"Ночной рейв",rarity:"EPIC",basePrice:14000,desc:"Громкая музыка и громкие выигрыши."},
+    {baseName:"Трон удачи",rarity:"LEGENDARY",basePrice:60000,desc:"Только для тех, кто не боится высоты."},
+    {baseName:"Тень портала",rarity:"MYTHIC",basePrice:170000,desc:"Граница между нормой и безумием."},
+    {baseName:"Космический сигнал",rarity:"COSMIC",basePrice:420000,desc:"Что-то прилетает издалека."},
+    {baseName:"Омега ядро",rarity:"OMEGA",basePrice:1000000,desc:"Последний уровень жадности и удачи."}
   ];
   const weightsByRarity={
-    COMMON:{COMMON:70,RARE:20,EPIC:8,LEGENDARY:2,MYTHIC:0},
-    RARE:{COMMON:45,RARE:30,EPIC:18,LEGENDARY:6,MYTHIC:1},
-    EPIC:{COMMON:28,RARE:30,EPIC:28,LEGENDARY:10,MYTHIC:4},
-    LEGENDARY:{COMMON:18,RARE:25,EPIC:30,LEGENDARY:18,MYTHIC:9},
-    MYTHIC:{COMMON:10,RARE:20,EPIC:30,LEGENDARY:25,MYTHIC:15}
+    COMMON:{COMMON:70,UNCOMMON:22,RARE:7,EPIC:1,LEGENDARY:0,MYTHIC:0,COSMIC:0,OMEGA:0},
+    UNCOMMON:{COMMON:45,UNCOMMON:35,RARE:15,EPIC:4,LEGENDARY:1,MYTHIC:0,COSMIC:0,OMEGA:0},
+    RARE:{COMMON:28,UNCOMMON:30,RARE:24,EPIC:10,LEGENDARY:5,MYTHIC:2,COSMIC:1,OMEGA:0},
+    EPIC:{COMMON:18,UNCOMMON:25,RARE:25,EPIC:18,LEGENDARY:8,MYTHIC:4,COSMIC:2,OMEGA:0},
+    LEGENDARY:{COMMON:10,UNCOMMON:18,RARE:24,EPIC:24,LEGENDARY:14,MYTHIC:7,COSMIC:2,OMEGA:1},
+    MYTHIC:{COMMON:7,UNCOMMON:12,RARE:18,EPIC:26,LEGENDARY:20,MYTHIC:10,COSMIC:5,OMEGA:2},
+    COSMIC:{COMMON:4,UNCOMMON:8,RARE:16,EPIC:22,LEGENDARY:24,MYTHIC:14,COSMIC:8,OMEGA:4},
+    OMEGA:{COMMON:2,UNCOMMON:4,RARE:10,EPIC:18,LEGENDARY:26,MYTHIC:18,COSMIC:12,OMEGA:10}
   };
   const out=[];
   let idCounter=1;
   templates.forEach(t=>{
-    for(let i=0;i<32;i++){
-      const price=t.basePrice+ i*250*(RARITIES.indexOf(t.rarity)+1);
+    for(let i=0;i<24;i++){
+      const price=t.basePrice+ i*230*(RARITIES.indexOf(t.rarity)+1);
       const suffix=i===0?"I":i===1?"II":i===2?"III":`#${i+1}`;
       out.push({
         id:`${t.baseName}_${idCounter}`,
@@ -1233,12 +1334,13 @@ function genCases(){
   CASES=out;
 }
 
-/* рендер кейсов */
+/* фильтры кейсов */
 let currentFilter="all";
 function renderCases(){
   const grid=document.getElementById("caseGrid");
   grid.innerHTML="";
-  CASES.filter(c=>currentFilter==="all"||c.rarity===currentFilter).forEach(c=>{
+  const filtered=CASES.filter(c=>currentFilter==="all"||c.rarity===currentFilter);
+  filtered.forEach(c=>{
     const rar=rarCfg(c.rarity);
     const div=document.createElement("div");
     div.className="case-card";
@@ -1254,13 +1356,70 @@ function renderCases(){
     div.onclick=()=>openCase(c);
     grid.appendChild(div);
   });
-  document.getElementById("caseCount").textContent=CASES.filter(c=>currentFilter==="all"||c.rarity===currentFilter).length;
+  document.getElementById("caseCount").textContent=filtered.length;
+}
+function initCaseFilters(){
+  document.querySelectorAll(".filter-pill").forEach(p=>{
+    p.onclick=()=>{
+      document.querySelectorAll(".filter-pill").forEach(pp=>pp.classList.remove("active"));
+      p.classList.add("active");
+      currentFilter=p.dataset.filter;
+      renderCases();
+    };
+  });
 }
 
-/* RNG */
+/* режимы */
+function applyModeDescription(){
+  const label=document.getElementById("activeModeLabel");
+  const desc=document.getElementById("modeDesc");
+  if(state.mode==="normal"){
+    label.textContent="Стандарт";
+    desc.textContent="Сбалансированный режим: без резких просадок и без безумия.";
+  }else if(state.mode==="highroll"){
+    label.textContent="Риск";
+    desc.textContent="Режим для любителей острых ощущений: чаще пусто, но редкий дроп мощнее.";
+  }else if(state.mode==="jackpot"){
+    label.textContent="Джекпот";
+    desc.textContent="Каждый кейс слегка кормит общий банк. Иногда кто-то забирает весь пул.";
+  }
+}
+function initModes(){
+  document.querySelectorAll(".mode-btn").forEach(btn=>{
+    btn.onclick=()=>{
+      state.mode=btn.dataset.mode;
+      applyModeDescription();
+      saveState();
+    };
+  });
+  applyModeDescription();
+}
+
+/* RNG c учётом режима */
+let jackpotPool=0;
 function pickRarity(weights){
-  const entries=Object.entries(weights);
+  // копия, чтобы не ломать оригинал
+  const base={...weights};
+  // модификаторы режимов
+  if(state.mode==="highroll"){
+    // меньше common/uncommon, чуть больше epic+
+    base.COMMON = (base.COMMON||0)*0.6;
+    base.UNCOMMON = (base.UNCOMMON||0)*0.7;
+    base.EPIC = (base.EPIC||0)*1.3;
+    base.LEGENDARY = (base.LEGENDARY||0)*1.5;
+    base.MYTHIC = (base.MYTHIC||0)*1.6;
+    base.COSMIC = (base.COSMIC||0)*1.8;
+    base.OMEGA = (base.OMEGA||0)*2;
+  }else if(state.mode==="jackpot"){
+    // больше шанса на легендарные и выше, но мелочи тоже остаётся
+    base.LEGENDARY = (base.LEGENDARY||0)*1.4;
+    base.MYTHIC = (base.MYTHIC||0)*1.5;
+    base.COSMIC = (base.COSMIC||0)*1.6;
+    base.OMEGA = (base.OMEGA||0)*1.6;
+  }
+  const entries=Object.entries(base);
   let sum=entries.reduce((a,[_r,w])=>a+w,0);
+  if(sum<=0) return "COMMON";
   let roll=Math.random()*sum;
   for(const [r,w] of entries){
     if(roll<w) return r;
@@ -1269,7 +1428,7 @@ function pickRarity(weights){
   return "COMMON";
 }
 
-/* анимация открытия кейса + интерес */
+/* анимация открытия кейса */
 let caseAnimRunning=false;
 function openCase(caseObj){
   if(caseAnimRunning) return;
@@ -1280,6 +1439,13 @@ function openCase(caseObj){
   state.player.balance-=caseObj.price;
   state.player.totalCases++;
   progressTask("case_open");
+
+  // джекпот-пул
+  if(state.mode==="jackpot"){
+    const fee=Math.round(caseObj.price*0.12);
+    jackpotPool+=fee;
+  }
+
   saveState();
   updateHeader();
 
@@ -1298,13 +1464,12 @@ function openCase(caseObj){
   reel.style.transform="translateY(0px)";
   fill.style.width="0%";
   title.textContent=`${caseObj.name}`;
-  status.textContent="RNG заводится...";
+  status.textContent="Механизм закручивается...";
   lock.textContent="🔒";
 
-  // генерируем 20 NFT в рулетку
   const reelItems=[];
   for(let i=0;i<20;i++){
-    const r = pickRarity(caseObj.weights);
+    const r=pickRarity(caseObj.weights);
     reelItems.push({
       rarity:r,
       name:randomName(r),
@@ -1330,17 +1495,15 @@ function openCase(caseObj){
     `;
   }).join("");
 
-  // анимация бара + рулетки
   let progress=0;
   const interval=setInterval(()=>{
     progress+=Math.random()*18+7;
     if(progress>100) progress=100;
     fill.style.width=progress+"%";
-    if(progress>40) status.textContent="Битва с шансами...";
-    if(progress>75) status.textContent="RNG выбирает твой NFT...";
+    if(progress>40) status.textContent="Шансы распределяются...";
+    if(progress>75) status.textContent="Определяем выпадение...";
     if(progress>=100){
       clearInterval(interval);
-      // финальный NFT
       const winningIndex=15+Math.floor(Math.random()*3);
       const item=reelItems[Math.min(winningIndex,reelItems.length-1)];
       const cardHeight=88;
@@ -1349,7 +1512,7 @@ function openCase(caseObj){
         reel.style.transform=`translateY(-${offset}px)`;
         setTimeout(()=>{
           lock.textContent="✅";
-          status.textContent="Дроп зафиксирован.";
+          status.textContent="Результат зафиксирован.";
           showDropResult(item,caseObj);
           caseAnimRunning=false;
         },1000);
@@ -1360,27 +1523,42 @@ function openCase(caseObj){
 function showDropResult(item,caseObj){
   const dropBox=document.getElementById("caseAnimDrop");
   const rar=rarCfg(item.rarity);
-  const nftId=Date.now()+"_"+Math.random().toString(16).slice(2);
-  const nft={id:nftId,rarity:item.rarity,name:item.name,level:item.level,createdAt:Date.now()};
+  const id=Date.now()+"_"+Math.random().toString(16).slice(2);
+  const nft={id,rarity:item.rarity,name:item.name,level:item.level,createdAt:Date.now()};
   state.nft.push(nft);
   state.player.bestRarity=bestRarity(state.player.bestRarity,nft.rarity);
   const val=fmt(estimateValue(nft));
 
-  // серия удач: если EPIC+, прибавляем стрик
   if(RARITIES.indexOf(nft.rarity)>=RARITIES.indexOf("EPIC")){
     state.player.streakWins++;
   }else{
     state.player.streakWins=0;
   }
 
+  let extraText="";
+  if(state.mode==="jackpot" && jackpotPool>0){
+    if(Math.random()<0.08 && RARITIES.indexOf(nft.rarity)>=RARITIES.indexOf("LEGENDARY")){
+      // забираем пул
+      const pool=jackpotPool;
+      jackpotPool=0;
+      state.player.balance+=pool;
+      extraText=`Ты срываешь джекпот и забираешь пул: +${fmt(pool)} 🪙.`;
+      pushHistory(`Джекпот! Получено ${fmt(pool)} 🪙`);
+    }else{
+      extraText=`Часть ставки ушла в общий пул. Сейчас там ~${fmt(jackpotPool)} 🪙.`;
+    }
+  }
+
   const mult = 1+state.player.streakWins*0.1;
-  const multText = state.player.streakWins>0?`Серия x${mult.toFixed(1)} — шанс на следующий ещё вкуснее.`:"Начни серию хорошим дропом.";
+  const multText = state.player.streakWins>0?`Серия удач x${mult.toFixed(1)} — следующий шанс ещё бодрее.`:"Начни серию хорошим дропом.";
+
   dropBox.innerHTML=`
     <div class="case-drop" style="border-color:${rar.color};box-shadow:0 0 26px ${rar.color};">
       <div style="font-weight:700;color:${rar.color};margin-bottom:4px;">${nft.rarity} дроп!</div>
       <div style="font-size:12px;margin-bottom:4px;">${nft.name} · LVL ${nft.level}</div>
       <div style="font-size:11.5px;color:#fbbf24;margin-bottom:4px;">Примерная ценность: ~${val} 🪙</div>
-      <div style="font-size:11px;color:var(--text-secondary);">${multText}</div>
+      <div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px;">${multText}</div>
+      ${extraText?`<div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px;">${extraText}</div>`:""}
       <button class="btn btn-ghost btn-small" style="margin-top:6px;width:100%;" onclick="document.getElementById('caseAnimOverlay').classList.remove('active');">
         Продолжить
       </button>
@@ -1406,7 +1584,7 @@ function initNav(){
   });
 }
 
-/* header/balance */
+/* header */
 function updateHeader(){
   document.getElementById("balanceValue").textContent=fmt(state.player.balance);
   document.getElementById("playerName").textContent=state.player.name;
@@ -1415,7 +1593,7 @@ function updateHeader(){
   document.getElementById("bestDrop").textContent=state.player.bestRarity?rarCfg(state.player.bestRarity).label:"нет";
   document.getElementById("streakWins").textContent=state.player.streakWins;
   document.getElementById("streakMult").textContent=(1+state.player.streakWins*0.1).toFixed(1);
-  document.getElementById("badgeEvent").textContent=state.eventHot?"🔥 Огненная неделя":"💤 Спокойный режим";
+  document.getElementById("badgeEvent").textContent=state.eventHot?"🔥 Ивент: Горячий дроп":"💤 Ивент: Оффлайн";
 }
 
 /* daily бонус */
@@ -1424,11 +1602,11 @@ function initDaily(){
   btn.onclick=()=>{
     const now=Date.now();
     if(now - state.lastDailyTs < 20*60*60*1000){
-      alert("Ещё рано. Зайди позже за бонусом.");
+      alert("Ещё рано. Загляни позже за бонусом.");
       return;
     }
-    const base=5000;
-    const bonus=state.eventHot?base*1.5:base;
+    const base=6000;
+    const bonus=state.eventHot?base*1.6:base;
     state.player.balance+=Math.round(bonus);
     state.lastDailyTs=now;
     pushHistory(`Ежедневный бонус: +${fmt(Math.round(bonus))} 🪙`);
@@ -1442,14 +1620,14 @@ function initDaily(){
   };
 }
 
-/* NFT рендер */
+/* NFT */
 function renderNft(){
   const count=document.getElementById("nftCount");
   const main=document.getElementById("nftMainBlock");
   count.textContent=state.nft.length;
   if(!state.nft.length){
     main.innerHTML=`<div style="font-size:12px;color:var(--text-secondary);">
-      NFT пока нет. Открой пару кейсов, чтобы собрать первую пачку.
+      NFT пока нет. Открой пару кейсов и посмотри, что упадёт.
     </div>`;
     state.activeNftId=null;
     return;
@@ -1462,10 +1640,11 @@ function renderNft(){
 
   const listHtml=state.nft.map(n=>{
     const isActive=n.id===active.id;
+    const rc=rarCfg(n.rarity);
     return `
-      <div class="nft-row" style="${isActive?'border-left:2px solid '+rarCfg(n.rarity).color:'border-left:2px solid transparent'}" data-nft-id="${n.id}">
+      <div class="nft-row" style="${isActive?'border-left:2px solid '+rc.color:'border-left:2px solid transparent'}" data-nft-id="${n.id}">
         <span>${n.name}</span>
-        <span style="color:${rarCfg(n.rarity).color};font-size:10px;">${n.rarity} · LVL ${n.level}</span>
+        <span style="color:${rc.color};font-size:10px;">${n.rarity} · LVL ${n.level}</span>
       </div>
     `;
   }).join("");
@@ -1480,7 +1659,7 @@ function renderNft(){
         <div class="nft-info-sub">${active.rarity} · LVL ${active.level}</div>
         <div class="nft-meta-row">
           <span class="tag">~${val} 🪙</span>
-          <span class="tag">#${active.id.slice(-4)}</span>
+          <span class="tag">ID #${active.id.slice(-4)}</span>
         </div>
         <div class="nft-circle-meter">
           <div class="circle-wrap">
@@ -1502,18 +1681,17 @@ function renderNft(){
   });
 }
 
-/* крафт и апгрейд */
+/* крафт / апгрейд */
 function initCraftUpgrade(){
   document.getElementById("btnCraft").onclick=()=>{
     if(state.nft.length<3){
       alert("Нужно минимум 3 NFT.");
       return;
     }
-    // берём 3 самых дешёвых
     const sorted=[...state.nft].sort((a,b)=>estimateValue(a)-estimateValue(b));
     const taken=sorted.slice(0,3);
-    const minRarityIdx=Math.max(0, Math.min(...taken.map(n=>RARITIES.indexOf(n.rarity)))+1);
-    const newRarity=RARITIES[minRarityIdx] || "EPIC";
+    const minIdx=Math.max(0, Math.min(...taken.map(n=>RARITIES.indexOf(n.rarity)))+1);
+    const newRarity=RARITIES[minIdx] || "EPIC";
     const newNft={
       id:Date.now()+"_"+Math.random().toString(16).slice(2),
       rarity:newRarity,
@@ -1537,12 +1715,12 @@ function initCraftUpgrade(){
     }
     const nft=state.nft.find(n=>n.id===state.activeNftId);
     if(!nft) return;
-    const upgradeCost=Math.round(estimateValue(nft)*0.3);
+    const upgradeCost=Math.round(estimateValue(nft)*0.35);
     if(state.player.balance<upgradeCost){
-      alert("Не хватает монет на улучшение.");
+      alert("Не хватает монет на ускорение.");
       return;
     }
-    if(!confirm(`Апгрейд стоит ${fmt(upgradeCost)} 🪙. Если не повезёт — NFT сгорит. Продолжить?`)) return;
+    if(!confirm(`Ускорение стоит ${fmt(upgradeCost)} 🪙. Если не повезёт — NFT может сгореть. Продолжить?`)) return;
     state.player.balance-=upgradeCost;
     const circle=document.querySelector(".circle-wrap");
     if(circle) circle.classList.add("upgrading");
@@ -1550,10 +1728,10 @@ function initCraftUpgrade(){
       const successChance=0.55;
       if(Math.random()<successChance){
         nft.level++;
-        pushHistory(`Успешный апгрейд: ${nft.name} теперь LVL ${nft.level}`);
+        pushHistory(`Успешное ускорение: ${nft.name} теперь LVL ${nft.level}`);
         progressTask("upgrade");
       }else{
-        pushHistory(`Провальный апгрейд: ${nft.name} сгорел.`);
+        pushHistory(`Провальное ускорение: ${nft.name} сгорел.`);
         state.nft=state.nft.filter(n=>n.id!==nft.id);
         state.activeNftId=state.nft[0]?.id||null;
       }
@@ -1565,7 +1743,7 @@ function initCraftUpgrade(){
   };
 }
 
-/* трейд коды с анимацией */
+/* трейд */
 function initTrade(){
   const out=document.getElementById("tradeCodeOut");
   const input=document.getElementById("tradeCodeIn");
@@ -1587,7 +1765,7 @@ function initTrade(){
     out.value=code;
     out.classList.add("trade-pulse");
     setTimeout(()=>out.classList.remove("trade-pulse"),1800);
-    pushHistory(`Сгенерирован код трейда для ${nft.name}`);
+    pushHistory(`Сгенерирован код обмена для ${nft.name}`);
   };
 
   btnApply.onclick=()=>{
@@ -1609,7 +1787,7 @@ function initTrade(){
     }
     const exists=state.nft.some(n=>n.id===payload.nft.id);
     if(exists){
-      alert("Этот NFT уже у тебя.");
+      alert("Этот NFT уже есть в инвентаре.");
       return;
     }
     payload.nft.id=Date.now()+"_"+Math.random().toString(16).slice(2);
@@ -1633,7 +1811,7 @@ function renderLeaders(){
     balance:state.player.balance,
     nftCount:state.nft.length
   };
-  state.leaders=[self]; // локально просто один игрок
+  state.leaders=[self];
   lb.innerHTML=state.leaders.map((p,i)=>`
     <div class="leader-row">
       <span>${i+1}. ${p.name}</span>
@@ -1648,7 +1826,7 @@ function renderLeaders(){
   `).join("");
 }
 
-/* касса/пакеты */
+/* касса */
 function initShop(){
   document.querySelectorAll(".pack").forEach(p=>{
     p.onclick=()=>{
@@ -1666,35 +1844,35 @@ function initShop(){
       case"50k":add=50000;break;
       case"250k":add=250000;break;
       case"1m":add=1000000;break;
-      default:return alert("Выбери пак.");
+      default:return alert("Выбери пакет.");
     }
     state.player.balance+=add;
-    pushHistory(`Фейк-додеп: +${fmt(add)} 🪙`);
+    pushHistory(`Добавлено монет: +${fmt(add)} 🪙 (локально)`);
     saveState();
     updateHeader();
   };
   document.getElementById("btnFakeWithdraw").onclick=()=>{
     const available = Math.round(state.player.balance*0.3);
     document.getElementById("withdrawAvailable").textContent=fmt(available);
-    alert("Фейковый запрос вывода отправлен. Когда появится реальный бот — сюда привяжем.");
+    alert("Это демонстрация. Здесь позже можно подключить реальный вывод через бота.");
   };
   document.getElementById("btnVip").onclick=()=>{
     const fee=Math.round(state.player.balance*0.1);
     if(fee<=0){
-      alert("Слишком мало монет для контракта.");
+      alert("Слишком мало монет для активации премиума.");
       return;
     }
-    if(!confirm(`10% баланса (${fmt(fee)} 🪙) уйдёт Максу. Взамен — x1.2 к ценности NFT на 24 часа. Ок?`))return;
+    if(!confirm(`10% баланса (${fmt(fee)} 🪙) уйдёт в фонд. Взамен — 24 часа бустов. Продолжить?`))return;
     state.player.balance-=fee;
     state.player.vipUntil=Date.now()+24*60*60*1000;
-    document.getElementById("vipStatus").textContent="VIP активен 24 часа. Крути по полной.";
-    pushHistory(`VIP-контракт активирован. За вход заплачено ${fmt(fee)} 🪙`);
+    document.getElementById("vipStatus").textContent="Премиум активен 24 часа. Шансы и ценность повышены.";
+    pushHistory(`Премиум активирован. Заплачено ${fmt(fee)} 🪙`);
     saveState();
     updateHeader();
   };
 }
 
-/* реферальная ссылка (демо) */
+/* реферальная ссылка */
 function initReferral(){
   const refArea=document.getElementById("refLink");
   if(!state.refCode){
@@ -1706,19 +1884,7 @@ function initReferral(){
   refArea.value=link;
 }
 
-/* фильтры кейсов */
-function initCaseFilters(){
-  document.querySelectorAll(".filter-pill").forEach(p=>{
-    p.onclick=()=>{
-      document.querySelectorAll(".filter-pill").forEach(pp=>pp.classList.remove("active"));
-      p.classList.add("active");
-      currentFilter=p.dataset.filter;
-      renderCases();
-    };
-  });
-}
-
-/* настройки/темы */
+/* настройки */
 function initSettings(){
   const vib=document.getElementById("btnVibration");
   const snd=document.getElementById("btnSound");
@@ -1747,10 +1913,10 @@ function initSettings(){
       saveState();
     };
   });
-  document.body.setAttribute("data-theme",state.theme||"default");
+  document.body.setAttribute("data-theme",state.theme||"dark");
 }
 
-/* Telegram user */
+/* user из Telegram */
 function initUser(){
   if(tg && tg.initDataUnsafe && tg.initDataUnsafe.user){
     const u=tg.initDataUnsafe.user;
@@ -1760,6 +1926,8 @@ function initUser(){
   }
 }
 
+/* daily / leaders уже выше */
+
 /* init */
 function init(){
   loadState();
@@ -1768,6 +1936,7 @@ function init(){
   initNav();
   initDaily();
   initCaseFilters();
+  initModes();
   initCraftUpgrade();
   initTrade();
   initShop();
@@ -1782,7 +1951,6 @@ function init(){
 }
 init();
 
-// закрытие оверлея по фону
 document.getElementById("caseAnimOverlay").addEventListener("click",e=>{
   if(e.target.id==="caseAnimOverlay"){
     e.currentTarget.classList.remove("active");
