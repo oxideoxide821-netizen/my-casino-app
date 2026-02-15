@@ -1,9 +1,9 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>ELITE DEB // NFT BATTLE</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
@@ -18,9 +18,13 @@
       --glow-main:rgba(251,191,36,0.9);
       --glow-blue:rgba(59,130,246,0.8);
       --shadow-main:0 24px 48px rgba(0,0,0,0.9);
+      --neon-cyan:#00f0ff;
+      --neon-pink:#ff00a0;
+      --neon-purple:#b829dd;
+      --neon-red:#ff0040;
+      --neon-gold:#ffd700;
     }
 
-    /* Темы: логичные имена */
     [data-theme="dark"]{
       --bg-main:#020617;
       --bg-card:rgba(10,15,30,0.96);
@@ -208,12 +212,12 @@
       display:grid;
       grid-template-columns:repeat(2,minmax(0,1fr));
       gap:8px;
-      max-height:260px;
+      max-height:320px;
       overflow-y:auto;
       padding-right:2px;
     }
     @media(min-width:900px){
-      .case-grid{grid-template-columns:repeat(3,minmax(0,1fr));max-height:300px;}
+      .case-grid{grid-template-columns:repeat(3,minmax(0,1fr));max-height:400px;}
     }
     .case-card{
       position:relative;
@@ -223,11 +227,7 @@
       border:1px solid rgba(148,163,184,0.4);
       cursor:pointer;
       overflow:hidden;
-      transition:
-        transform 160ms ease,
-        box-shadow 160ms ease,
-        border-color 160ms ease,
-        background 160ms ease;
+      transition:transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
       touch-action:manipulation;
     }
     .case-card:hover,
@@ -550,6 +550,91 @@
     .history-row:last-child{border-bottom:none;}
     .history-time{color:var(--text-secondary);white-space:nowrap;}
 
+    /* Колесо фортуны */
+    .wheel-container{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:20px 0;
+    }
+    .wheel-wrapper{
+      position:relative;
+      width:260px;
+      height:260px;
+      margin-bottom:20px;
+    }
+    .wheel{
+      width:100%;
+      height:100%;
+      border-radius:50%;
+      position:relative;
+      border:4px solid var(--neon-cyan);
+      box-shadow:0 0 30px var(--neon-cyan), inset 0 0 30px rgba(0,240,255,0.2);
+      transition:transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+      background:conic-gradient(
+        #ff0040 0deg 45deg,
+        #ffd700 45deg 90deg,
+        #b829dd 90deg 135deg,
+        #ff00a0 135deg 180deg,
+        #00f0ff 180deg 225deg,
+        #0066ff 225deg 270deg,
+        #00ff88 270deg 315deg,
+        #9e9e9e 315deg 360deg
+      );
+    }
+    .wheel-center{
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform:translate(-50%,-50%);
+      width:60px;
+      height:60px;
+      background:var(--bg-card);
+      border:3px solid var(--neon-cyan);
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:12px;
+      font-weight:700;
+      color:var(--neon-cyan);
+      box-shadow:0 0 20px var(--neon-cyan);
+      z-index:10;
+    }
+    .wheel-pointer{
+      position:absolute;
+      top:-15px;
+      left:50%;
+      transform:translateX(-50%);
+      width:0;
+      height:0;
+      border-left:15px solid transparent;
+      border-right:15px solid transparent;
+      border-top:25px solid var(--neon-pink);
+      filter:drop-shadow(0 0 10px var(--neon-pink));
+      z-index:20;
+    }
+    .wheel-legend{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:8px;
+      width:100%;
+    }
+    .legend-item{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:11px;
+      padding:4px 8px;
+      background:var(--bg-soft);
+      border-radius:8px;
+    }
+    .legend-color{
+      width:12px;
+      height:12px;
+      border-radius:3px;
+    }
+
     /* задания */
     .task-list{
       margin-top:5px;max-height:160px;overflow-y:auto;border-radius:12px;
@@ -667,6 +752,20 @@
     /* админ панель */
     .admin-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
     .admin-row .btn-small{flex:1;min-width:0;}
+    .admin-section{
+      background:rgba(255,0,64,0.1);
+      border:1px solid var(--neon-red);
+      border-radius:12px;
+      padding:12px;
+      margin-top:8px;
+    }
+    .admin-title{
+      color:var(--neon-red);
+      font-size:11px;
+      font-weight:700;
+      text-transform:uppercase;
+      margin-bottom:8px;
+    }
 
     /* трейд анимация */
     .trade-pulse{
@@ -678,13 +777,54 @@
       100%{box-shadow:0 0 0 0 rgba(34,197,94,0);}
     }
 
+    /* реферальная система */
+    .ref-card{
+      background:linear-gradient(135deg,rgba(0,255,136,0.1),rgba(0,240,255,0.1));
+      border:1px solid var(--neon-green);
+      border-radius:12px;
+      padding:12px;
+      text-align:center;
+      margin-bottom:10px;
+    }
+    .ref-code{
+      font-family:monospace;
+      font-size:18px;
+      color:var(--neon-green);
+      text-shadow:0 0 10px var(--neon-green);
+      margin:8px 0;
+      letter-spacing:2px;
+    }
+    .ref-stats{
+      display:flex;
+      justify-content:space-around;
+      margin-top:8px;
+      padding-top:8px;
+      border-top:1px solid var(--border-soft);
+    }
+
+    /* input select */
+    .input-select{
+      background:var(--bg-soft);
+      border:1px solid rgba(148,163,184,0.6);
+      color:var(--text-primary);
+      padding:8px 12px;
+      border-radius:8px;
+      font-size:12px;
+      width:100%;
+      margin-bottom:8px;
+    }
+    .input-select:focus{
+      outline:none;
+      border-color:var(--neon-cyan);
+      box-shadow:0 0 10px var(--neon-cyan);
+    }
   </style>
 </head>
 <body data-theme="dark">
 <canvas id="sparksCanvas"></canvas>
 <div class="app">
   <main class="main">
-    <!-- КЕЙСЫ / РЕЖИМЫ -->
+    <!-- КЕЙСЫ -->
     <section id="screen-cases" class="screen active">
       <div class="grid-2">
         <div class="card">
@@ -728,8 +868,8 @@
 
       <div class="card">
         <div class="card-header">
-          <div class="card-title">🎰 Кейсы</div>
-          <div class="badge"><span id="caseCount">0</span> кейсов</div>
+          <div class="card-title">🎰 Кейсы <span style="color:var(--neon-cyan)">(150)</span></div>
+          <div class="badge"><span id="caseCount">150</span> кейсов</div>
         </div>
         <div class="case-filter-row" id="caseFilters">
           <div class="filter-pill active" data-filter="all">Все</div>
@@ -745,7 +885,26 @@
         <div class="case-grid" id="caseGrid"></div>
       </div>
 
-      <!-- КАЛЕНДАРЬ / БОНУСЫ / АДМИН -->
+      <!-- КОЛЕСО ФОРТУНЫ -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🎯 Колесо Фортуны</div>
+          <div class="badge gold">VIP</div>
+        </div>
+        <div class="wheel-container">
+          <div class="wheel-wrapper">
+            <div class="wheel-pointer"></div>
+            <div class="wheel" id="fortuneWheel"></div>
+            <div class="wheel-center">SPIN</div>
+          </div>
+          <button class="btn btn-primary" id="spinBtn" style="width:100%;margin-bottom:10px;">
+            КРУТИТЬ ЗА 5,000 🪙
+          </button>
+          <div class="wheel-legend" id="wheelLegend"></div>
+        </div>
+      </div>
+
+      <!-- БОНУСЫ -->
       <div class="card">
         <div class="card-header">
           <div class="card-title">📆 Бонусы</div>
@@ -758,18 +917,22 @@
         <button id="btnToggleEvent" class="btn btn-ghost btn-small" style="width:100%;">Сменить статус ивента (локально)</button>
       </div>
 
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">👑 Админ-панель</div>
-          <div class="badge">локальные тесты</div>
+      <!-- РЕФЕРАЛЬНАЯ СИСТЕМА -->
+      <div class="ref-card">
+        <div class="card-title" style="justify-content:center;margin-bottom:4px;">🔗 Реферальная система</div>
+        <div style="font-size:11px;color:var(--text-secondary);margin-bottom:6px;">
+          Приглашай друзей — получай автонаграды
         </div>
-        <div style="font-size:11.5px;color:var(--text-secondary);">
-          Локальные инструменты для разогрева, баланса и проверки механик.
-        </div>
-        <div class="admin-row">
-          <button id="btnAdminPlus1M" class="btn btn-ghost btn-small">+1M 🪙</button>
-          <button id="btnAdminAll10M" class="btn btn-ghost btn-small">Все 10M</button>
-          <button id="btnAdminToggleEvent" class="btn btn-ghost btn-small">Переключить ивент</button>
+        <div class="ref-code" id="refCode">LOADING...</div>
+        <div class="ref-stats">
+          <div>
+            <div style="font-size:18px;color:var(--neon-cyan);font-weight:700;" id="refCount">0</div>
+            <div style="font-size:9px;color:var(--text-secondary);">ПРИГЛАШЕНО</div>
+          </div>
+          <div>
+            <div style="font-size:18px;color:var(--neon-gold);font-weight:700;" id="refEarnings">0</div>
+            <div style="font-size:9px;color:var(--text-secondary);">ЗАРАБОТАНО</div>
+          </div>
         </div>
       </div>
     </section>
@@ -802,7 +965,7 @@
       </div>
     </section>
 
-    <!-- КАССА / ВЫВОД -->
+    <!-- КАССА -->
     <section id="screen-shop" class="screen">
       <div class="card">
         <div class="card-header">
@@ -869,7 +1032,7 @@
       </div>
     </section>
 
-    <!-- ТОП / ОБМЕН / ИСТОРИЯ / РЕФЕРАЛКА -->
+    <!-- ТОП / ОБМЕН / ИСТОРИЯ -->
     <section id="screen-top" class="screen">
       <div class="card">
         <div class="card-header">
@@ -891,7 +1054,7 @@
           <div class="badge">через код</div>
         </div>
         <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:4px;">
-          Генерируешь код — кидаешь его другу. Он вставляет у себя и забирает предмет. Визуально — как отправка посылки.
+          Генерируешь код — кидаешь его другу. Он вставляет у себя и забирает предмет.
         </div>
         <div style="font-size:10.5px;margin-bottom:3px;">Код для отправки (активный NFT):</div>
         <textarea id="tradeCodeOut" class="textarea" readonly>Нет NFT для отправки</textarea>
@@ -905,17 +1068,6 @@
 
       <div class="card">
         <div class="card-header">
-          <div class="card-title">🔗 Пригласить друга</div>
-          <div class="badge">реферальная ссылка</div>
-        </div>
-        <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:4px;">
-          Делишься ссылкой, друг заходит — вы оба получаете бонус монет. Сейчас это демо, но логика реферальной системы уже на месте.
-        </div>
-        <textarea id="refLink" class="textarea" readonly>Реферальная ссылка появится после первого запуска.</textarea>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
           <div class="card-title">📜 История</div>
           <div class="badge">последние события</div>
         </div>
@@ -923,7 +1075,61 @@
       </div>
     </section>
 
-    <!-- НАСТРОЙКИ / ЗАДАНИЯ / ТЕМЫ -->
+    <!-- АДМИН ПАНЕЛЬ -->
+    <section id="screen-admin" class="screen">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">👑 Админ-панель</div>
+          <div class="badge" style="color:var(--neon-red);border-color:var(--neon-red);">ADMIN</div>
+        </div>
+        <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:8px;">
+          Полный контроль над экономикой и игроками
+        </div>
+        
+        <div class="admin-section">
+          <div class="admin-title">💰 Управление балансом</div>
+          <div class="admin-row">
+            <button id="btnAdminPlus1M" class="btn btn-ghost btn-small">+1M 🪙</button>
+            <button id="btnAdminPlus10M" class="btn btn-ghost btn-small">+10M 🪙</button>
+          </div>
+        </div>
+
+        <div class="admin-section">
+          <div class="admin-title">🎴 Выдача NFT</div>
+          <select class="input-select" id="adminNftRarity">
+            <option value="COMMON">COMMON</option>
+            <option value="UNCOMMON">UNCOMMON</option>
+            <option value="RARE">RARE</option>
+            <option value="EPIC">EPIC</option>
+            <option value="LEGENDARY">LEGENDARY</option>
+            <option value="MYTHIC">MYTHIC</option>
+            <option value="COSMIC">COSMIC</option>
+            <option value="OMEGA" selected>OMEGA (Самый дорогой)</option>
+          </select>
+          <div class="admin-row">
+            <button id="btnAdminNftSelf" class="btn btn-primary btn-small">СЕБЕ</button>
+            <button id="btnAdminNftAll" class="btn btn-danger btn-small">ВСЕМ</button>
+          </div>
+        </div>
+
+        <div class="admin-section">
+          <div class="admin-title">⚙️ Система</div>
+          <div class="admin-row">
+            <button id="btnAdminToggleEvent" class="btn btn-ghost btn-small">Переключить ивент</button>
+            <button id="btnAdminReset" class="btn btn-danger btn-small">Сбросить всё</button>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;padding:10px;background:var(--bg-soft);border-radius:8px;font-family:monospace;font-size:10px;color:var(--text-secondary);">
+          <div>Система: <span style="color:var(--neon-green)">ONLINE</span></div>
+          <div>Игроков: <span id="adminOnlineCount">1</span></div>
+          <div>Последний дроп: <span id="adminLastDrop">-</span></div>
+          <div>Рефералов: <span id="adminRefCount">0</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- НАСТРОЙКИ -->
     <section id="screen-settings" class="screen">
       <div class="card">
         <div class="card-header">
@@ -931,7 +1137,7 @@
           <div class="badge">daily / случайные</div>
         </div>
         <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:4px;">
-          Ежедневные и случайные миссии: иногда обновятся через минуту, иногда через час — чтобы было интересно возвращаться.
+          Ежедневные и случайные миссии: иногда обновятся через минуту, иногда через час.
         </div>
         <div id="taskList" class="task-list"></div>
       </div>
@@ -983,6 +1189,10 @@
     <div class="nav-item" data-screen="top">
       <span class="nav-item-icon">🏆</span>
       <span class="nav-label">Топ</span>
+    </div>
+    <div class="nav-item" data-screen="admin" id="adminNavItem" style="display:none;">
+      <span class="nav-item-icon" style="color:var(--neon-red)">👑</span>
+      <span class="nav-label" style="color:var(--neon-red)">ADMIN</span>
     </div>
     <div class="nav-item" data-screen="settings">
       <span class="nav-item-icon">⚙️</span>
@@ -1080,24 +1290,52 @@ let state = {
   tasks:[],
   lastTaskRoll:0,
   theme:"dark",
-  refCode:null
+  refCode:null,
+  referrals:[],
+  refEarnings:0,
+  isAdmin:false,
+  wheelSpins:[],
+  jackpotPool:0
 };
 
 const RARITIES=["COMMON","UNCOMMON","RARE","EPIC","LEGENDARY","MYTHIC","COSMIC","OMEGA"];
+const RARITY_COLORS={
+  COMMON:"#9ca3af",
+  UNCOMMON:"#86efac",
+  RARE:"#60a5fa",
+  EPIC:"#e9d5ff",
+  LEGENDARY:"#fef3c7",
+  MYTHIC:"#fee2e2",
+  COSMIC:"#e0f2fe",
+  OMEGA:"#f9a8d4"
+};
+
 let CASES=[];
-const STORAGE_KEY="elite_deb_nft_battle_v4";
+const STORAGE_KEY="elite_deb_nft_battle_v5";
+
+// Колесо фортуны
+const WHEEL_SEGMENTS=[
+  {label:'1 000',color:'#9e9e9e',value:1000,chance:25},
+  {label:'2 500',color:'#00ff88',value:2500,chance:20},
+  {label:'5 000',color:'#0066ff',value:5000,chance:15},
+  {label:'10 000',color:'#b829dd',value:10000,chance:12},
+  {label:'25 000',color:'#ffd700',value:25000,chance:10},
+  {label:'NFT',color:'#ff00a0',value:'nft',chance:8},
+  {label:'50 000',color:'#00f0ff',value:50000,chance:6},
+  {label:'JACKPOT',color:'#ff0040',value:'jackpot',chance:4}
+];
 
 function fmt(n){return n.toLocaleString("ru-RU");}
 function rarCfg(r){
   switch(r){
-    case"COMMON":return{label:"COMMON",class:"rarity-common",color:"#9ca3af",badge:"C"};
-    case"UNCOMMON":return{label:"UNCOMMON",class:"rarity-uncommon",color:"#86efac",badge:"U"};
-    case"RARE":return{label:"RARE",class:"rarity-rare",color:"#60a5fa",badge:"R"};
-    case"EPIC":return{label:"EPIC",class:"rarity-epic",color:"#e9d5ff",badge:"E"};
-    case"LEGENDARY":return{label:"LEGENDARY",class:"rarity-legendary",color:"#fef3c7",badge:"L"};
-    case"MYTHIC":return{label:"MYTHIC",class:"rarity-mythic",color:"#fee2e2",badge:"M"};
-    case"COSMIC":return{label:"COSMIC",class:"rarity-cosmic",color:"#e0f2fe",badge:"C+"};
-    case"OMEGA":return{label:"OMEGA",class:"rarity-omega",color:"#f9a8d4",badge:"Ω"};
+    case"COMMON":return{label:"COMMON",class:"rarity-common",color:RARITY_COLORS.COMMON,badge:"C"};
+    case"UNCOMMON":return{label:"UNCOMMON",class:"rarity-uncommon",color:RARITY_COLORS.UNCOMMON,badge:"U"};
+    case"RARE":return{label:"RARE",class:"rarity-rare",color:RARITY_COLORS.RARE,badge:"R"};
+    case"EPIC":return{label:"EPIC",class:"rarity-epic",color:RARITY_COLORS.EPIC,badge:"E"};
+    case"LEGENDARY":return{label:"LEGENDARY",class:"rarity-legendary",color:RARITY_COLORS.LEGENDARY,badge:"L"};
+    case"MYTHIC":return{label:"MYTHIC",class:"rarity-mythic",color:RARITY_COLORS.MYTHIC,badge:"M"};
+    case"COSMIC":return{label:"COSMIC",class:"rarity-cosmic",color:RARITY_COLORS.COSMIC,badge:"C+"};
+    case"OMEGA":return{label:"OMEGA",class:"rarity-omega",color:RARITY_COLORS.OMEGA,badge:"Ω"};
     default:return{label:r,class:"rarity-common",color:"#9ca3af",badge:"?"};
   }
 }
@@ -1151,6 +1389,8 @@ function loadState(){
     if(!Array.isArray(state.leaders)) state.leaders=[];
     if(!Array.isArray(state.history)) state.history=[];
     if(!Array.isArray(state.tasks)) state.tasks=[];
+    if(!Array.isArray(state.referrals)) state.referrals=[];
+    if(!Array.isArray(state.wheelSpins)) state.wheelSpins=[];
   }catch(e){}
 }
 
@@ -1162,6 +1402,7 @@ function pushHistory(text){
   if(state.history.length>40) state.history.pop();
   renderHistory();
   saveState();
+  updateAdminStats();
 }
 function renderHistory(){
   const box=document.getElementById("historyList");
@@ -1217,9 +1458,9 @@ function genRandomTasks(){
       type:"hourly",
       title:pick.title,
       target:pick.target,
-      progress:0,
+      progress:pick.target,
       reward:pick.reward,
-      done:false
+      done:true
     });
     state.lastTaskRoll=now;
   }
@@ -1292,18 +1533,19 @@ function progressTask(kind){
   }
 }
 
-/* генерация кейсов */
+/* генерация 150 кейсов */
 function genCases(){
   const templates=[
-    {baseName:"Уличный",rarity:"COMMON",basePrice:600,desc:"Минимальный вход, обычный риск."},
-    {baseName:"Дворовый",rarity:"UNCOMMON",basePrice:1200,desc:"Чуть выше ставки и немного удачи."},
-    {baseName:"Городская легенда",rarity:"RARE",basePrice:4500,desc:"Ходят слухи о редких находках."},
-    {baseName:"Ночной рейв",rarity:"EPIC",basePrice:14000,desc:"Громкая музыка и громкие выигрыши."},
-    {baseName:"Трон удачи",rarity:"LEGENDARY",basePrice:60000,desc:"Только для тех, кто не боится высоты."},
-    {baseName:"Тень портала",rarity:"MYTHIC",basePrice:170000,desc:"Граница между нормой и безумием."},
-    {baseName:"Космический сигнал",rarity:"COSMIC",basePrice:420000,desc:"Что-то прилетает издалека."},
-    {baseName:"Омега ядро",rarity:"OMEGA",basePrice:1000000,desc:"Последний уровень жадности и удачи."}
+    {prefix:"STREET",rarity:"COMMON",basePrice:500,count:30},
+    {prefix:"URBAN",rarity:"UNCOMMON",basePrice:1200,count:25},
+    {prefix:"NEON",rarity:"RARE",basePrice:3500,count:20},
+    {prefix:"CYBER",rarity:"EPIC",basePrice:10000,count:15},
+    {prefix:"ROYAL",rarity:"LEGENDARY",basePrice:45000,count:12},
+    {prefix:"VOID",rarity:"MYTHIC",basePrice:150000,count:10},
+    {prefix:"STAR",rarity:"COSMIC",basePrice:400000,count:8},
+    {prefix:"OMEGA",rarity:"OMEGA",basePrice:1000000,count:5}
   ];
+  
   const weightsByRarity={
     COMMON:{COMMON:70,UNCOMMON:22,RARE:7,EPIC:1,LEGENDARY:0,MYTHIC:0,COSMIC:0,OMEGA:0},
     UNCOMMON:{COMMON:45,UNCOMMON:35,RARE:15,EPIC:4,LEGENDARY:1,MYTHIC:0,COSMIC:0,OMEGA:0},
@@ -1314,23 +1556,36 @@ function genCases(){
     COSMIC:{COMMON:4,UNCOMMON:8,RARE:16,EPIC:22,LEGENDARY:24,MYTHIC:14,COSMIC:8,OMEGA:4},
     OMEGA:{COMMON:2,UNCOMMON:4,RARE:10,EPIC:18,LEGENDARY:26,MYTHIC:18,COSMIC:12,OMEGA:10}
   };
+  
+  const descs={
+    COMMON:"Базовый контейнер с мусором и редкими сюрпризами",
+    UNCOMMON:"Улучшенный шанс на хороший дроп",
+    RARE:"Содержит технологии будущего",
+    EPIC:"Высокотехнологичные артефакты",
+    LEGENDARY:"Королевские сокровища",
+    MYTHIC:"Предметы из параллельных миров",
+    COSMIC:"Энергия звезд и галактик",
+    OMEGA:"Абсолютная редкость. Ты избран."
+  };
+  
   const out=[];
   let idCounter=1;
+  
   templates.forEach(t=>{
-    for(let i=0;i<24;i++){
-      const price=t.basePrice+ i*230*(RARITIES.indexOf(t.rarity)+1);
-      const suffix=i===0?"I":i===1?"II":i===2?"III":`#${i+1}`;
+    for(let i=0;i<t.count;i++){
+      const variation=String.fromCharCode(65+(i%26))+(i>26?Math.floor(i/26):"");
       out.push({
-        id:`${t.baseName}_${idCounter}`,
-        name:`${t.baseName} ${suffix}`,
+        id:`${t.prefix}_${idCounter}`,
+        name:`${t.prefix} ${variation}`,
         rarity:t.rarity,
-        price,
-        desc:t.desc,
+        price:t.basePrice+(i*100*(RARITIES.indexOf(t.rarity)+1)),
+        desc:descs[t.rarity],
         weights:weightsByRarity[t.rarity]
       });
       idCounter++;
     }
   });
+  
   CASES=out;
 }
 
@@ -1395,27 +1650,22 @@ function initModes(){
   applyModeDescription();
 }
 
-/* RNG c учётом режима */
-let jackpotPool=0;
+/* RNG */
 function pickRarity(weights){
-  // копия, чтобы не ломать оригинал
   const base={...weights};
-  // модификаторы режимов
   if(state.mode==="highroll"){
-    // меньше common/uncommon, чуть больше epic+
-    base.COMMON = (base.COMMON||0)*0.6;
-    base.UNCOMMON = (base.UNCOMMON||0)*0.7;
-    base.EPIC = (base.EPIC||0)*1.3;
-    base.LEGENDARY = (base.LEGENDARY||0)*1.5;
-    base.MYTHIC = (base.MYTHIC||0)*1.6;
-    base.COSMIC = (base.COSMIC||0)*1.8;
-    base.OMEGA = (base.OMEGA||0)*2;
+    base.COMMON=(base.COMMON||0)*0.6;
+    base.UNCOMMON=(base.UNCOMMON||0)*0.7;
+    base.EPIC=(base.EPIC||0)*1.3;
+    base.LEGENDARY=(base.LEGENDARY||0)*1.5;
+    base.MYTHIC=(base.MYTHIC||0)*1.6;
+    base.COSMIC=(base.COSMIC||0)*1.8;
+    base.OMEGA=(base.OMEGA||0)*2;
   }else if(state.mode==="jackpot"){
-    // больше шанса на легендарные и выше, но мелочи тоже остаётся
-    base.LEGENDARY = (base.LEGENDARY||0)*1.4;
-    base.MYTHIC = (base.MYTHIC||0)*1.5;
-    base.COSMIC = (base.COSMIC||0)*1.6;
-    base.OMEGA = (base.OMEGA||0)*1.6;
+    base.LEGENDARY=(base.LEGENDARY||0)*1.4;
+    base.MYTHIC=(base.MYTHIC||0)*1.5;
+    base.COSMIC=(base.COSMIC||0)*1.6;
+    base.OMEGA=(base.OMEGA||0)*1.6;
   }
   const entries=Object.entries(base);
   let sum=entries.reduce((a,[_r,w])=>a+w,0);
@@ -1440,10 +1690,9 @@ function openCase(caseObj){
   state.player.totalCases++;
   progressTask("case_open");
 
-  // джекпот-пул
   if(state.mode==="jackpot"){
     const fee=Math.round(caseObj.price*0.12);
-    jackpotPool+=fee;
+    state.jackpotPool=(state.jackpotPool||0)+fee;
   }
 
   saveState();
@@ -1536,21 +1785,20 @@ function showDropResult(item,caseObj){
   }
 
   let extraText="";
-  if(state.mode==="jackpot" && jackpotPool>0){
+  if(state.mode==="jackpot" && state.jackpotPool>0){
     if(Math.random()<0.08 && RARITIES.indexOf(nft.rarity)>=RARITIES.indexOf("LEGENDARY")){
-      // забираем пул
-      const pool=jackpotPool;
-      jackpotPool=0;
+      const pool=state.jackpotPool;
+      state.jackpotPool=0;
       state.player.balance+=pool;
       extraText=`Ты срываешь джекпот и забираешь пул: +${fmt(pool)} 🪙.`;
       pushHistory(`Джекпот! Получено ${fmt(pool)} 🪙`);
     }else{
-      extraText=`Часть ставки ушла в общий пул. Сейчас там ~${fmt(jackpotPool)} 🪙.`;
+      extraText=`Часть ставки ушла в общий пул. Сейчас там ~${fmt(state.jackpotPool)} 🪙.`;
     }
   }
 
-  const mult = 1+state.player.streakWins*0.1;
-  const multText = state.player.streakWins>0?`Серия удач x${mult.toFixed(1)} — следующий шанс ещё бодрее.`:"Начни серию хорошим дропом.";
+  const mult=1+state.player.streakWins*0.1;
+  const multText=state.player.streakWins>0?`Серия удач x${mult.toFixed(1)} — следующий шанс ещё бодрее.`:"Начни серию хорошим дропом.";
 
   dropBox.innerHTML=`
     <div class="case-drop" style="border-color:${rar.color};box-shadow:0 0 26px ${rar.color};">
@@ -1565,10 +1813,89 @@ function showDropResult(item,caseObj){
     </div>
   `;
   pushHistory(`Кейс "${caseObj.name}" — ${nft.rarity} ${nft.name}`);
+  document.getElementById("adminLastDrop").textContent=`${nft.rarity} ${nft.name}`;
   if(RARITIES.indexOf(nft.rarity)>=RARITIES.indexOf("EPIC")) progressTask("epic_plus");
   saveState();
   updateHeader();
   renderNft();
+}
+
+/* Колесо фортуны */
+function initWheel(){
+  const legend=document.getElementById("wheelLegend");
+  legend.innerHTML=WHEEL_SEGMENTS.map(s=>`
+    <div class="legend-item">
+      <div class="legend-color" style="background:${s.color}"></div>
+      <span>${s.label}</span>
+    </div>
+  `).join("");
+}
+
+function spinWheel(){
+  if(state.player.balance<5000){
+    alert("Недостаточно средств!");
+    return;
+  }
+  
+  state.player.balance-=5000;
+  updateHeader();
+  saveState();
+  
+  const wheel=document.getElementById("fortuneWheel");
+  const btn=document.getElementById("spinBtn");
+  
+  btn.disabled=true;
+  btn.textContent="КРУТИМ...";
+  
+  const totalChance=WHEEL_SEGMENTS.reduce((a,s)=>a+s.chance,0);
+  let random=Math.random()*totalChance;
+  let resultIndex=0;
+  
+  for(let i=0;i<WHEEL_SEGMENTS.length;i++){
+    random-=WHEEL_SEGMENTS[i].chance;
+    if(random<=0){
+      resultIndex=i;
+      break;
+    }
+  }
+  
+  const segmentAngle=360/WHEEL_SEGMENTS.length;
+  const extraSpins=5+Math.floor(Math.random()*3);
+  const finalAngle=360-(resultIndex*segmentAngle)-(segmentAngle/2);
+  const totalRotation=(extraSpins*360)+finalAngle;
+  
+  wheel.style.transform=`rotate(${totalRotation}deg)`;
+  
+  setTimeout(()=>{
+    const result=WHEEL_SEGMENTS[resultIndex];
+    processWheelResult(result);
+    btn.disabled=false;
+    btn.textContent="КРУТИТЬ ЗА 5,000 🪙";
+    
+    state.wheelSpins.unshift({
+      result:result.label,
+      time:new Date().toLocaleTimeString()
+    });
+  },4000);
+}
+
+function processWheelResult(result){
+  if(result.value==="nft"){
+    const rarity=Math.random()<0.5?"EPIC":"LEGENDARY";
+    giveNft(rarity,1);
+    alert(`Выпал NFT: ${rarity}!`);
+  }else if(result.value==="jackpot"){
+    const jackpot=100000+Math.floor(Math.random()*50000);
+    state.player.balance+=jackpot;
+    pushHistory(`Колесо: JACKPOT +${fmt(jackpot)} 🪙`);
+    alert(`JACKPOT! +${fmt(jackpot)}`);
+  }else{
+    state.player.balance+=result.value;
+    pushHistory(`Колесо: ${result.label} 🪙`);
+    alert(`+${fmt(result.value)}`);
+  }
+  updateHeader();
+  saveState();
 }
 
 /* навигация */
@@ -1594,6 +1921,13 @@ function updateHeader(){
   document.getElementById("streakWins").textContent=state.player.streakWins;
   document.getElementById("streakMult").textContent=(1+state.player.streakWins*0.1).toFixed(1);
   document.getElementById("badgeEvent").textContent=state.eventHot?"🔥 Ивент: Горячий дроп":"💤 Ивент: Оффлайн";
+  
+  let rank="Новичок";
+  if(state.player.bestRarity==="LEGENDARY") rank="Элита";
+  if(state.player.bestRarity==="MYTHIC") rank="Мастер";
+  if(state.player.bestRarity==="COSMIC") rank="Космос";
+  if(state.player.bestRarity==="OMEGA") rank="Бог";
+  document.getElementById("playerRank").textContent=rank;
 }
 
 /* daily бонус */
@@ -1601,7 +1935,7 @@ function initDaily(){
   const btn=document.getElementById("btnDaily");
   btn.onclick=()=>{
     const now=Date.now();
-    if(now - state.lastDailyTs < 20*60*60*1000){
+    if(now-state.lastDailyTs<20*60*60*1000){
       alert("Ещё рано. Загляни позже за бонусом.");
       return;
     }
@@ -1633,7 +1967,7 @@ function renderNft(){
     return;
   }
   if(!state.activeNftId) state.activeNftId=state.nft[0].id;
-  const active = state.nft.find(n=>n.id===state.activeNftId) || state.nft[0];
+  const active=state.nft.find(n=>n.id===state.activeNftId)||state.nft[0];
   state.activeNftId=active.id;
   const rar=rarCfg(active.rarity);
   const val=fmt(estimateValue(active));
@@ -1681,6 +2015,28 @@ function renderNft(){
   });
 }
 
+function giveNft(rarity,count=1,target='self'){
+  for(let i=0;i<count;i++){
+    const nft={
+      id:Date.now()+i,
+      name:randomName(rarity),
+      rarity:rarity,
+      level:0,
+      value:estimateValue({rarity:rarity,level:0}),
+      createdAt:Date.now()
+    };
+    if(target==='self'){
+      state.nft.push(nft);
+      if(!state.player.bestRarity||RARITIES.indexOf(rarity)>RARITIES.indexOf(state.player.bestRarity)){
+        state.player.bestRarity=rarity;
+      }
+    }
+  }
+  saveState();
+  renderNft();
+  updateHeader();
+}
+
 /* крафт / апгрейд */
 function initCraftUpgrade(){
   document.getElementById("btnCraft").onclick=()=>{
@@ -1690,22 +2046,12 @@ function initCraftUpgrade(){
     }
     const sorted=[...state.nft].sort((a,b)=>estimateValue(a)-estimateValue(b));
     const taken=sorted.slice(0,3);
-    const minIdx=Math.max(0, Math.min(...taken.map(n=>RARITIES.indexOf(n.rarity)))+1);
-    const newRarity=RARITIES[minIdx] || "EPIC";
-    const newNft={
-      id:Date.now()+"_"+Math.random().toString(16).slice(2),
-      rarity:newRarity,
-      name:randomName(newRarity),
-      level:0,
-      createdAt:Date.now()
-    };
+    const minIdx=Math.max(0,Math.min(...taken.map(n=>RARITIES.indexOf(n.rarity)))+1);
+    const newRarity=RARITIES[minIdx]||"EPIC";
     state.nft=state.nft.filter(n=>!taken.includes(n));
-    state.nft.push(newNft);
-    state.player.bestRarity=bestRarity(state.player.bestRarity,newNft.rarity);
-    pushHistory(`Крафт 3→1 — получен ${newNft.rarity} ${newNft.name}`);
+    giveNft(newRarity,1,'self');
+    pushHistory(`Крафт 3→1 — получен ${newRarity}`);
     progressTask("craft");
-    saveState();
-    renderNft();
   };
 
   document.getElementById("btnUpgrade").onclick=()=>{
@@ -1781,7 +2127,7 @@ function initTrade(){
       alert("Код повреждён.");
       return;
     }
-    if(!payload.nft || !payload.nft.id){
+    if(!payload.nft||!payload.nft.id){
       alert("Неверный формат кода.");
       return;
     }
@@ -1798,6 +2144,7 @@ function initTrade(){
     input.value="";
     saveState();
     renderNft();
+    updateHeader();
   };
 }
 
@@ -1852,7 +2199,7 @@ function initShop(){
     updateHeader();
   };
   document.getElementById("btnFakeWithdraw").onclick=()=>{
-    const available = Math.round(state.player.balance*0.3);
+    const available=Math.round(state.player.balance*0.3);
     document.getElementById("withdrawAvailable").textContent=fmt(available);
     alert("Это демонстрация. Здесь позже можно подключить реальный вывод через бота.");
   };
@@ -1872,16 +2219,91 @@ function initShop(){
   };
 }
 
-/* реферальная ссылка */
+/* реферальная система */
 function initReferral(){
-  const refArea=document.getElementById("refLink");
   if(!state.refCode){
-    state.refCode=Math.random().toString(36).slice(2,10);
+    state.refCode="REF-"+Math.random().toString(36).substring(2,8).toUpperCase();
     saveState();
   }
-  const baseUrl=location.origin+location.pathname;
-  const link=`${baseUrl}?ref=${state.refCode}`;
-  refArea.value=link;
+  document.getElementById("refCode").textContent=state.refCode;
+  
+  // Check for ref in URL
+  const urlParams=new URLSearchParams(window.location.search);
+  const ref=urlParams.get('ref');
+  if(ref && ref!==state.refCode && !state.referrals.includes(ref)){
+    state.referrals.push(ref);
+    const bonus=5000;
+    state.refEarnings+=bonus;
+    state.player.balance+=bonus;
+    pushHistory(`Реферальный бонус: +${fmt(bonus)} 🪙`);
+    saveState();
+    updateHeader();
+    updateRefDisplay();
+  }
+  
+  updateRefDisplay();
+}
+
+function updateRefDisplay(){
+  document.getElementById("refCount").textContent=state.referrals.length;
+  document.getElementById("refEarnings").textContent=fmt(state.refEarnings);
+  document.getElementById("adminRefCount").textContent=state.referrals.length;
+}
+
+/* админ панель */
+function initAdmin(){
+  // Check admin
+  const urlParams=new URLSearchParams(window.location.search);
+  if(urlParams.get('admin')==='true'||state.isAdmin){
+    state.isAdmin=true;
+    document.getElementById("adminNavItem").style.display="flex";
+  }
+  
+  document.getElementById("btnAdminPlus1M").onclick=()=>{
+    state.player.balance+=1000000;
+    pushHistory("Админ: +1M баланс");
+    saveState();
+    updateHeader();
+  };
+  
+  document.getElementById("btnAdminPlus10M").onclick=()=>{
+    state.player.balance+=10000000;
+    pushHistory("Админ: +10M баланс");
+    saveState();
+    updateHeader();
+  };
+  
+  document.getElementById("btnAdminNftSelf").onclick=()=>{
+    const rarity=document.getElementById("adminNftRarity").value;
+    giveNft(rarity,1,'self');
+    pushHistory(`Админ: выдан ${rarity} себе`);
+  };
+  
+  document.getElementById("btnAdminNftAll").onclick=()=>{
+    const rarity=document.getElementById("adminNftRarity").value;
+    alert(`Рассылка ${rarity} всем пользователям... (демо)`);
+    pushHistory(`Админ: рассылка ${rarity} всем`);
+  };
+  
+  document.getElementById("btnAdminToggleEvent").onclick=()=>{
+    state.eventHot=!state.eventHot;
+    updateHeader();
+    saveState();
+    pushHistory(`Админ: ивент ${state.eventHot?'ON':'OFF'}`);
+  };
+  
+  document.getElementById("btnAdminReset").onclick=()=>{
+    if(!confirm("Сбросить ВСЁ?"))return;
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+  };
+}
+
+function updateAdminStats(){
+  document.getElementById("adminOnlineCount").textContent="1";
+  if(state.history.length>0){
+    document.getElementById("adminLastDrop").textContent=state.history[0].text.substring(0,30)+"...";
+  }
 }
 
 /* настройки */
@@ -1926,8 +2348,6 @@ function initUser(){
   }
 }
 
-/* daily / leaders уже выше */
-
 /* init */
 function init(){
   loadState();
@@ -1940,14 +2360,23 @@ function init(){
   initCraftUpgrade();
   initTrade();
   initShop();
-  initSettings();
   initReferral();
+  initAdmin();
+  initSettings();
+  initWheel();
   renderCases();
   renderNft();
   renderLeaders();
   renderTasks();
   renderHistory();
   updateHeader();
+  updateAdminStats();
+  
+  // Spin button
+  document.getElementById("spinBtn").onclick=spinWheel;
+  
+  // Auto-save
+  setInterval(saveState,5000);
 }
 init();
 
@@ -1959,4 +2388,4 @@ document.getElementById("caseAnimOverlay").addEventListener("click",e=>{
 });
 </script>
 </body>
-</html>
+  </html>
