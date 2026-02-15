@@ -6,45 +6,76 @@
     <script src="https://telegram.org"></script>
     <script src="https://unpkg.com"></script>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; padding-bottom: 80px; }
-        .tab-content { display: none; padding: 20px; text-align: center; }
-        .active { display: block; }
+        :root { --main-red: #8b0000; --dark-red: #4b0000; --accent: #ffca28; }
+        body { background: radial-gradient(circle, var(--main-red), var(--dark-red)); color: white; font-family: sans-serif; margin: 0; overflow: hidden; height: 100vh; }
         
-        /* Кнопки навигации снизу как в Virus Bot */
-        .nav { position: fixed; bottom: 0; width: 100%; display: flex; background: #111; border-top: 1px solid #222; padding: 10px 0; z-index: 100; }
-        .nav-item { flex: 1; text-align: center; font-size: 10px; color: #888; }
-        .nav-item.active { color: #007aff; }
+        /* Эффект падающих искр */
+        #particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
 
-        .case-container { background: #1c1c1e; border-radius: 20px; padding: 20px; margin: 10px; border: 1px solid #333; }
-        .btn-open { background: #007aff; border: none; color: #fff; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; margin-top: 10px; }
+        /* Верхняя панель */
+        .header { position: relative; z-index: 10; display: flex; justify-content: space-between; padding: 15px; background: rgba(0,0,0,0.3); backdrop-filter: blur(10px); }
+        .balance { background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 20px; font-weight: bold; display: flex; align-items: center; }
+
+        /* Контент и вкладки */
+        .content { position: relative; z-index: 5; height: calc(100vh - 140px); overflow-y: auto; padding: 20px; }
+        .page { display: none; animation: fadeIn 0.3s ease; }
+        .active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Сетка инвентаря (100 ячеек) */
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .nft-slot { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; height: 100px; display: flex; align-items: center; justify-content: center; position: relative; }
+        .nft-slot img { width: 80%; }
+
+        /* Кнопки как в Virus Bot */
+        .btn-action { background: white; color: black; border: none; width: 100%; padding: 18px; border-radius: 18px; font-weight: bold; font-size: 16px; transition: 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .btn-action:active { transform: scale(0.95); background: #eee; }
+
+        /* Нижнее меню */
+        .nav { position: fixed; bottom: 0; width: 100%; display: flex; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); padding: 15px 0; border-top: 1px solid rgba(255,255,255,0.1); }
+        .nav-item { flex: 1; text-align: center; font-size: 11px; color: #888; transition: 0.3s; }
+        .nav-item.active { color: white; transform: translateY(-3px); }
     </style>
 </head>
 <body>
+    <canvas id="particles"></canvas>
 
-    <!-- ВКЛАДКА КЕЙСЫ -->
-    <div id="cases" class="tab-content active">
-        <h2>📦 Доступные кейсы</h2>
-        <div class="case-container">
-            <lottie-player src="https://assets3.lottiefiles.com" speed="1" style="width: 150px; margin: 0 auto;" loop autoplay></lottie-player>
-            <h3>Classic Pepe Case</h3>
-            <p>Цена: 50$</p>
-            <button class="btn-open" onclick="openCase()">ОТКРЫТЬ</button>
+    <div class="header">
+        <div style="font-weight: bold; font-size: 18px;">Elite Deb</div>
+        <div class="balance"><span id="stars-bal">540,000</span> <span style="color:var(--accent); margin-left:5px;">⭐</span></div>
+    </div>
+
+    <div class="content">
+        <!-- ГЛАВНАЯ: РУЛЕТКА -->
+        <div id="home" class="page active">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <lottie-player src="https://assets2.lottiefiles.com" speed="1" style="width: 200px; margin: 0 auto;" loop autoplay></lottie-player>
+            </div>
+            <button class="btn-action" onclick="spin()">РАСКРУТИТЬ РУЛЕТКУ</button>
+        </div>
+
+        <!-- ИНВЕНТАРЬ -->
+        <div id="inventory" class="page">
+            <h3 style="text-align: center;">ТВОЙ ИНВЕНТАРЬ (0/100)</h3>
+            <div class="grid" id="inv-grid">
+                <!-- 100 пустых слотов генерируются скриптом -->
+            </div>
+        </div>
+
+        <!-- РЕФЕРАЛЫ -->
+        <div id="refs" class="page">
+            <h3 style="text-align: center;">РЕФЕРАЛЬНАЯ СИСТЕМА</h3>
+            <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 20px; text-align: center;">
+                <p>Приглашай друзей и получай 10% от их выигрышей!</p>
+                <button class="btn-action" onclick="copyRef()">КОПИРОВАТЬ ССЫЛКУ</button>
+            </div>
         </div>
     </div>
 
-    <!-- ВКЛАДКА МАГАЗИН -->
-    <div id="shop" class="tab-content">
-        <h2>🛒 Магазин бустов</h2>
-        <div class="case-container">
-            <p>Ускоритель майнинга x2</p>
-            <button class="btn-open">КУПИТЬ (200$)</button>
-        </div>
-    </div>
-
-    <!-- НИЖНЯЯ ПАНЕЛЬ -->
     <div class="nav">
-        <div class="nav-item active" onclick="showTab('cases')">📦 Кейсы</div>
-        <div class="nav-item" onclick="showTab('shop')">🛒 Магазин</div>
+        <div class="nav-item active" onclick="showTab('home', this)">🎡 Игры</div>
+        <div class="nav-item" onclick="showTab('inventory', this)">🎒 Инвентарь</div>
+        <div class="nav-item" onclick="showTab('refs', this)">👥 Друзья</div>
         <div class="nav-item" onclick="tg.close()">❌ Выход</div>
     </div>
 
@@ -52,16 +83,47 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        function showTab(id) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        // Скрипт "падающих искр"
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let particles = [];
+
+        function createParticle() {
+            return { x: Math.random() * canvas.width, y: -10, s: Math.random() * 2 + 1, v: Math.random() * 2 + 1 };
+        }
+
+        function drawParticles() {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            ctx.fillStyle = "rgba(255, 202, 40, 0.5)";
+            if(particles.length < 50) particles.push(createParticle());
+            particles.forEach((p, i) => {
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill();
+                p.y += p.v; if(p.y > canvas.height) particles[i] = createParticle();
+            });
+            requestAnimationFrame(drawParticles);
+        }
+        drawParticles();
+
+        function showTab(id, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(id).classList.add('active');
+            el.classList.add('active');
             tg.HapticFeedback.impactOccurred('light');
         }
 
-        function openCase() {
-            // Здесь запускаем анимацию открытия, которую делали раньше
-            alert("Кейс открывается! Передаю запрос боту...");
+        function spin() {
             tg.HapticFeedback.notificationOccurred('success');
+            // Здесь отправка данных боту
+            tg.sendData(JSON.stringify({action: "spin", cost: 540000}));
+        }
+
+        // Заполняем 100 слотов
+        const grid = document.getElementById('inv-grid');
+        for(let i=0; i<100; i++) {
+            grid.innerHTML += `<div class="nft-slot"></div>`;
         }
     </script>
 </body>
