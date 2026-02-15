@@ -7,61 +7,53 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
-      --bg-main: #020617;
-      --bg-card: rgba(15,23,42,0.96);
-      --bg-soft: rgba(15,23,42,0.8);
-      --accent-gold: linear-gradient(135deg,#f59e0b,#fbbf24,#f59e0b);
-      --accent-fire: linear-gradient(135deg,#ef4444,#f97316,#f59e0b);
-      --text-primary: #e5e7eb;
-      --text-secondary: #9ca3af;
-      --border-soft: rgba(148,163,184,0.25);
-      --glow-blue: rgba(59,130,246,0.6);
-      --glow-gold: rgba(251,191,36,0.7);
-      --shadow-main: 0 24px 48px rgba(0,0,0,0.85);
+      --bg-main:#020617;
+      --bg-card:rgba(15,23,42,0.96);
+      --bg-soft:rgba(15,23,42,0.85);
+      --accent-gold:linear-gradient(135deg,#f59e0b,#fbbf24,#f59e0b);
+      --accent-fire:linear-gradient(135deg,#ef4444,#f97316,#f59e0b);
+      --text-primary:#e5e7eb;
+      --text-secondary:#9ca3af;
+      --border-soft:rgba(148,163,184,0.3);
+      --glow-blue:rgba(59,130,246,0.6);
+      --glow-gold:rgba(251,191,36,0.7);
+      --shadow-main:0 24px 48px rgba(0,0,0,0.85);
     }
-    * { box-sizing:border-box;margin:0;padding:0; }
-    body {
-      font-family: -apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',system-ui,sans-serif;
-      background: radial-gradient(circle at top, #1f2937 0%, #020617 45%, #000 100%);
-      color: var(--text-primary);
-      min-height: 100vh;
-      overflow-x: hidden;
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{
+      font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',system-ui,sans-serif;
+      background:radial-gradient(circle at top,#1f2937 0%,#020617 45%,#000 100%);
+      color:var(--text-primary);
+      min-height:100vh;
+      overflow-x:hidden;
     }
-    body::before {
+    body::before{
       content:'';
       position:fixed;
       inset:0;
       background:
-        radial-gradient(circle at 10% 90%,rgba(59,130,246,0.25) 0%,transparent 55%),
-        radial-gradient(circle at 90% 10%,rgba(168,85,247,0.25) 0%,transparent 55%),
-        radial-gradient(circle at 50% 40%,rgba(251,191,36,0.18) 0%,transparent 55%);
+        radial-gradient(circle at 10% 90%,rgba(59,130,246,0.22) 0%,transparent 55%),
+        radial-gradient(circle at 90% 10%,rgba(168,85,247,0.22) 0%,transparent 55%),
+        radial-gradient(circle at 50% 40%,rgba(251,191,36,0.16) 0%,transparent 55%);
       pointer-events:none;
       z-index:-1;
     }
-    .app {
-      min-height:100vh;
-      display:flex;
-      flex-direction:column;
-    }
-    .main {
+    .app{min-height:100vh;display:flex;flex-direction:column;}
+    .main{
       flex:1;
-      padding:12px;
-      padding-bottom:80px;
+      padding:10px;
+      padding-bottom:84px;
       overflow-y:auto;
       scrollbar-width:none;
     }
     .main::-webkit-scrollbar{display:none;}
-    .screen {
-      display:none;
-      min-height:100%;
-      gap:16px;
-    }
+    .screen{display:none;min-height:100%;gap:10px;flex-direction:column;}
     .screen.active{display:flex;}
-    .card {
+    .card{
       background:var(--bg-card);
       border-radius:18px;
       border:1px solid var(--border-soft);
-      padding:14px 14px 16px;
+      padding:12px 12px 14px;
       box-shadow:var(--shadow-main);
       position:relative;
       overflow:hidden;
@@ -76,20 +68,17 @@
     }
     .card:hover::before{
       opacity:1;
-      animation:cardShimmer 1.9s linear infinite;
+      animation:cardShimmer 1.8s linear infinite;
     }
-    @keyframes cardShimmer{
-      0%{transform:translateX(-100%);}
-      100%{transform:translateX(100%);}
-    }
+    @keyframes cardShimmer{0%{transform:translateX(-100%);}100%{transform:translateX(100%);}}
     .card-header{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      margin-bottom:10px;
+      margin-bottom:8px;
     }
     .card-title{
-      font-size:15px;
+      font-size:14px;
       font-weight:700;
       display:flex;
       align-items:center;
@@ -97,29 +86,27 @@
     }
     .badge{
       font-size:11px;
-      padding:4px 8px;
+      padding:3px 7px;
       border-radius:999px;
       background:rgba(15,23,42,0.9);
       border:1px solid rgba(148,163,184,0.5);
       color:var(--text-secondary);
+      white-space:nowrap;
     }
     .grid-2{
       display:grid;
-      grid-template-columns:1.15fr 0.85fr;
-      gap:12px;
-    }
-    .grid-3{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
+      grid-template-columns:minmax(0,1.1fr) minmax(0,0.9fr);
       gap:8px;
     }
-    /* Баланс */
+    @media(max-width:700px){
+      .grid-2{grid-template-columns:1fr;}
+    }
     .balance-main{
-      font-size:24px;
+      font-size:22px;
       font-weight:800;
       display:flex;
       align-items:baseline;
-      gap:8px;
+      gap:6px;
     }
     .balance-main span.unit{
       font-size:13px;
@@ -129,64 +116,105 @@
     .sub-row{
       display:flex;
       flex-wrap:wrap;
-      gap:6px;
-      margin-top:8px;
+      gap:5px;
+      margin-top:6px;
     }
     .chip{
-      padding:4px 8px;
+      padding:3px 7px;
       border-radius:999px;
       border:1px solid rgba(148,163,184,0.4);
       font-size:11px;
       color:var(--text-secondary);
       background:rgba(15,23,42,0.9);
+      max-width:48%;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
     }
-    /* Кейсы */
-    .case-list{
-      margin-top:4px;
+    /* кейсы */
+    .case-filter-row{
+      display:flex;
+      gap:5px;
+      margin-bottom:6px;
+      overflow-x:auto;
+      padding-bottom:2px;
+    }
+    .filter-pill{
+      font-size:11px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,0.5);
+      background:rgba(15,23,42,0.9);
+      color:var(--text-secondary);
+      white-space:nowrap;
+      cursor:pointer;
+      flex-shrink:0;
+    }
+    .filter-pill.active{
+      background:var(--glow-blue);
+      color:#020617;
+      box-shadow:0 0 18px var(--glow-blue);
+    }
+    .case-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:6px;
+      max-height:260px;
+      overflow-y:auto;
+      padding-right:2px;
+    }
+    @media(min-width:900px){
+      .case-grid{grid-template-columns:repeat(3,minmax(0,1fr));max-height:300px;}
     }
     .case-card{
       position:relative;
-      padding:10px 8px;
+      padding:9px 7px;
       border-radius:14px;
       background:rgba(15,23,42,0.9);
       border:1px solid rgba(148,163,184,0.35);
-      margin-bottom:6px;
       cursor:pointer;
       overflow:hidden;
-      transition:all 0.2s;
+      transition:all 0.16s;
     }
     .case-card:hover{
-      transform:translateY(-2px);
-      box-shadow:0 18px 32px rgba(0,0,0,0.7);
+      transform:translateY(-1px) scale(1.01);
+      box-shadow:0 14px 26px rgba(0,0,0,0.8);
     }
     .case-header{
       display:flex;
       justify-content:space-between;
       align-items:center;
       margin-bottom:2px;
+      gap:4px;
     }
     .case-name{
-      font-size:13px;
+      font-size:11.5px;
       font-weight:600;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
     }
     .case-price{
       font-size:11px;
       color:var(--text-secondary);
       display:flex;
       align-items:center;
-      gap:4px;
+      gap:3px;
+      white-space:nowrap;
     }
     .case-desc{
-      font-size:11px;
+      font-size:10.5px;
       color:var(--text-secondary);
-      margin-top:2px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
     }
     .case-rarity-tag{
       position:absolute;
-      right:6px;
-      top:6px;
-      font-size:10px;
-      padding:2px 6px;
+      right:5px;
+      top:5px;
+      font-size:9px;
+      padding:2px 5px;
       border-radius:999px;
       text-transform:uppercase;
       letter-spacing:0.08em;
@@ -196,7 +224,7 @@
     .rarity-epic{background:rgba(168,85,247,0.28);color:#e9d5ff;}
     .rarity-legendary{background:rgba(251,191,36,0.32);color:#fef3c7;}
     .rarity-mythic{background:rgba(248,113,113,0.35);color:#fee2e2;}
-    /* Анимация открытия кейса */
+    /* анимация кейсов */
     .case-anim-overlay{
       position:fixed;
       inset:0;
@@ -209,37 +237,42 @@
     }
     .case-anim-overlay.active{display:flex;}
     .case-anim-box{
-      width:min(360px,90vw);
+      width:min(360px,92vw);
       background:var(--bg-card);
       border-radius:22px;
       border:1px solid var(--border-soft);
-      padding:16px;
+      padding:14px;
       box-shadow:var(--shadow-main);
       text-align:center;
     }
     .case-anim-title{
-      font-size:16px;
+      font-size:15px;
       font-weight:700;
-      margin-bottom:6px;
+      margin-bottom:4px;
     }
     .case-anim-status{
-      font-size:12px;
+      font-size:11px;
       color:var(--text-secondary);
-      margin-bottom:10px;
+      margin-bottom:8px;
+    }
+    .case-anim-lock{font-size:22px;margin-bottom:8px;animation:lockPulse 1s infinite;}
+    @keyframes lockPulse{
+      0%,100%{transform:scale(1);}
+      50%{transform:scale(1.1);}
     }
     .case-anim-bar{
-      height:10px;
+      height:9px;
       border-radius:999px;
       background:rgba(15,23,42,0.9);
       border:1px solid rgba(148,163,184,0.5);
       overflow:hidden;
-      margin-bottom:10px;
+      margin-bottom:8px;
     }
     .case-anim-fill{
       height:100%;
       width:0%;
       background:linear-gradient(90deg,#22c55e,#eab308,#f97316);
-      box-shadow:0 0 18px rgba(234,179,8,0.7);
+      box-shadow:0 0 16px rgba(234,179,8,0.7);
       transition:width 0.14s cubic-bezier(0.68,-0.55,0.265,1.55);
       position:relative;
       overflow:hidden;
@@ -251,49 +284,36 @@
       background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.4) 50%,transparent 100%);
       animation:barShimmer 1.4s infinite;
     }
-    @keyframes barShimmer{
-      0%{transform:translateX(-100%);}
-      100%{transform:translateX(100%);}
-    }
-    .case-anim-lock{
-      font-size:24px;
-      margin-bottom:10px;
-    }
+    @keyframes barShimmer{0%{transform:translateX(-100%);}100%{transform:translateX(100%);}}
     .case-drop{
-      margin-top:8px;
-      padding:10px;
+      margin-top:6px;
+      padding:8px;
       border-radius:16px;
-      border:1px solid rgba(251,191,36,0.6);
-      background:rgba(15,23,42,0.95);
-      font-size:13px;
-      box-shadow:0 0 30px rgba(251,191,36,0.6);
+      border:1px solid rgba(251,191,36,0.7);
+      background:rgba(15,23,42,0.97);
+      font-size:12px;
+      box-shadow:0 0 26px rgba(251,191,36,0.6);
     }
-    /* NFT экран */
-    .nft-header{
+    /* streak */
+    .streak-row{
+      margin-top:6px;
+      font-size:11px;
+      color:var(--text-secondary);
       display:flex;
       justify-content:space-between;
-      align-items:flex-start;
-      gap:10px;
-    }
-    .nft-main{
-      display:flex;
-      gap:12px;
       align-items:center;
-      margin-bottom:8px;
     }
+    /* NFT */
+    .nft-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+    .nft-main{display:flex;gap:10px;align-items:center;margin-bottom:6px;}
     .nft-avatar{
-      width:74px;
-      height:74px;
-      border-radius:20px;
+      width:64px;height:64px;
+      border-radius:18px;
       background:radial-gradient(circle at 0 0,#4f46e5,#0f172a);
       border:2px solid rgba(129,140,248,0.7);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:22px;
-      font-weight:800;
-      position:relative;
-      overflow:hidden;
+      display:flex;align-items:center;justify-content:center;
+      font-size:20px;font-weight:800;
+      position:relative;overflow:hidden;
     }
     .nft-avatar::before{
       content:'';
@@ -303,217 +323,115 @@
       animation:nftSpin 3.2s linear infinite;
       mix-blend-mode:screen;
     }
-    .nft-avatar-inner{
-      position:relative;
-      z-index:1;
-      text-shadow:0 0 20px rgba(129,140,248,0.8);
-    }
     @keyframes nftSpin{to{transform:rotate(360deg);}}
-    .nft-info h3{margin:0;font-size:16px;}
-    .nft-info-sub{
-      font-size:11px;
-      color:var(--text-secondary);
-      margin-top:2px;
-    }
-    .nft-meta-row{
-      display:flex;
-      gap:10px;
-      margin-top:6px;
-      font-size:11px;
-      color:var(--text-secondary);
-    }
-    .tag{
-      padding:2px 6px;
-      border-radius:999px;
-      border:1px solid rgba(148,163,184,0.45);
-      font-size:10px;
-    }
+    .nft-avatar-inner{position:relative;z-index:1;text-shadow:0 0 16px rgba(129,140,248,0.8);}
+    .nft-info h3{margin:0;font-size:14px;}
+    .nft-info-sub{font-size:11px;color:var(--text-secondary);margin-top:2px;}
+    .nft-meta-row{display:flex;gap:8px;margin-top:4px;font-size:10.5px;color:var(--text-secondary);}
+    .tag{padding:2px 6px;border-radius:999px;border:1px solid rgba(148,163,184,0.45);font-size:10px;}
     .nft-circle-meter{
-      margin-top:8px;
-      display:flex;
-      align-items:center;
-      gap:8px;
-      font-size:12px;
+      margin-top:6px;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-secondary);
     }
     .circle-wrap{
-      width:46px;
-      height:46px;
-      border-radius:999px;
-      border:2px solid rgba(148,163,184,0.6);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:12px;
-      font-weight:600;
-      position:relative;
-      overflow:hidden;
+      width:40px;height:40px;border-radius:999px;border:2px solid rgba(148,163,184,0.6);
+      display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;
+      position:relative;overflow:hidden;
     }
     .circle-fill{
-      position:absolute;
-      inset:-10%;
+      position:absolute;inset:-10%;
       background:conic-gradient(#22c55e,#eab308,#f97316,#ef4444,#22c55e);
-      transform:rotate(0deg);
-      opacity:0;
+      transform:rotate(0deg);opacity:0;
     }
-    .circle-inner{
-      position:relative;
-      z-index:1;
-      background:#020617;
-      border-radius:999px;
-      padding:8px 10px;
-    }
-    .circle-wrap.upgrading .circle-fill{
-      opacity:0.9;
-      animation:circleSpin 1.4s linear infinite;
-    }
+    .circle-inner{position:relative;z-index:1;background:#020617;border-radius:999px;padding:6px 8px;}
+    .circle-wrap.upgrading .circle-fill{opacity:0.9;animation:circleSpin 1.4s linear infinite;}
     @keyframes circleSpin{to{transform:rotate(360deg);}}
     .nft-list{
-      margin-top:10px;
-      max-height:140px;
-      overflow-y:auto;
-      border-radius:12px;
-      border:1px solid rgba(148,163,184,0.4);
-      background:rgba(15,23,42,0.9);
-      font-size:11px;
+      margin-top:8px;max-height:130px;overflow-y:auto;
+      border-radius:12px;border:1px solid rgba(148,163,184,0.4);background:rgba(15,23,42,0.9);font-size:11px;
     }
     .nft-row{
-      padding:5px 8px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      cursor:pointer;
+      padding:4px 6px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;
     }
     .nft-row:nth-child(odd){background:rgba(15,23,42,0.9);}
-    .nft-row:nth-child(even){background:rgba(15,23,42,0.7);}
+    .nft-row:nth-child(even){background:rgba(15,23,42,0.75);}
     .nft-row:hover{background:rgba(30,64,175,0.45);}
-    /* Магазин */
-    .pack-row{
-      display:flex;
-      gap:8px;
-      margin-top:6px;
-    }
+    /* магазин / топ / обмен */
+    .pack-row{display:flex;gap:6px;margin-top:5px;}
     .pack{
-      flex:1;
-      padding:8px;
-      border-radius:12px;
-      background:rgba(15,23,42,0.9);
-      border:1px solid rgba(148,163,184,0.4);
-      font-size:11px;
-      cursor:pointer;
-      transition:all 0.2s;
+      flex:1;padding:7px;border-radius:12px;background:rgba(15,23,42,0.9);
+      border:1px solid rgba(148,163,184,0.4);font-size:11px;cursor:pointer;transition:all 0.16s;
     }
-    .pack.selected{
-      border-color:rgba(251,191,36,0.9);
-      box-shadow:0 0 24px rgba(251,191,36,0.6);
-    }
-    .pack h4{margin-bottom:2px;font-size:12px;}
+    .pack.selected{border-color:rgba(251,191,36,0.9);box-shadow:0 0 20px rgba(251,191,36,0.6);}
+    .pack h4{margin-bottom:2px;font-size:11.5px;}
     .pack-desc{color:var(--text-secondary);}
-    /* Топы */
     .leader-list{
-      margin-top:6px;
-      max-height:180px;
-      overflow-y:auto;
-      border-radius:12px;
-      border:1px solid rgba(148,163,184,0.4);
-      background:rgba(15,23,42,0.9);
-      font-size:11px;
+      margin-top:5px;max-height:160px;overflow-y:auto;border-radius:12px;
+      border:1px solid rgba(148,163,184,0.4);background:rgba(15,23,42,0.9);font-size:11px;
     }
     .leader-row{
-      padding:4px 8px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
+      padding:4px 6px;display:flex;justify-content:space-between;align-items:center;
     }
-    .leader-row:nth-child(even){background:rgba(15,23,42,0.7);}
+    .leader-row:nth-child(even){background:rgba(15,23,42,0.75);}
     .leader-score-balance{color:#bfdbfe;}
     .leader-score-inv{color:#facc15;}
+    .textarea{
+      width:100%;min-height:56px;background:rgba(15,23,42,0.9);
+      border-radius:10px;border:1px solid rgba(148,163,184,0.5);color:var(--text-primary);
+      font-size:11px;padding:5px;resize:vertical;
+    }
     /* нижняя навигация */
     .bottom-nav{
-      position:fixed;
-      left:0;right:0;bottom:0;
-      background:rgba(15,23,42,0.96);
+      position:fixed;left:0;right:0;bottom:0;
+      background:rgba(15,23,42,0.97);
       border-top:1px solid rgba(148,163,184,0.3);
-      backdrop-filter:blur(18px);
-      padding:4px 10px 10px;
-      display:flex;
-      gap:8px;
-      z-index:20;
+      backdrop-filter:blur(16px);
+      padding:4px 8px 8px;
+      display:flex;gap:6px;z-index:20;
     }
     .nav-item{
-      flex:1;
-      text-align:center;
-      padding:8px 4px 6px;
-      border-radius:14px;
-      font-size:11px;
-      color:var(--text-secondary);
-      cursor:pointer;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:2px;
-      transition:all 0.2s;
+      flex:1;text-align:center;padding:7px 3px 5px;border-radius:14px;
+      font-size:11px;color:var(--text-secondary);cursor:pointer;
+      display:flex;flex-direction:column;align-items:center;gap:1px;
+      transition:all 0.16s;min-width:0;
     }
-    .nav-item-icon{font-size:18px;}
+    .nav-item-icon{font-size:17px;}
     .nav-item.active{
-      background:var(--glow-blue);
-      color:#020617;
-      box-shadow:0 0 26px var(--glow-blue);
+      background:var(--glow-blue);color:#020617;box-shadow:0 0 22px var(--glow-blue);
     }
-    /* общие кнопки */
+    @media(min-width:900px){
+      .main{padding:14px 14px 90px;max-width:900px;margin:0 auto;}
+      .bottom-nav{max-width:900px;left:50%;transform:translateX(-50%);}
+    }
+    /* кнопки */
     .btn{
-      border:none;
-      border-radius:999px;
-      padding:8px 12px;
-      font-size:12px;
-      font-weight:600;
-      cursor:pointer;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:6px;
-      transition:all 0.2s;
+      border:none;border-radius:999px;padding:7px 10px;
+      font-size:11.5px;font-weight:600;cursor:pointer;display:inline-flex;
+      align-items:center;justify-content:center;gap:5px;transition:all 0.16s;
+      white-space:nowrap;
     }
     .btn-primary{
-      background:var(--accent-gold);
-      color:#0f172a;
-      box-shadow:0 10px 25px rgba(251,191,36,0.6);
+      background:var(--accent-gold);color:#0f172a;
+      box-shadow:0 8px 22px rgba(251,191,36,0.6);
     }
     .btn-primary:hover{transform:translateY(-1px);}
     .btn-ghost{
-      background:rgba(15,23,42,0.9);
-      color:var(--text-secondary);
+      background:rgba(15,23,42,0.9);color:var(--text-secondary);
       border:1px solid rgba(148,163,184,0.5);
     }
     .btn-danger{
-      background:rgba(239,68,68,0.2);
-      color:#fecaca;
+      background:rgba(239,68,68,0.2);color:#fecaca;
       border:1px solid rgba(239,68,68,0.6);
     }
-    .btn-small{padding:6px 8px;font-size:11px;}
-    /* обмен */
-    .textarea {
-      width:100%;
-      min-height:60px;
-      background:rgba(15,23,42,0.9);
-      border-radius:10px;
-      border:1px solid rgba(148,163,184,0.5);
-      color:var(--text-primary);
-      font-size:11px;
-      padding:6px;
-      resize:vertical;
-    }
-    /* адаптив */
-    @media(min-width:768px){
-      .main{padding:20px;padding-bottom:90px;max-width:960px;margin:0 auto;}
-      .grid-3{grid-template-columns:repeat(4,1fr);}
-      .bottom-nav{max-width:960px;left:50%;transform:translateX(-50%);}
-    }
+    .btn-small{padding:5px 7px;font-size:10.5px;}
+    /* админ панель */
+    .admin-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+    .admin-row .btn-small{flex:1;min-width:0;}
   </style>
 </head>
 <body>
 <div class="app">
   <main class="main">
-    <!-- ЭКРАН КЕЙСОВ -->
+    <!-- КЕЙСЫ -->
     <section id="screen-cases" class="screen active">
       <div class="grid-2">
         <div class="card">
@@ -529,10 +447,14 @@
             <div class="chip">Игрок: <span id="playerName">Игрок</span></div>
             <div class="chip">@<span id="playerUser">user</span></div>
             <div class="chip">Ранг: <span id="playerRank">Новичок</span></div>
+            <div class="chip">Кейсов: <span id="totalCases">0</span></div>
           </div>
-          <div class="sub-row" style="margin-top:6px;">
-            <div class="chip">Всего кейсов: <span id="totalCases">0</span></div>
-            <div class="chip">Лучший дроп: <span id="bestDrop">нет</span></div>
+          <div class="sub-row" style="margin-top:5px;">
+            <div class="chip" style="max-width:100%;">Лучший дроп: <span id="bestDrop">нет</span></div>
+          </div>
+          <div class="streak-row">
+            <span>🔥 Серия удач: <span id="streakWins">0</span></span>
+            <span>Мультипликатор: x<span id="streakMult">1.0</span></span>
           </div>
         </div>
         <div class="card">
@@ -540,24 +462,48 @@
             <div class="card-title">📆 Ежедневный бонус</div>
             <div class="badge">+ ивент шанс</div>
           </div>
-          <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">
-            Раз в 24 часа Макс выдает подарок. В ивент — x2.
+          <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:6px;">
+            1 раз в сутки Макс выдаёт подарок. В ивент — x2 и больше шанс эпика+.
           </div>
-          <button id="btnDaily" class="btn btn-primary" style="width:100%;margin-bottom:6px;">Забрать бонус 🪙</button>
+          <button id="btnDaily" class="btn btn-primary" style="width:100%;margin-bottom:4px;">Забрать бонус 🪙</button>
           <button id="btnToggleEvent" class="btn btn-ghost btn-small" style="width:100%;">🔥 Переключить ивент (локально)</button>
         </div>
       </div>
 
-      <div class="card" style="margin-top:12px;">
+      <div class="card">
         <div class="card-header">
           <div class="card-title">🎰 Кейсы</div>
-          <div class="badge">100% локальный RNG</div>
+          <div class="badge"><span id="caseCount">0</span> кейсов</div>
         </div>
-        <div class="case-list" id="caseList"></div>
+        <div class="case-filter-row" id="caseFilters">
+          <div class="filter-pill active" data-filter="all">Все</div>
+          <div class="filter-pill" data-filter="COMMON">Common</div>
+          <div class="filter-pill" data-filter="RARE">Rare</div>
+          <div class="filter-pill" data-filter="EPIC">Epic</div>
+          <div class="filter-pill" data-filter="LEGENDARY">Legend</div>
+          <div class="filter-pill" data-filter="MYTHIC">Mythic</div>
+        </div>
+        <div class="case-grid" id="caseGrid"></div>
+      </div>
+
+      <!-- АДМИН ПАНЕЛЬ -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">👑 АДМИН ПАНЕЛЬ</div>
+          <div class="badge">MAX POWER</div>
+        </div>
+        <div style="font-size:11.5px;color:var(--text-secondary);">
+          Только локально, чисто для теста и баловства.
+        </div>
+        <div class="admin-row">
+          <button id="btnAdminPlus1M" class="btn btn-ghost btn-small">+1M 🪙</button>
+          <button id="btnAdminAll10M" class="btn btn-ghost btn-small">ВСЕМ 10M</button>
+          <button id="btnAdminToggleEvent" class="btn btn-ghost btn-small">🔥 ТОГГЛ ИВЕНТ</button>
+        </div>
       </div>
     </section>
 
-    <!-- ЭКРАН NFT -->
+    <!-- NFT -->
     <section id="screen-nft" class="screen">
       <div class="card">
         <div class="card-header">
@@ -566,7 +512,7 @@
         </div>
         <div id="nftMainBlock">
           <div style="font-size:12px;color:var(--text-secondary);">
-            Тут будут NFT, когда ты начнешь хозяйничать с кейсами.
+            NFT с возможностью улучшения. Пока пусто — разблокируй пару кейсов.
           </div>
         </div>
       </div>
@@ -575,28 +521,25 @@
           <div class="card-title">⚗️ Крафт и улучшения</div>
           <div class="badge">risk / reward</div>
         </div>
-        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">
-          Собери 3 NFT и скрафти новый ранг. Или рискуй через улучшитель — шанс выжить не всегда на твоей стороне.
+        <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:6px;">
+          3 NFT = новый, более высокий ранг. Или кидай активный NFT в апгрейдер — будет либо герой, либо пепел.
         </div>
         <div class="sub-row">
           <button id="btnCraft" class="btn btn-ghost btn-small">⚗️ КРАФТ 3→1</button>
           <button id="btnUpgrade" class="btn btn-ghost btn-small">⚡ УЛУЧШИТЕЛЬ</button>
         </div>
-        <div style="margin-top:10px;font-size:11px;color:var(--text-secondary);">
-          Макс: "Я за апгрейды. Но если сгорит — не ной, ты сам нажал кнопку."
-        </div>
       </div>
     </section>
 
-    <!-- ЭКРАН МАГАЗИН -->
+    <!-- КАССА -->
     <section id="screen-shop" class="screen">
       <div class="card">
         <div class="card-header">
           <div class="card-title">💎 Касса ELITE DEB</div>
           <div class="badge">NFT BATTLE</div>
         </div>
-        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px;">
-          Выбери пакет для локального додепа. Потом можно подвязать сюда реальный донат через бота.
+        <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:4px;">
+          Всё пока локально. Потом сюда можно подвязать реальный донат через бота.
         </div>
         <div class="pack-row">
           <div class="pack" data-pack="10k">
@@ -605,10 +548,10 @@
           </div>
           <div class="pack" data-pack="50k">
             <h4>Grinder</h4>
-            <div class="pack-desc">Кейсы 24/7 · +50 000 🪙</div>
+            <div class="pack-desc">Кейсы нон-стоп · +50 000 🪙</div>
           </div>
         </div>
-        <div class="pack-row" style="margin-top:8px;">
+        <div class="pack-row">
           <div class="pack" data-pack="250k">
             <h4>Whale</h4>
             <div class="pack-desc">NFT‑империя · +250 000 🪙</div>
@@ -618,41 +561,42 @@
             <div class="pack-desc">Максимальный разгон · +1 000 000 🪙</div>
           </div>
         </div>
-        <div style="margin-top:10px;font-size:12px;">
+        <div style="margin-top:7px;font-size:11.5px;">
           Текущий выбор: <span id="packLabel" style="color:#fbbf24;">не выбран</span>
         </div>
-        <div class="sub-row" style="margin-top:10px;">
+        <div class="sub-row" style="margin-top:7px;">
           <button id="btnFakeTopup" class="btn btn-ghost" style="flex:1;">⭐ Фейк-додеп (локально)</button>
         </div>
       </div>
+
       <div class="card">
         <div class="card-header">
           <div class="card-title">👑 VIP-контракт с Максом</div>
           <div class="badge">24 часа</div>
         </div>
-        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px;">
-          Оставляешь 10% баланса Максу — получаешь 24 часа бонусов: x1.2 к продаже NFT, больше шанс эпика и выше.
+        <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:4px;">
+          Отдаёшь 10% баланса Максу — получаешь 24 часа бустов: x1.2 к ценности NFT, больше шанс эпика+.
         </div>
         <button id="btnVip" class="btn btn-primary" style="width:100%;">✒️ Подписать контракт</button>
-        <div id="vipStatus" style="margin-top:6px;font-size:11px;color:var(--text-secondary);">
+        <div id="vipStatus" style="margin-top:5px;font-size:11px;color:var(--text-secondary);">
           Контракт не активен.
         </div>
       </div>
     </section>
 
-    <!-- ЭКРАН ТОПЫ/ОБМЕН -->
+    <!-- ТОП / ОБМЕН -->
     <section id="screen-top" class="screen">
       <div class="card">
         <div class="card-header">
           <div class="card-title">🏆 Лидеры (локально)</div>
-          <div class="badge">по балансу и NFT</div>
+          <div class="badge">баланс / NFT</div>
         </div>
-        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px;">
-          Локальный зал славы. Каждый раз, как ты заходишь в мини‑ап, твой прогресс остаётся.
+        <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:4px;">
+          Локальный зал славы. Каждый запуск мини‑аппа обновляет твой статус.
         </div>
-        <div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px;">По балансу:</div>
+        <div style="font-size:10.5px;color:var(--text-secondary);margin-bottom:3px;">По балансу:</div>
         <div id="leadersBalance" class="leader-list"></div>
-        <div style="font-size:11px;color:var(--text-secondary);margin:8px 0 4px;">По инвентарю:</div>
+        <div style="font-size:10.5px;color:var(--text-secondary);margin:6px 0 3px;">По инвентарю:</div>
         <div id="leadersInv" class="leader-list"></div>
       </div>
       <div class="card">
@@ -660,21 +604,21 @@
           <div class="card-title">🔁 Обмен NFT</div>
           <div class="badge">через код</div>
         </div>
-        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px;">
-          Генерируй код на NFT — пересылай другу. Он вставляет код у себя и забирает предмет.
+        <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:4px;">
+          Генерируешь код — кидаешь его другу. Он вставляет у себя и забирает предмет.
         </div>
-        <div style="font-size:11px;margin-bottom:4px;">Код для отправки (активный NFT):</div>
+        <div style="font-size:10.5px;margin-bottom:3px;">Код для отправки (активный NFT):</div>
         <textarea id="tradeCodeOut" class="textarea" readonly>нет NFT для отправки</textarea>
-        <div style="font-size:11px;margin-top:6px;">Вставить код от друга:</div>
+        <div style="font-size:10.5px;margin-top:5px;">Вставить код от друга:</div>
         <textarea id="tradeCodeIn" class="textarea" placeholder="Вставь сюда код обмена..."></textarea>
-        <div class="sub-row" style="margin-top:8px;">
+        <div class="sub-row" style="margin-top:6px;">
           <button id="btnGenTrade" class="btn btn-ghost btn-small">🎯 Сгенерировать код</button>
           <button id="btnApplyTrade" class="btn btn-primary btn-small">✅ Принять NFT</button>
         </div>
       </div>
     </section>
 
-    <!-- ЭКРАН НАСТРОЙКИ -->
+    <!-- НАСТРОЙКИ -->
     <section id="screen-settings" class="screen">
       <div class="card">
         <div class="card-header">
@@ -685,10 +629,10 @@
           <button id="btnVibration" class="btn btn-ghost btn-small">📳 Вибрация: ВКЛ</button>
           <button id="btnSound" class="btn btn-ghost btn-small">🔊 Звук: ВКЛ</button>
         </div>
-        <div style="margin-top:10px;font-size:12px;color:var(--text-secondary);">
-          Все настройки и прогресс хранятся в локальном storage браузера внутри Telegram, без серверов.
+        <div style="margin-top:7px;font-size:11.5px;color:var(--text-secondary);">
+          Прогресс и настройки хранятся в localStorage Telegram‑браузера. Никаких серверов.
         </div>
-        <button id="btnReset" class="btn btn-danger" style="margin-top:10px;width:100%;">🧨 Сбросить прогресс (локально)</button>
+        <button id="btnReset" class="btn btn-danger" style="margin-top:8px;width:100%;">🧨 Сбросить прогресс</button>
       </div>
       <div class="card">
         <div class="card-header">
@@ -725,7 +669,7 @@
   </nav>
 </div>
 
-<!-- Оверлей анимации кейса -->
+<!-- оверлей анимации кейса -->
 <div id="caseAnimOverlay" class="case-anim-overlay">
   <div class="case-anim-box">
     <div class="case-anim-title" id="caseAnimTitle">Открываем кейс...</div>
@@ -739,635 +683,605 @@
 </div>
 
 <script>
-  const tg = window.Telegram?.WebApp;
-  if (tg) tg.expand();
+const tg = window.Telegram?.WebApp;
+if (tg) tg.expand();
 
-  /* === состояние === */
-  let state = {
-    player: {
-      name: "Игрок",
-      user: "user",
-      balance: 15000,
-      totalCases: 0,
-      bestRarity: null,
-      vipUntil: 0,
-      vibration: true,
-      sound: true
-    },
-    eventHot: true,
-    nft: [], // {id,name,rarity,level,exp}
-    activeNftId: null,
-    lastDailyTs: 0,
-    selectedPack: null,
-    leaders: []
+/* состояние */
+let state = {
+  player:{
+    name:"Игрок",
+    user:"user",
+    balance:15000,
+    totalCases:0,
+    bestRarity:null,
+    vipUntil:0,
+    vibration:true,
+    sound:true,
+    streakWins:0
+  },
+  eventHot:true,
+  nft:[],
+  activeNftId:null,
+  lastDailyTs:0,
+  selectedPack:null,
+  leaders:[]
+};
+
+const RARITIES=["COMMON","RARE","EPIC","LEGENDARY","MYTHIC"];
+let CASES=[]; // сгенерируем ~250+ штук
+
+function fmt(n){return n.toLocaleString("ru-RU");}
+function rarCfg(r){
+  switch(r){
+    case"COMMON":return{label:"COMMON",class:"rarity-common",color:"#9ca3af"};
+    case"RARE":return{label:"RARE",class:"rarity-rare",color:"#60a5fa"};
+    case"EPIC":return{label:"EPIC",class:"rarity-epic",color:"#e9d5ff"};
+    case"LEGENDARY":return{label:"LEGEND",class:"rarity-legendary",color:"#fef3c7"};
+    case"MYTHIC":return{label:"MYTHIC",class:"rarity-mythic",color:"#fee2e2"};
+    default:return{label:r,class:"rarity-common",color:"#9ca3af"};
+  }
+}
+function randomName(r){
+  const map={
+    COMMON:["Street Chip","Rusty Core","Old Drive","Dust Key","Cheap Fragment"],
+    RARE:["Virus Core","Neon Blade","Midnight Node","Cold Barrel","Blue Circuit"],
+    EPIC:["Quantum Spike","Ghost Kernel","Stellar Mask","Abyss Dagger","Dark Beacon"],
+    LEGENDARY:["Royal Matrix","Emperor Key","Crown Protocol","Gold Operator","Dragon Mask"],
+    MYTHIC:["Omega Singularity","Godlike Seed","Chaos Script","Zero Origin","Myth Core"]
   };
+  const arr=map[r]||map["COMMON"];
+  const base=arr[Math.floor(Math.random()*arr.length)];
+  const num=String(Math.floor(Math.random()*999)+1).padStart(3,"0");
+  return `${base} #${num}`;
+}
+function estimateValue(nft){
+  const baseMap={COMMON:2000,RARE:8000,EPIC:25000,LEGENDARY:80000,MYTHIC:240000};
+  const base=baseMap[nft.rarity]||2000;
+  let mult=1+nft.level*0.35;
+  if (state.player.vipUntil>Date.now()) mult*=1.2;
+  return Math.round(base*mult);
+}
+function bestRarity(current,n){
+  if(!n) return current;
+  if(!current) return n;
+  return RARITIES.indexOf(n)>RARITIES.indexOf(current)?n:current;
+}
 
-  const RARITIES = ["COMMON","RARE","EPIC","LEGENDARY","MYTHIC"];
-  const CASES = [
-    {
-      id:"street",
-      name:"Уличный старт",
-      rarity:"COMMON",
-      price:1000,
-      desc:"Дешево, быстро, массово.",
-      weights:{COMMON:70,RARE:20,EPIC:8,LEGENDARY:2,MYTHIC:0}
-    },
-    {
-      id:"blood",
-      name:"Кровавый рассвет",
-      rarity:"RARE",
-      price:5000,
-      desc:"Баланс риска и награды.",
-      weights:{COMMON:35,RARE:30,EPIC:22,LEGENDARY:10,MYTHIC:3}
-    },
-    {
-      id:"lava",
-      name:"Лава",
-      rarity:"EPIC",
-      price:15000,
-      desc:"Горячий шанс на эпик.",
-      weights:{COMMON:25,RARE:28,EPIC:30,LEGENDARY:12,MYTHIC:5}
-    },
-    {
-      id:"royal",
-      name:"Трон удачи",
-      rarity:"LEGENDARY",
-      price:60000,
-      desc:"Королевский риск — королевский дроп.",
-      weights:{COMMON:18,RARE:25,EPIC:30,LEGENDARY:18,MYTHIC:9}
-    },
-    {
-      id:"olymp",
-      name:"Олимп богов",
-      rarity:"MYTHIC",
-      price:160000,
-      desc:"Чистый азарт, без подушек безопасности.",
-      weights:{COMMON:10,RARE:20,EPIC:30,LEGENDARY:25,MYTHIC:15}
-    }
+/* localStorage */
+const STORAGE_KEY="elite_deb_nft_battle_v2";
+function loadState(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw) return;
+    const data=JSON.parse(raw);
+    state=Object.assign(state,data);
+    if(!Array.isArray(state.nft)) state.nft=[];
+    if(!Array.isArray(state.leaders)) state.leaders=[];
+  }catch(e){}
+}
+function saveState(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){}
+}
+
+/* кейсы генерация */
+function genCases(){
+  const templates=[
+    {baseName:"Уличный",rarity:"COMMON",basePrice:800,desc:"Дешёвый грязный рандом."},
+    {baseName:"Подворотня",rarity:"COMMON",basePrice:1200,desc:"Обычный мусор, иногда что-то живое."},
+    {baseName:"Городской миф",rarity:"RARE",basePrice:4000,desc:"Редкие легенды спального района."},
+    {baseName:"Ночная смена",rarity:"RARE",basePrice:6000,desc:"Играть после полуночи — твой выбор."},
+    {baseName:"Кровавый рассвет",rarity:"EPIC",basePrice:13000,desc:"Солнце идёт, а твой банк качается."},
+    {baseName:"Лава",rarity:"EPIC",basePrice:17000,desc:"Может обжечь, может осветить."},
+    {baseName:"Трон удачи",rarity:"LEGENDARY",basePrice:55000,desc:"Только для тех, кто не боится смотреть вниз."},
+    {baseName:"Олимп богов",rarity:"MYTHIC",basePrice:160000,desc:"Здесь RNG пишет законы."}
   ];
-
-  /* === utils === */
-  function fmt(n){return n.toLocaleString("ru-RU");}
-  function rarCfg(r){
-    switch(r){
-      case "COMMON":return{label:"COMMON",class:"rarity-common",color:"#9ca3af"};
-      case "RARE":return{label:"RARE",class:"rarity-rare",color:"#60a5fa"};
-      case "EPIC":return{label:"EPIC",class:"rarity-epic",color:"#e9d5ff"};
-      case "LEGENDARY":return{label:"LEGEND",class:"rarity-legendary",color:"#fef3c7"};
-      case "MYTHIC":return{label:"MYTHIC",class:"rarity-mythic",color:"#fee2e2"};
-      default:return{label:r,class:"rarity-common",color:"#9ca3af"};
+  const weightsByRarity={
+    COMMON:{COMMON:70,RARE:20,EPIC:8,LEGENDARY:2,MYTHIC:0},
+    RARE:{COMMON:45,RARE:30,EPIC:18,LEGENDARY:6,MYTHIC:1},
+    EPIC:{COMMON:28,RARE:30,EPIC:28,LEGENDARY:10,MYTHIC:4},
+    LEGENDARY:{COMMON:18,RARE:25,EPIC:30,LEGENDARY:18,MYTHIC:9},
+    MYTHIC:{COMMON:10,RARE:20,EPIC:30,LEGENDARY:25,MYTHIC:15}
+  };
+  const out=[];
+  let idCounter=1;
+  templates.forEach(t=>{
+    for(let i=0;i<32;i++){
+      const price=t.basePrice+ i*250*(RARITIES.indexOf(t.rarity)+1);
+      const multiName=i===0?"I":i===1?"II":i===2?"III":`#${i+1}`;
+      out.push({
+        id:`${t.baseName}_${idCounter}`,
+        name:`${t.baseName} ${multiName}`,
+        rarity:t.rarity,
+        price,
+        desc:t.desc,
+        weights:weightsByRarity[t.rarity]
+      });
+      idCounter++;
     }
-  }
-  function randomRarity(weights){
-    let total=0;
-    Object.values(weights).forEach(w=>total+=w);
-    let roll=Math.random()*total;
-    for(const [r,w] of Object.entries(weights)){
-      if(roll<w) return r;
-      roll-=w;
-    }
-    return "COMMON";
-  }
-  function randomName(r){
-    const map={
-      COMMON:["Street Chip","Rusty Core","Old Drive","Dust Key"],
-      RARE:["Virus Core","Neon Blade","Midnight Node","Cold Barrel"],
-      EPIC:["Quantum Spike","Ghost Kernel","Stellar Mask","Abyssal Dagger"],
-      LEGENDARY:["Royal Matrix","Emperor Key","Crown Protocol","Gold Operator"],
-      MYTHIC:["Omega Singularity","Godlike Seed","Chaos Script","Zero Origin"]
-    };
-    const arr=map[r]||map["COMMON"];
-    const base=arr[Math.floor(Math.random()*arr.length)];
-    const num=String(Math.floor(Math.random()*999)+1).padStart(3,"0");
-    return `${base} #${num}`;
-  }
-  function estimateValue(nft){
-    const baseMap={COMMON:2000,RARE:8000,EPIC:25000,LEGENDARY:80000,MYTHIC:240000};
-    const base=baseMap[nft.rarity]||2000;
-    return Math.round(base*(1+nft.level*0.35));
-  }
-  function bestRarity(current,newR){
-    if(!newR) return current;
-    if(!current) return newR;
-    return RARITIES.indexOf(newR)>RARITIES.indexOf(current)?newR:current;
-  }
+  });
+  CASES=out;
+}
 
-  /* === localStorage === */
-  const STORAGE_KEY="elite_deb_nft_battle_v1";
-  function loadState(){
-    try{
-      const raw=localStorage.getItem(STORAGE_KEY);
-      if(!raw) return;
-      const data=JSON.parse(raw);
-      state=Object.assign(state,data);
-      // упрощённо: баланс/лидеры/NFT
-      if(!Array.isArray(state.nft)) state.nft=[];
-      if(!Array.isArray(state.leaders)) state.leaders=[];
-    }catch(e){}
+/* общие обновления */
+function updateHeader(){
+  document.getElementById("balanceValue").textContent=fmt(state.player.balance);
+  document.getElementById("playerName").textContent=state.player.name;
+  document.getElementById("playerUser").textContent=state.player.user;
+  document.getElementById("totalCases").textContent=state.player.totalCases;
+  document.getElementById("nftCount").textContent=state.nft.length;
+  document.getElementById("caseCount").textContent=CASES.length;
+  document.getElementById("bestDrop").textContent=state.player.bestRarity||"нет";
+  document.getElementById("badgeEvent").textContent=state.eventHot?"🔥 Огненная неделя":"Обычный режим";
+  document.getElementById("streakWins").textContent=state.player.streakWins;
+  const mult = 1 + state.player.streakWins*0.05;
+  document.getElementById("streakMult").textContent=mult.toFixed(2);
+  // ранг
+  const invValue=state.nft.reduce((s,n)=>s+estimateValue(n),0);
+  const power=state.player.balance+invValue*0.6;
+  let rank="Новичок";
+  if(power>=1_000_000) rank="Легенда казино";
+  else if(power>=300_000) rank="Босс азарта";
+  else if(power>=100_000) rank="Серьёзный ставочник";
+  document.getElementById("playerRank").textContent=rank;
+  // vip
+  const now=Date.now();
+  const vipEl=document.getElementById("vipStatus");
+  if(state.player.vipUntil>now){
+    const diff=state.player.vipUntil-now;
+    const h=Math.floor(diff/3600000);
+    const m=Math.floor((diff%3600000)/60000);
+    vipEl.textContent=`Контракт активен ещё ${h}ч ${m}м. Бонусы к дропу и ценам.`;
+  }else{
+    vipEl.textContent="Контракт не активен.";
   }
-  function saveState(){
-    try{
-      localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
-    }catch(e){}
+  updateLeaders();
+}
+
+/* кейсы рендер */
+let currentFilter="all";
+function renderCases(){
+  const grid=document.getElementById("caseGrid");
+  grid.innerHTML="";
+  CASES.filter(c=>currentFilter==="all"||c.rarity===currentFilter).forEach(c=>{
+    const rar=rarCfg(c.rarity);
+    const div=document.createElement("div");
+    div.className="case-card";
+    div.dataset.caseId=c.id;
+    div.innerHTML=`
+      <div class="case-header">
+        <div class="case-name">${c.name}</div>
+        <div class="case-price">${fmt(c.price)} 🪙</div>
+      </div>
+      <div class="case-desc">${c.desc}</div>
+      <div class="case-rarity-tag ${rar.class}">${rar.label}</div>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+/* NFT render */
+function renderNftMain(){
+  const box=document.getElementById("nftMainBlock");
+  if(!state.nft.length){
+    box.innerHTML=`<div style="font-size:12px;color:var(--text-secondary);">
+      NFT с возможностью улучшения. Пока пусто — разблокируй пару кейсов.
+    </div>`;
+    document.getElementById("tradeCodeOut").value="нет NFT для отправки";
+    return;
   }
-
-  /* === обновление UI === */
-  function updateHeader(){
-    document.getElementById("balanceValue").textContent=fmt(state.player.balance);
-    document.getElementById("playerName").textContent=state.player.name;
-    document.getElementById("playerUser").textContent=state.player.user;
-    document.getElementById("totalCases").textContent=state.player.totalCases;
-    document.getElementById("nftCount").textContent=state.nft.length;
-    const rar=state.player.bestRarity;
-    document.getElementById("bestDrop").textContent=rar?rar:"нет";
-    document.getElementById("badgeEvent").textContent=state.eventHot?"🔥 Огненная неделя":"Обычный режим";
-
-    const invValue=state.nft.reduce((s,n)=>s+estimateValue(n),0);
-    const power=state.player.balance+invValue*0.6;
-    let rank="Новичок";
-    if(power>=1000000) rank="Легенда казино";
-    else if(power>=300000) rank="Босс азарта";
-    else if(power>=100000) rank="Серьёзный ставочник";
-    document.getElementById("playerRank").textContent=rank;
-
-    // VIP
-    const now=Date.now();
-    const vipEl=document.getElementById("vipStatus");
-    if(state.player.vipUntil>now){
-      const diff=state.player.vipUntil-now;
-      const hours=Math.floor(diff/3600000);
-      const mins=Math.floor((diff%3600000)/60000);
-      vipEl.textContent=`Контракт активен ещё ${hours}ч ${mins}м. Бонусы к дропу и ценам.`;
-    }else{
-      vipEl.textContent="Контракт не активен.";
-    }
-
-    // лидеры
-    updateLeaders();
-  }
-
-  function renderCases(){
-    const container=document.getElementById("caseList");
-    container.innerHTML="";
-    CASES.forEach(c=>{
-      const rar=rarCfg(c.rarity);
-      const div=document.createElement("div");
-      div.className="case-card";
-      div.dataset.caseId=c.id;
-      div.innerHTML=`
-        <div class="case-header">
-          <div class="case-name">${c.name}</div>
-          <div class="case-price">${fmt(c.price)} 🪙</div>
-        </div>
-        <div class="case-desc">${c.desc}</div>
-        <div class="case-rarity-tag ${rar.class}">${rar.label}</div>
-      `;
-      container.appendChild(div);
-    });
-  }
-
-  function renderNftMain(){
-    const box=document.getElementById("nftMainBlock");
-    if(!state.nft.length){
-      box.innerHTML=`<div style="font-size:12px;color:var(--text-secondary);">
-        Тут будут NFT, когда ты начнешь хозяйничать с кейсами.
-      </div>`;
-      document.getElementById("tradeCodeOut").value="нет NFT для отправки";
-      return;
-    }
-    const active=state.nft.find(n=>n.id===state.activeNftId)||state.nft[0];
-    state.activeNftId=active.id;
-    const rar=rarCfg(active.rarity);
-    const value=estimateValue(active);
-    const nftHtml=`
-      <div class="nft-header">
-        <div>
-          <div class="nft-main">
-            <div class="nft-avatar">
-              <div class="nft-avatar-inner">${active.rarity[0]}</div>
-            </div>
-            <div class="nft-info">
-              <h3>${active.name}</h3>
-              <div class="nft-info-sub" style="color:${rar.color};">${rar.label} · LVL ${active.level}</div>
-              <div class="nft-meta-row">
-                <span class="tag">~${fmt(value)} 🪙</span>
-                <span class="tag">NFT: ${state.nft.length}</span>
-              </div>
-            </div>
+  const active=state.nft.find(n=>n.id===state.activeNftId)||state.nft[0];
+  state.activeNftId=active.id;
+  const rar=rarCfg(active.rarity);
+  const value=estimateValue(active);
+  box.innerHTML=`
+    <div class="nft-header">
+      <div>
+        <div class="nft-main">
+          <div class="nft-avatar">
+            <div class="nft-avatar-inner">${active.rarity[0]}</div>
           </div>
-          <div class="nft-circle-meter">
-            <div class="circle-wrap" id="nftCircle">
-              <div class="circle-fill"></div>
-              <div class="circle-inner">${Math.round(active.exp||0)}%</div>
-            </div>
-            <div style="font-size:11px;color:var(--text-secondary);">
-              Шанс выжить при апгрейде зависит от уровня. Чем выше — тем жарче.
+          <div class="nft-info">
+            <h3>${active.name}</h3>
+            <div class="nft-info-sub" style="color:${rar.color};">${rar.label} · LVL ${active.level}</div>
+            <div class="nft-meta-row">
+              <span class="tag">~${fmt(value)} 🪙</span>
+              <span class="tag">NFT: ${state.nft.length}</span>
             </div>
           </div>
         </div>
+        <div class="nft-circle-meter">
+          <div class="circle-wrap" id="nftCircle">
+            <div class="circle-fill"></div>
+            <div class="circle-inner">${Math.round(active.exp||0)}%</div>
+          </div>
+          <div>
+            Шанс выжить при апгрейде зависит от уровня и ивента.
+          </div>
+        </div>
       </div>
-      <div class="nft-list" id="nftList"></div>
+    </div>
+    <div class="nft-list" id="nftList"></div>
+  `;
+  const list=document.getElementById("nftList");
+  state.nft.forEach(n=>{
+    const r=rarCfg(n.rarity);
+    const row=document.createElement("div");
+    row.className="nft-row";
+    row.dataset.nftId=n.id;
+    row.innerHTML=`
+      <span>${n.name}</span>
+      <span style="color:${r.color};">${r.label} · L${n.level}</span>
     `;
-    box.innerHTML=nftHtml;
-    const list=document.getElementById("nftList");
-    state.nft.forEach(n=>{
-      const r=rarCfg(n.rarity);
-      const row=document.createElement("div");
-      row.className="nft-row";
-      row.dataset.nftId=n.id;
-      row.innerHTML=`
-        <span>${n.name}</span>
-        <span style="color:${r.color};">${r.label} · L${n.level}</span>
-      `;
-      row.addEventListener("click",()=>{
-        state.activeNftId=n.id;
-        renderNftMain();
-        updateHeader();
-      });
-      list.appendChild(row);
-    });
-    generateTradeCode();
-  }
+    row.onclick=()=>{
+      state.activeNftId=n.id;
+      renderNftMain();
+      updateHeader();
+    };
+    list.appendChild(row);
+  });
+  generateTradeCode();
+}
 
-  function updateLeaders(){
-    const invValue=state.nft.reduce((s,n)=>s+estimateValue(n),0);
-    const key=state.player.user||"user";
-    const entry=state.leaders.find(l=>l.user===key);
-    if(entry){
-      entry.balance=state.player.balance;
-      entry.invValue=invValue;
-      entry.name=state.player.name;
+/* лидеры */
+function updateLeaders(){
+  const invValue=state.nft.reduce((s,n)=>s+estimateValue(n),0);
+  const key=state.player.user||"user";
+  const e=state.leaders.find(l=>l.user===key);
+  if(e){
+    e.balance=state.player.balance;
+    e.invValue=invValue;
+    e.name=state.player.name;
+  }else{
+    state.leaders.push({user:key,name:state.player.name,balance:state.player.balance,invValue});
+  }
+  const byBal=[...state.leaders].sort((a,b)=>b.balance-a.balance).slice(0,10);
+  const byInv=[...state.leaders].sort((a,b)=>b.invValue-a.invValue).slice(0,10);
+  const lb=document.getElementById("leadersBalance");
+  const li=document.getElementById("leadersInv");
+  lb.innerHTML=byBal.map((u,i)=>`
+    <div class="leader-row">
+      <span>${i+1}. ${u.name} (@${u.user})</span>
+      <span class="leader-score-balance">${fmt(u.balance)} 🪙</span>
+    </div>`).join("") || `<div style="padding:6px;color:var(--text-secondary);">Пока пусто.</div>`;
+  li.innerHTML=byInv.map((u,i)=>`
+    <div class="leader-row">
+      <span>${i+1}. ${u.name} (@${u.user})</span>
+      <span class="leader-score-inv">${fmt(Math.round(u.invValue))} 🪙</span>
+    </div>`).join("") || `<div style="padding:6px;color:var(--text-secondary);">Пока пусто.</div>`;
+}
+
+/* trade */
+function generateTradeCode(){
+  const out=document.getElementById("tradeCodeOut");
+  if(!state.nft.length){out.value="нет NFT для отправки";return;}
+  const nft=state.nft.find(n=>n.id===state.activeNftId)||state.nft[0];
+  const payload={type:"nft_trade",nft};
+  out.value=btoa(JSON.stringify(payload));
+}
+function applyTrade(){
+  const txt=document.getElementById("tradeCodeIn").value.trim();
+  if(!txt){alert("Вставь код обмена.");return;}
+  try{
+    const payload=JSON.parse(atob(txt));
+    if(payload.type!=="nft_trade"||!payload.nft) throw new Error();
+    const exists=state.nft.find(n=>n.id===payload.nft.id);
+    if(exists){alert("Этот NFT уже есть.");return;}
+    state.nft.push(payload.nft);
+    state.activeNftId=payload.nft.id;
+    alert("NFT принят в инвентарь.");
+    renderNftMain();
+    saveState();
+    updateHeader();
+  }catch(e){alert("Неверный код обмена.");}
+}
+
+/* кейсы логика */
+function randomWeighted(weights){
+  let total=0;Object.values(weights).forEach(w=>total+=w);
+  let roll=Math.random()*total;
+  for(const [r,w] of Object.entries(weights)){
+    if(roll<w) return r;
+    roll-=w;
+  }
+  return"COMMON";
+}
+function calcDropRarity(baseWeights){
+  const now=Date.now();
+  const vip=state.player.vipUntil>now;
+  const w={...baseWeights};
+  if(state.eventHot){
+    w.EPIC=(w.EPIC||0)*1.15;
+    w.LEGENDARY=(w.LEGENDARY||0)*1.35;
+    w.MYTHIC=(w.MYTHIC||0)*1.5;
+  }
+  if(vip){
+    w.EPIC=(w.EPIC||0)*1.2;
+    w.LEGENDARY=(w.LEGENDARY||0)*1.2;
+    w.MYTHIC=(w.MYTHIC||0)*1.2;
+  }
+  return randomWeighted(w);
+}
+function openCase(caseId){
+  const c=CASES.find(x=>x.id===caseId);
+  if(!c) return;
+  if(state.player.balance<c.price){
+    alert("Не хватает монет на этот кейс.");
+    return;
+  }
+  state.player.balance-=c.price;
+  state.player.totalCases++;
+  saveState();
+  updateHeader();
+  showCaseAnim(c);
+}
+function showCaseAnim(c){
+  const overlay=document.getElementById("caseAnimOverlay");
+  const title=document.getElementById("caseAnimTitle");
+  const status=document.getElementById("caseAnimStatus");
+  const lock=document.getElementById("caseAnimLock");
+  const fill=document.getElementById("caseAnimFill");
+  const dropBlock=document.getElementById("caseAnimDrop");
+  title.textContent=`Открываем: ${c.name}`;
+  status.textContent="Подключение к ELITE RNG...";
+  lock.textContent="🔒";
+  fill.style.width="0%";
+  dropBlock.innerHTML="";
+  overlay.classList.add("active");
+  const stages=[
+    {t:"Подключение к хранилищу NFT...",icon:"📡"},
+    {t:"Синхронизирую фарт с космосом...",icon:"🛰"},
+    {t:"Крутится внутренняя рулетка Макса...",icon:"🎲"},
+    {t:"Проверяю, не в минус ли ты...",icon:"📊"},
+    {t:"Фиксирую результат дропа...",icon:"🔐"}
+  ];
+  let step=0;
+  const timer=setInterval(()=>{
+    step++;
+    const progress=Math.min(100,(step/stages.length)*100);
+    fill.style.width=progress+"%";
+    if(step<=stages.length){
+      status.textContent=stages[step-1].t;
+      lock.textContent=stages[step-1].icon;
     }else{
-      state.leaders.push({
-        user:key,
-        name:state.player.name,
-        balance:state.player.balance,
-        invValue
-      });
+      clearInterval(timer);
+      lock.textContent="✅";
+      status.textContent="RNG зафиксирован.";
+      setTimeout(()=>revealDrop(c),250);
     }
-    const byBal=[...state.leaders].sort((a,b)=>b.balance-a.balance).slice(0,10);
-    const byInv=[...state.leaders].sort((a,b)=>b.invValue-a.invValue).slice(0,10);
-    const lb=document.getElementById("leadersBalance");
-    const li=document.getElementById("leadersInv");
-    lb.innerHTML=byBal.map((u,i)=>`
-      <div class="leader-row">
-        <span>${i+1}. ${u.name} (@${u.user})</span>
-        <span class="leader-score-balance">${fmt(u.balance)} 🪙</span>
-      </div>`).join("") || `<div style="padding:6px;color:var(--text-secondary);">Пока пусто.</div>`;
-    li.innerHTML=byInv.map((u,i)=>`
-      <div class="leader-row">
-        <span>${i+1}. ${u.name} (@${u.user})</span>
-        <span class="leader-score-inv">${fmt(Math.round(u.invValue))} 🪙</span>
-      </div>`).join("") || `<div style="padding:6px;color:var(--text-secondary);">Пока пусто.</div>`;
+  },220);
+}
+function revealDrop(c){
+  const dropBlock=document.getElementById("caseAnimDrop");
+  const rarity=calcDropRarity(c.weights);
+  const name=randomName(rarity);
+  const nft={id:"nft_"+Date.now()+"_"+Math.floor(Math.random()*9999),name,rarity,level:0,exp:0};
+  state.nft.push(nft);
+  state.activeNftId=nft.id;
+  state.player.bestRarity=bestRarity(state.player.bestRarity,rarity);
+  // streak: эпик и выше — плюс серия, иначе сброс
+  const idx=RARITIES.indexOf(rarity);
+  if(idx>=RARITIES.indexOf("EPIC")){
+    state.player.streakWins+=1;
+  }else{
+    state.player.streakWins=0;
   }
+  const rar=rarCfg(rarity);
+  const value=estimateValue(nft);
+  dropBlock.innerHTML=`
+    <div class="case-drop">
+      <div style="font-size:12px;margin-bottom:2px;">🎊 Выпало:</div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:2px;">${nft.name}</div>
+      <div style="font-size:11.5px;color:${rar.color};margin-bottom:2px;">${rar.label}</div>
+      <div style="font-size:11px;color:var(--text-secondary);">~${fmt(value)} 🪙</div>
+    </div>
+    <button id="btnCloseCaseAnim" class="btn btn-primary" style="margin-top:7px;width:100%;">Забрать и продолжить</button>
+  `;
+  document.getElementById("btnCloseCaseAnim").onclick=()=>{
+    document.getElementById("caseAnimOverlay").classList.remove("active");
+  };
+  renderNftMain();
+  saveState();
+  updateHeader();
+}
 
-  function generateTradeCode(){
-    const out=document.getElementById("tradeCodeOut");
-    if(!state.nft.length){out.value="нет NFT для отправки";return;}
-    const nft=state.nft.find(n=>n.id===state.activeNftId)||state.nft[0];
-    const payload={type:"nft_trade",nft};
-    out.value=btoa(JSON.stringify(payload));
+/* ежедневный бонус */
+function takeDaily(){
+  const now=Date.now();
+  if(now-state.lastDailyTs<24*3600000){
+    alert("Бонус уже забран. Жди ещё.");
+    return;
   }
+  let base=5000;
+  if(state.eventHot) base*=2;
+  state.player.balance+=base;
+  state.lastDailyTs=now;
+  alert(`Ежедневный бонус: +${fmt(base)} 🪙`);
+  saveState();
+  updateHeader();
+}
 
-  /* === кейсы: анимация и дроп === */
-  function openCase(caseId){
-    const c=CASES.find(x=>x.id===caseId);
-    if(!c) return;
-    if(state.player.balance<c.price){
-      alert("Не хватает монет на этот кейс.");
-      return;
+/* крафт и апгрейд */
+function craft(){
+  if(state.nft.length<3){
+    alert("Нужно минимум 3 NFT для крафта.");
+    return;
+  }
+  const removed=state.nft.splice(0,3);
+  let maxIdx=0;
+  removed.forEach(n=>{
+    const idx=RARITIES.indexOf(n.rarity);
+    if(idx>maxIdx) maxIdx=idx;
+  });
+  const newIdx=Math.min(RARITIES.length-1,maxIdx+1);
+  const rar=RARITIES[newIdx];
+  const nft={id:"nft_"+Date.now()+"_"+Math.floor(Math.random()*9999),name:randomName(rar),rarity:rar,level:0,exp:0};
+  state.nft.push(nft);
+  state.activeNftId=nft.id;
+  alert("Крафт удался. Новый NFT выше классом.");
+  renderNftMain();
+  saveState();
+  updateHeader();
+}
+function upgrade(){
+  if(!state.nft.length){
+    alert("Нет NFT для апгрейда.");
+    return;
+  }
+  const nft=state.nft.find(n=>n.id===state.activeNftId)||state.nft[0];
+  const baseCost=5000;
+  const cost=baseCost+nft.level*4000;
+  if(state.player.balance<cost){
+    alert("Не хватает монет для улучшения.");
+    return;
+  }
+  state.player.balance-=cost;
+  const baseRisk=10+nft.level*7;
+  let risk=Math.min(80,baseRisk);
+  if(state.eventHot) risk=Math.max(5,risk-5);
+  const circle=document.getElementById("nftCircle");
+  if(circle) circle.classList.add("upgrading");
+  setTimeout(()=>{
+    const roll=Math.random()*100;
+    if(roll<risk){
+      state.nft=state.nft.filter(n=>n.id!==nft.id);
+      state.activeNftId=state.nft[0]?.id||null;
+      alert("NFT сгорел на апгрейде. Макс кивнул одобрительно.");
+    }else{
+      nft.level+=1;
+      nft.exp=Math.min(100,(nft.exp||0)+35);
+      alert("NFT выжил и стал жёстче.");
     }
-    state.player.balance-=c.price;
-    state.player.totalCases++;
-    showCaseAnim(c);
-    saveState();
-    updateHeader();
-  }
-
-  function showCaseAnim(c){
-    const overlay=document.getElementById("caseAnimOverlay");
-    const title=document.getElementById("caseAnimTitle");
-    const status=document.getElementById("caseAnimStatus");
-    const lock=document.getElementById("caseAnimLock");
-    const fill=document.getElementById("caseAnimFill");
-    const dropBlock=document.getElementById("caseAnimDrop");
-    title.textContent=`Открываем: ${c.name}`;
-    status.textContent="Подключение к ELITE RNG...";
-    lock.textContent="🔒";
-    fill.style.width="0%";
-    dropBlock.innerHTML="";
-    overlay.classList.add("active");
-    let step=0;
-    const stages=[
-      {text:"Подключение к хранилищу NFT...",icon:"📡"},
-      {text:"Анализ твоего фартового профиля...",icon:"🧠"},
-      {text:"Крутится виртуальная рулетка...",icon:"🎲"},
-      {text:"Макс смотрит, насколько ты наглый...",icon:"👀"},
-      {text:"Фиксирую результат дропа...",icon:"🔐"}
-    ];
-    const timer=setInterval(()=>{
-      step++;
-      const progress=Math.min(100,(step/stages.length)*100);
-      fill.style.width=progress+"%";
-      if(step<=stages.length){
-        status.textContent=stages[step-1].text;
-        lock.textContent=stages[step-1].icon;
-      }else{
-        clearInterval(timer);
-        lock.textContent="✅";
-        status.textContent="RNG зафиксирован.";
-        setTimeout(()=>{
-          revealDrop(c);
-        },350);
-      }
-    },240);
-  }
-
-  function revealDrop(c){
-    const dropBlock=document.getElementById("caseAnimDrop");
-    const rarity=calculateDropRarity(c.weights);
-    const name=randomName(rarity);
-    const nft={
-      id:"nft_"+Date.now()+"_"+Math.floor(Math.random()*9999),
-      name,
-      rarity,
-      level:0,
-      exp:0
-    };
-    state.nft.push(nft);
-    state.activeNftId=nft.id;
-    state.player.bestRarity=bestRarity(state.player.bestRarity,rarity);
-
-    const rar=rarCfg(rarity);
-    const value=estimateValue(nft);
-
-    dropBlock.innerHTML=`
-      <div class="case-drop">
-        <div style="font-size:13px;margin-bottom:4px;">🎊 Выпало:</div>
-        <div style="font-size:14px;font-weight:600;margin-bottom:2px;">${nft.name}</div>
-        <div style="font-size:12px;color:${rar.color};margin-bottom:2px;">${rar.label}</div>
-        <div style="font-size:11px;color:var(--text-secondary);">~${fmt(value)} 🪙</div>
-      </div>
-      <button id="btnCloseCaseAnim" class="btn btn-primary" style="margin-top:10px;width:100%;">Забрать и продолжить</button>
-    `;
-    document.getElementById("btnCloseCaseAnim").onclick=()=>{
-      document.getElementById("caseAnimOverlay").classList.remove("active");
-    };
+    if(circle) circle.classList.remove("upgrading");
     renderNftMain();
     saveState();
     updateHeader();
-  }
+  },950);
+}
 
-  function calculateDropRarity(weights){
-    const now=Date.now();
-    const vip=state.player.vipUntil>now;
-    const w={...weights};
-    if(state.eventHot){
-      w.LEGENDARY=(w.LEGENDARY||0)*1.4;
-      w.MYTHIC=(w.MYTHIC||0)*1.6;
-    }
-    if(vip){
-      w.EPIC=(w.EPIC||0)*1.3;
-      w.LEGENDARY=(w.LEGENDARY||0)*1.3;
-      w.MYTHIC=(w.MYTHIC||0)*1.2;
-    }
-    return randomRarity(w);
+/* магазин / vip */
+function selectPack(id){
+  state.selectedPack=id;
+  document.querySelectorAll(".pack").forEach(p=>{
+    p.classList.toggle("selected",p.dataset.pack===id);
+  });
+  const label=document.getElementById("packLabel");
+  const map={"10k":"Starter · +10 000 🪙","50k":"Grinder · +50 000 🪙","250k":"Whale · +250 000 🪙","1m":"ELITE · +1 000 000 🪙"};
+  label.textContent=map[id]||"не выбран";
+}
+function fakeTopup(){
+  if(!state.selectedPack){alert("Сначала выбери пакет.");return;}
+  const map={"10k":10000,"50k":50000,"250k":250000,"1m":1000000};
+  const val=map[state.selectedPack]||0;
+  state.player.balance+=val;
+  alert(`Локальный додеп: +${fmt(val)} 🪙`);
+  saveState();
+  updateHeader();
+}
+function signVip(){
+  if(state.player.balance<100000){
+    alert("Для контракта нужно минимум 100 000 🪙.");
+    return;
   }
+  const fee=Math.round(state.player.balance*0.1);
+  state.player.balance-=fee;
+  state.player.vipUntil=Date.now()+24*3600000;
+  alert(`Контракт подписан. Макс забрал ${fmt(fee)} 🪙 и дал тебе 24 часа бонусов.`);
+  saveState();
+  updateHeader();
+}
 
-  /* === ежедневный бонус === */
-  function takeDaily(){
-    const now=Date.now();
-    if(now-state.lastDailyTs<24*3600000){
-      alert("Бонус уже забран. Жди ещё чуть-чуть.");
-      return;
-    }
-    const base=5000;
-    let bonus=base;
-    if(state.eventHot) bonus*=2;
-    state.player.balance+=bonus;
-    state.lastDailyTs=now;
-    alert(`Ежедневный бонус: +${fmt(bonus)} 🪙`);
+/* навигация */
+function switchScreen(screen){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("active",s.id==="screen-"+screen));
+  document.querySelectorAll(".nav-item").forEach(n=>n.classList.toggle("active",n.dataset.screen===screen));
+}
+
+/* init from telegram */
+function initFromTelegram(){
+  if(!tg) return;
+  const user=tg.initDataUnsafe?.user;
+  if(user){
+    state.player.name=user.first_name||state.player.name;
+    state.player.user=user.username||state.player.user;
+  }
+}
+
+/* события */
+function attachEvents(){
+  document.querySelectorAll(".nav-item").forEach(n=>n.onclick=()=>switchScreen(n.dataset.screen));
+  document.getElementById("caseGrid").onclick=e=>{
+    const card=e.target.closest(".case-card");
+    if(!card) return;
+    openCase(card.dataset.caseId);
+  };
+  document.getElementById("caseAnimOverlay").onclick=e=>{
+    if(e.target.id==="caseAnimOverlay") e.currentTarget.classList.remove("active");
+  };
+  document.getElementById("btnDaily").onclick=takeDaily;
+  document.getElementById("btnToggleEvent").onclick=()=>{
+    state.eventHot=!state.eventHot;
     saveState();
     updateHeader();
-  }
-
-  /* === крафт и улучшение === */
-  function craft(){
-    if(state.nft.length<3){
-      alert("Нужно минимум 3 NFT для крафта.");
-      return;
-    }
-    const removed=state.nft.splice(0,3);
-    let maxIdx=0;
-    removed.forEach(n=>{
-      const idx=RARITIES.indexOf(n.rarity);
-      if(idx>maxIdx) maxIdx=idx;
-    });
-    const newIdx=Math.min(RARITIES.length-1,maxIdx+1);
-    const rar=RARITIES[newIdx];
-    const nft={
-      id:"nft_"+Date.now()+"_"+Math.floor(Math.random()*9999),
-      name:randomName(rar),
-      rarity:rar,
-      level:0,
-      exp:0
+  };
+  document.querySelectorAll("#caseFilters .filter-pill").forEach(p=>{
+    p.onclick=()=>{
+      document.querySelectorAll("#caseFilters .filter-pill").forEach(x=>x.classList.remove("active"));
+      p.classList.add("active");
+      currentFilter=p.dataset.filter;
+      renderCases();
     };
-    state.nft.push(nft);
-    state.activeNftId=nft.id;
-    alert("Крафт удался. Новый NFT выше классом.");
-    renderNftMain();
+  });
+  document.getElementById("btnCraft").onclick=craft;
+  document.getElementById("btnUpgrade").onclick=upgrade;
+  document.querySelectorAll(".pack").forEach(p=>p.onclick=()=>selectPack(p.dataset.pack));
+  document.getElementById("btnFakeTopup").onclick=fakeTopup;
+  document.getElementById("btnVip").onclick=signVip;
+  document.getElementById("btnGenTrade").onclick=generateTradeCode;
+  document.getElementById("btnApplyTrade").onclick=applyTrade;
+  document.getElementById("btnVibration").onclick=()=>{
+    state.player.vibration=!state.player.vibration;
+    document.getElementById("btnVibration").textContent=`📳 Вибрация: ${state.player.vibration?"ВКЛ":"ВЫКЛ"}`;
     saveState();
-    updateHeader();
-  }
-
-  function upgrade(){
-    if(!state.nft.length){
-      alert("Нет NFT для апгрейда.");
-      return;
-    }
-    const nft=state.nft.find(n=>n.id===state.activeNftId)||state.nft[0];
-    const baseCost=5000;
-    const cost=baseCost+nft.level*4000;
-    if(state.player.balance<cost){
-      alert("Не хватает монет для улучшения.");
-      return;
-    }
-    state.player.balance-=cost;
-    const baseRisk=10+nft.level*7;
-    const risk=Math.min(80,baseRisk);
-    const circle=document.getElementById("nftCircle");
-    if(circle) circle.classList.add("upgrading");
-    setTimeout(()=>{
-      const roll=Math.random()*100;
-      if(roll<risk){
-        state.nft=state.nft.filter(n=>n.id!==nft.id);
-        state.activeNftId=state.nft[0]?.id||null;
-        alert("NFT сгорел на апгрейде. Макс был не впечатлён.");
-      }else{
-        nft.level+=1;
-        nft.exp=Math.min(100,(nft.exp||0)+35);
-        alert("NFT выжил и стал жёстче.");
-      }
-      if(circle) circle.classList.remove("upgrading");
-      renderNftMain();
-      saveState();
-      updateHeader();
-    },1000);
-  }
-
-  /* === магазин / VIP === */
-  function selectPack(id){
-    state.selectedPack=id;
-    document.querySelectorAll(".pack").forEach(p=>{
-      p.classList.toggle("selected",p.dataset.pack===id);
-    });
-    const label=document.getElementById("packLabel");
-    const map={
-      "10k":"Starter · +10 000 🪙",
-      "50k":"Grinder · +50 000 🪙",
-      "250k":"Whale · +250 000 🪙",
-      "1m":"ELITE · +1 000 000 🪙"
-    };
-    label.textContent=map[id]||"не выбран";
-  }
-
-  function fakeTopup(){
-    if(!state.selectedPack){
-      alert("Сначала выбери пакет.");
-      return;
-    }
-    const map={"10k":10000,"50k":50000,"250k":250000,"1m":1000000};
-    const val=map[state.selectedPack]||0;
-    state.player.balance+=val;
-    alert(`Локальный додеп: +${fmt(val)} 🪙`);
+  };
+  document.getElementById("btnSound").onclick=()=>{
+    state.player.sound=!state.player.sound;
+    document.getElementById("btnSound").textContent=`🔊 Звук: ${state.player.sound?"ВКЛ":"ВЫКЛ"}`;
     saveState();
-    updateHeader();
-  }
-
-  function signVip(){
-    if(state.player.balance<100000){
-      alert("Для контракта нужно минимум 100 000 🪙.");
-      return;
+  };
+  document.getElementById("btnReset").onclick=()=>{
+    if(confirm("Точно сбросить весь локальный прогресс?")){
+      localStorage.removeItem(STORAGE_KEY);
+      location.reload();
     }
-    const fee=state.player.balance*0.1;
-    state.player.balance-=fee;
-    const now=Date.now();
-    state.player.vipUntil=now+24*3600000;
-    alert(`Контракт подписан. Макс забрал ${fmt(Math.round(fee))} 🪙 и дал тебе 24 часа бонусов.`);
-    saveState();
-    updateHeader();
-  }
+  };
+  document.getElementById("btnExit").onclick=()=>{if(tg) tg.close();};
+  // админ
+  document.getElementById("btnAdminPlus1M").onclick=()=>{
+    state.player.balance+=1_000_000;
+    saveState();updateHeader();
+  };
+  document.getElementById("btnAdminAll10M").onclick=()=>{
+    state.player.balance=10_000_000;
+    saveState();updateHeader();
+  };
+  document.getElementById("btnAdminToggleEvent").onclick=()=>{
+    state.eventHot=!state.eventHot;
+    saveState();updateHeader();
+  };
+}
 
-  /* === обмен === */
-  function applyTrade(){
-    const txt=document.getElementById("tradeCodeIn").value.trim();
-    if(!txt){alert("Вставь код обмена.");return;}
-    try{
-      const payload=JSON.parse(atob(txt));
-      if(payload.type!=="nft_trade"||!payload.nft) throw new Error();
-      const exists=state.nft.find(n=>n.id===payload.nft.id);
-      if(exists){
-        alert("Этот NFT уже есть у тебя.");
-        return;
-      }
-      state.nft.push(payload.nft);
-      state.activeNftId=payload.nft.id;
-      alert("NFT принят в инвентарь.");
-      renderNftMain();
-      saveState();
-      updateHeader();
-    }catch(e){
-      alert("Неверный код обмена.");
-    }
-  }
-
-  /* === нижняя навигация === */
-  function switchScreen(screen){
-    document.querySelectorAll(".screen").forEach(s=>{
-      s.classList.toggle("active",s.id==="screen-"+screen);
-    });
-    document.querySelectorAll(".nav-item").forEach(n=>{
-      n.classList.toggle("active",n.dataset.screen===screen);
-    });
-  }
-
-  /* === инициализация === */
-  function initFromTelegram(){
-    if(!tg) return;
-    const user=tg.initDataUnsafe?.user;
-    if(user){
-      state.player.name=user.first_name||state.player.name;
-      state.player.user=user.username||state.player.user;
-    }
-  }
-
-  function attachEvents(){
-    // нижние вкладки
-    document.querySelectorAll(".nav-item").forEach(n=>{
-      n.addEventListener("click",()=>switchScreen(n.dataset.screen));
-    });
-    // кейсы
-    document.getElementById("caseList").addEventListener("click",e=>{
-      const card=e.target.closest(".case-card");
-      if(!card) return;
-      openCase(card.dataset.caseId);
-    });
-    document.getElementById("caseAnimOverlay").addEventListener("click",e=>{
-      if(e.target.id==="caseAnimOverlay"){
-        document.getElementById("caseAnimOverlay").classList.remove("active");
-      }
-    });
-
-    document.getElementById("btnDaily").onclick=takeDaily;
-    document.getElementById("btnToggleEvent").onclick=()=>{
-      state.eventHot=!state.eventHot;
-      saveState();
-      updateHeader();
-    };
-
-    document.getElementById("btnCraft").onclick=craft;
-    document.getElementById("btnUpgrade").onclick=upgrade;
-
-    document.querySelectorAll(".pack").forEach(p=>{
-      p.addEventListener("click",()=>selectPack(p.dataset.pack));
-    });
-    document.getElementById("btnFakeTopup").onclick=fakeTopup;
-    document.getElementById("btnVip").onclick=signVip;
-
-    document.getElementById("btnGenTrade").onclick=generateTradeCode;
-    document.getElementById("btnApplyTrade").onclick=applyTrade;
-
-    document.getElementById("btnVibration").onclick=()=>{
-      state.player.vibration=!state.player.vibration;
-      document.getElementById("btnVibration").textContent=`📳 Вибрация: ${state.player.vibration?"ВКЛ":"ВЫКЛ"}`;
-      saveState();
-    };
-    document.getElementById("btnSound").onclick=()=>{
-      state.player.sound=!state.player.sound;
-      document.getElementById("btnSound").textContent=`🔊 Звук: ${state.player.sound?"ВКЛ":"ВЫКЛ"}`;
-      saveState();
-    };
-    document.getElementById("btnReset").onclick=()=>{
-      if(confirm("Точно сбросить весь локальный прогресс?")) {
-        localStorage.removeItem(STORAGE_KEY);
-        location.reload();
-      }
-    };
-    document.getElementById("btnExit").onclick=()=>{
-      if(tg) tg.close();
-    };
-  }
-
-  function init(){
-    initFromTelegram();
-    loadState();
-    renderCases();
-    renderNftMain();
-    attachEvents();
-    updateHeader();
-  }
-
-  init();
+/* init */
+function init(){
+  initFromTelegram();
+  genCases();
+  loadState();
+  renderCases();
+  renderNftMain();
+  attachEvents();
+  updateHeader();
+}
+init();
 </script>
 </body>
 </html>
+
