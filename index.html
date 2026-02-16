@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Pro Farm Tycoon</title>
+    <title>Ultimate 2D Farm</title>
     <style>
         :root { --neon: #00ff88; --gold: #ffcc00; --bg: #0d130d; }
         body { 
@@ -12,9 +12,9 @@
             background-image: radial-gradient(circle at 50% 50%, #1a2e1a 0%, #0d130d 100%);
         }
 
-        /* GUI ВЕРХ */
+        /* GUI Верх */
         #header { 
-            padding: 20px; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); 
+            padding: 20px; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); 
             border-bottom: 2px solid var(--neon); text-align: center;
         }
         .balance { font-size: 38px; font-weight: 900; color: var(--gold); }
@@ -22,37 +22,48 @@
         /* СЕТКА ЗАГОНОВ */
         #field {
             display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
-            padding: 20px; height: 65vh; overflow-y: auto;
+            padding: 20px; height: 65vh; overflow-y: auto; scrollbar-width: none;
         }
 
         .plot {
-            background: rgba(255,255,255,0.05); border-radius: 30px; height: 160px;
+            background: rgba(255,255,255,0.05); border-radius: 30px; height: 180px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            position: relative; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            position: relative; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s;
         }
 
         .locked { background: rgba(0,0,0,0.5); filter: grayscale(1); opacity: 0.5; border: 2px dashed #444; }
-        .lock-icon { font-size: 24px; margin-bottom: 5px; }
 
-        /* ОКОШКО ДЛЯ ОДНОГО ЖИВОТНОГО */
-        .sprite-window {
-            width: 48px; height: 48px; overflow: hidden; position: relative;
-            transform: scale(2.5); image-rendering: pixelated;
+        /* ОЖИВЛЯЕМ МОДЕЛЬКУ (CSS Sprite Animation) */
+        .sprite-viewport {
+            width: 48px; height: 48px; /* Размер одного кадра */
+            overflow: hidden; position: relative;
+            transform: scale(3); /* Увеличиваем пиксель-арт */
+            image-rendering: pixelated; /* Сохраняем четкость 2D */
         }
-        .sheet {
-            position: absolute; left: 0; top: 0;
-            animation: walk 0.8s steps(6) infinite;
-        }
-        @keyframes walk { from { left: 0; } to { left: -288px; } }
 
-        /* Магазин внизу */
+        .sprite-sheet {
+            position: absolute; left: 0; top: 0; height: 48px;
+            /* Анимация прокрутки 6 кадров за 0.8 сек */
+            animation: walk-cycle 0.8s steps(6) infinite;
+        }
+
+        @keyframes walk-cycle {
+            from { transform: translateX(0); }
+            to { transform: translateX(-288px); } /* 48px * 6 кадров = 288px */
+        }
+
+        /* Тень под животным */
+        .shadow { width: 45px; height: 8px; background: rgba(0,0,0,0.4); border-radius: 50%; margin-top: 45px; filter: blur(2px); }
+
+        /* Магазин */
         .shop-bar {
             position: fixed; bottom: 0; width: 100%; background: #111; 
             padding: 20px; border-radius: 30px 30px 0 0; display: flex; gap: 10px; box-sizing: border-box;
+            border-top: 2px solid var(--neon);
         }
         .btn {
             flex: 1; background: var(--neon); color: #000; border: none; 
-            padding: 15px; border-radius: 15px; font-weight: 900;
+            padding: 15px; border-radius: 15px; font-weight: 900; box-shadow: 0 5px 15px rgba(0,255,136,0.3);
         }
     </style>
 </head>
@@ -60,13 +71,13 @@
 
 <div id="header">
     <div class="balance">💰 <span id="money">0</span></div>
-    <div style="color:var(--neon); font-size:12px; margin-top:5px;">ДОХОД: +<span id="inc">0</span>/СЕК</div>
+    <div style="color:var(--neon); font-size:12px; margin-top:5px; font-weight:bold;">ФЕРМА УРОВНЯ: <span id="lvl">1</span></div>
 </div>
 
 <div id="field"></div>
 
 <div class="shop-bar">
-    <button class="btn" onclick="buyPlot()">НОВЫЙ ЗАГОН <br> <span id="price">500</span> 💰</button>
+    <button class="btn" onclick="buyPlot()">КУПИТЬ ЗАГОН <br> <span id="price">500</span> 💰</button>
 </div>
 
 <script>
@@ -81,20 +92,32 @@
             if (i <= unlocked) {
                 plot.className = 'plot';
                 plot.innerHTML = `
-                    <div class="sprite-window">
-                        <img src="${i}.gif" class="sheet" style="height:48px">
+                    <div class="sprite-viewport">
+                        <img src="${i}.gif" class="sprite-sheet">
                     </div>
-                    <div style="width:40px; height:8px; background:rgba(0,0,0,0.3); border-radius:50%; margin-top:35px"></div>
+                    <div class="shadow"></div>
                 `;
-                plot.onclick = () => { money += (unlocked * 10); update(); };
+                plot.onclick = (e) => { 
+                    money += (unlocked * 15); 
+                    createVfx(e);
+                    update(); 
+                };
             } else {
                 plot.className = 'plot locked';
-                plot.innerHTML = `<div class="lock-icon">🔒</div><div style="font-size:10px">КУПИТЬ</div>`;
+                plot.innerHTML = `<div style="font-size:30px">🔒</div><div style="font-size:10px; font-weight:bold;">ЗАБЛОКИРОВАНО</div>`;
                 plot.onclick = () => buyPlot();
             }
             field.appendChild(plot);
         }
         update();
+    }
+
+    function createVfx(e) {
+        const v = document.createElement('div');
+        v.style.cssText = `position:fixed; left:${e.clientX}px; top:${e.clientY}px; color:var(--neon); font-weight:900; pointer-events:none; z-index:2000; animation:moveUp 0.6s forwards;`;
+        v.innerText = "+" + (unlocked * 15);
+        document.body.appendChild(v);
+        setTimeout(() => v.remove(), 600);
     }
 
     function buyPlot() {
@@ -108,13 +131,18 @@
 
     function update() {
         document.getElementById('money').innerText = Math.floor(money);
-        document.getElementById('inc').innerText = unlocked * 5;
+        document.getElementById('lvl').innerText = unlocked;
         document.getElementById('price').innerText = unlocked * 500;
         localStorage.setItem('f_m', money);
         localStorage.setItem('f_u', unlocked);
     }
 
-    setInterval(() => { money += (unlocked * 0.5); update(); }, 1000);
+    // CSS Анимация вылета цифр
+    const style = document.createElement('style');
+    style.innerHTML = "@keyframes moveUp { 0%{opacity:1; transform:translateY(0);} 100%{opacity:0; transform:translateY(-100px);} }";
+    document.head.appendChild(style);
+
+    setInterval(() => { money += (unlocked * 1); update(); }, 1000);
     render();
 </script>
 </body>
