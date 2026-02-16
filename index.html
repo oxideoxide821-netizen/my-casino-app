@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Forest Tycoon Pro</title>
+    <title>Pro Farm Tycoon</title>
     <style>
         :root { --neon: #00ff88; --gold: #ffcc00; --bg: #0d130d; }
         body { 
@@ -12,151 +12,110 @@
             background-image: radial-gradient(circle at 50% 50%, #1a2e1a 0%, #0d130d 100%);
         }
 
-        /* GUI */
-        #header { padding: 25px; background: rgba(0,0,0,0.6); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .balance { font-size: 48px; font-weight: 900; color: var(--gold); text-shadow: 0 0 15px rgba(255,204,0,0.3); text-align: center; }
-        .income { text-align: center; color: var(--neon); font-size: 14px; font-weight: bold; margin-top: 5px; }
-
-        /* СКРОЛЛЕР ЖИВОТНЫХ */
-        #slider {
-            display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
-            padding: 50px 0; gap: 20px; scrollbar-width: none;
+        /* GUI ВЕРХ */
+        #header { 
+            padding: 20px; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); 
+            border-bottom: 2px solid var(--neon); text-align: center;
         }
-        #slider::-webkit-scrollbar { display: none; }
+        .balance { font-size: 38px; font-weight: 900; color: var(--gold); }
 
-        .card {
-            min-width: 85vw; height: 450px; background: rgba(255,255,255,0.05);
-            border-radius: 40px; scroll-snap-align: center;
+        /* СЕТКА ЗАГОНОВ */
+        #field {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
+            padding: 20px; height: 65vh; overflow-y: auto;
+        }
+
+        .plot {
+            background: rgba(255,255,255,0.05); border-radius: 30px; height: 160px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border: 1px solid rgba(255,255,255,0.1); margin: 0 20px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            position: relative; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
 
-        /* УМНОЕ ОКОШКО АНИМАЦИИ */
-        .sprite-box {
-            width: 64px; height: 64px; /* Размер одного зверя */
-            overflow: hidden; position: relative;
-            transform: scale(4); /* Увеличиваем в 4 раза */
-            image-rendering: pixelated;
+        .locked { background: rgba(0,0,0,0.5); filter: grayscale(1); opacity: 0.5; border: 2px dashed #444; }
+        .lock-icon { font-size: 24px; margin-bottom: 5px; }
+
+        /* ОКОШКО ДЛЯ ОДНОГО ЖИВОТНОГО */
+        .sprite-window {
+            width: 48px; height: 48px; overflow: hidden; position: relative;
+            transform: scale(2.5); image-rendering: pixelated;
         }
         .sheet {
             position: absolute; left: 0; top: 0;
-            /* Анимация: сдвигаем сетку, чтобы видеть только 1 кадр */
-            animation: play 0.8s steps(6) infinite; 
+            animation: walk 0.8s steps(6) infinite;
         }
-        @keyframes play {
-            from { transform: translateX(0); }
-            to { transform: translateX(-384px); } /* 64px * 6 кадров */
-        }
+        @keyframes walk { from { left: 0; } to { left: -288px; } }
 
-        .shadow { width: 120px; height: 15px; background: rgba(0,0,0,0.4); border-radius: 50%; filter: blur(8px); margin-top: 50px; }
-
-        /* МАГАЗИН */
-        #shop-btn {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: var(--neon); color: #000; border: none; padding: 18px 50px;
-            border-radius: 50px; font-weight: 900; font-size: 18px; box-shadow: 0 10px 30px rgba(0,255,136,0.4);
+        /* Магазин внизу */
+        .shop-bar {
+            position: fixed; bottom: 0; width: 100%; background: #111; 
+            padding: 20px; border-radius: 30px 30px 0 0; display: flex; gap: 10px; box-sizing: border-box;
         }
-
-        #shop {
-            position: fixed; bottom: -100%; left: 0; width: 100%; height: 60vh;
-            background: #111; border-radius: 40px 40px 0 0; padding: 30px;
-            z-index: 1000; transition: 0.5s; border-top: 3px solid var(--neon); box-sizing: border-box;
+        .btn {
+            flex: 1; background: var(--neon); color: #000; border: none; 
+            padding: 15px; border-radius: 15px; font-weight: 900;
         }
-        .item { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        
-        .vfx { position: absolute; color: var(--neon); font-weight: 900; font-size: 30px; animation: fly 0.6s forwards; pointer-events: none; }
-        @keyframes fly { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
     </style>
 </head>
 <body>
 
 <div id="header">
     <div class="balance">💰 <span id="money">0</span></div>
-    <div class="income">ПРИБЫЛЬ: +<span id="power">10</span></div>
+    <div style="color:var(--neon); font-size:12px; margin-top:5px;">ДОХОД: +<span id="inc">0</span>/СЕК</div>
 </div>
 
-<div id="slider"></div>
+<div id="field"></div>
 
-<button id="shop-btn" onclick="openShop()">МАРКЕТ 🛒</button>
-
-<div id="shop">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h2>Магазин</h2>
-        <button onclick="closeShop()" style="background:none; border:none; color:white; font-size:30px;">×</button>
-    </div>
-    <div class="item">
-        <div><b>💪 Сила тапа</b><br><small id="cost-t">Цена: 100</small></div>
-        <button onclick="buy(1)" style="background:var(--neon); border:none; padding:10px 20px; border-radius:10px; font-weight:bold;">Купить</button>
-    </div>
-    <div class="item">
-        <div><b>🤖 Авто-бот</b><br><small id="cost-a">Цена: 500</small></div>
-        <button onclick="buy(2)" style="background:var(--neon); border:none; padding:10px 20px; border-radius:10px; font-weight:bold;">Купить</button>
-    </div>
+<div class="shop-bar">
+    <button class="btn" onclick="buyPlot()">НОВЫЙ ЗАГОН <br> <span id="price">500</span> 💰</button>
 </div>
 
 <script>
-    let money = parseInt(localStorage.getItem('m')) || 0;
-    let power = parseInt(localStorage.getItem('p')) || 10;
-    let auto = parseInt(localStorage.getItem('a')) || 0;
-    let costT = parseInt(localStorage.getItem('ct')) || 100;
-    let costA = parseInt(localStorage.getItem('ca')) || 500;
+    let money = parseInt(localStorage.getItem('f_m')) || 0;
+    let unlocked = parseInt(localStorage.getItem('f_u')) || 1;
 
-    function init() {
-        const slider = document.getElementById('slider');
-        for(let i=1; i<=8; i++) {
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-                <div class="sprite-box">
-                    <img src="${i}.gif" class="sheet" style="height:100%">
-                </div>
-                <div class="shadow"></div>
-                <h2 style="margin-top:40px">УРОВЕНЬ ${i}</h2>
-                <p style="color:#666">Нажимай на зверя!</p>
-            `;
-            card.onclick = (e) => tap(e);
-            slider.appendChild(card);
+    function render() {
+        const field = document.getElementById('field');
+        field.innerHTML = '';
+        for (let i = 1; i <= 8; i++) {
+            const plot = document.createElement('div');
+            if (i <= unlocked) {
+                plot.className = 'plot';
+                plot.innerHTML = `
+                    <div class="sprite-window">
+                        <img src="${i}.gif" class="sheet" style="height:48px">
+                    </div>
+                    <div style="width:40px; height:8px; background:rgba(0,0,0,0.3); border-radius:50%; margin-top:35px"></div>
+                `;
+                plot.onclick = () => { money += (unlocked * 10); update(); };
+            } else {
+                plot.className = 'plot locked';
+                plot.innerHTML = `<div class="lock-icon">🔒</div><div style="font-size:10px">КУПИТЬ</div>`;
+                plot.onclick = () => buyPlot();
+            }
+            field.appendChild(plot);
         }
-        update();
-        setInterval(() => { if(auto > 0) { money += auto; update(); } }, 1000);
-    }
-
-    function tap(e) {
-        money += power;
-        const v = document.createElement('div');
-        v.className = 'vfx'; v.innerText = `+${power}`;
-        v.style.left = e.clientX + 'px'; v.style.top = e.clientY + 'px';
-        document.body.appendChild(v);
-        setTimeout(() => v.remove(), 600);
         update();
     }
 
-    function buy(type) {
-        if(type === 1 && money >= costT) {
-            money -= costT; power += 5; costT = Math.round(costT * 1.6);
-        } else if(type === 2 && money >= costA) {
-            money -= costA; auto += 2; costA = Math.round(costA * 1.8);
+    function buyPlot() {
+        let cost = unlocked * 500;
+        if (money >= cost && unlocked < 8) {
+            money -= cost;
+            unlocked++;
+            render();
         }
-        update();
     }
 
     function update() {
         document.getElementById('money').innerText = Math.floor(money);
-        document.getElementById('power').innerText = power;
-        document.getElementById('cost-t').innerText = `Цена: ${costT}`;
-        document.getElementById('cost-a').innerText = `Цена: ${costA}`;
-        localStorage.setItem('m', money);
-        localStorage.setItem('p', power);
-        localStorage.setItem('a', auto);
-        localStorage.setItem('ct', costT);
-        localStorage.setItem('ca', costA);
+        document.getElementById('inc').innerText = unlocked * 5;
+        document.getElementById('price').innerText = unlocked * 500;
+        localStorage.setItem('f_m', money);
+        localStorage.setItem('f_u', unlocked);
     }
 
-    function openShop() { document.getElementById('shop').style.bottom = '0'; }
-    function closeShop() { document.getElementById('shop').style.bottom = '-100%'; }
-
-    init();
+    setInterval(() => { money += (unlocked * 0.5); update(); }, 1000);
+    render();
 </script>
 </body>
 </html>
