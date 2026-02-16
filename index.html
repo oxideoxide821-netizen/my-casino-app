@@ -3,202 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Crypto Forest Tycoon</title>
+    <title>Forest Tycoon Pro</title>
     <style>
-        :root {
-            --neon: #00ff88; --gold: #ffcc00; --bg: #0a0f0a; --glass: rgba(255,255,255,0.1);
+        :root { --neon: #00ff88; --gold: #ffcc00; --bg: #0d130d; }
+        body { 
+            margin: 0; background: var(--bg); color: white; 
+            font-family: 'Segoe UI', sans-serif; overflow: hidden;
+            background-image: radial-gradient(circle at 50% 50%, #1a2e1a 0%, #0d130d 100%);
         }
 
-        body {
-            margin: 0; background: var(--bg); color: white;
-            font-family: 'Segoe UI', Roboto, sans-serif; overflow: hidden;
-            background-image: radial-gradient(circle at 50% 50%, #1a2e1a 0%, var(--bg) 100%);
-        }
+        /* GUI */
+        #header { padding: 25px; background: rgba(0,0,0,0.6); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .balance { font-size: 48px; font-weight: 900; color: var(--gold); text-shadow: 0 0 15px rgba(255,204,0,0.3); text-align: center; }
+        .income { text-align: center; color: var(--neon); font-size: 14px; font-weight: bold; margin-top: 5px; }
 
-        /* GUI ВЕРХ */
-        #header {
-            padding: 20px; display: flex; flex-direction: column; gap: 10px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-        }
-
-        .stats-row { display: flex; justify-content: space-between; align-items: center; }
-        
-        .main-balance { font-size: 42px; font-weight: 900; color: var(--gold); text-shadow: 0 0 20px rgba(255,204,0,0.4); }
-        
-        .xp-bar { width: 100%; height: 8px; background: #222; border-radius: 4px; overflow: hidden; }
-        #xp-fill { width: 0%; height: 100%; background: var(--neon); transition: 0.3s; }
-
-        /* СКРОЛЛ ЖИВОТНЫХ */
-        #animal-slider {
+        /* СКРОЛЛЕР ЖИВОТНЫХ */
+        #slider {
             display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
-            padding: 40px 0; gap: 20px; scrollbar-width: none;
+            padding: 50px 0; gap: 20px; scrollbar-width: none;
         }
-        #animal-slider::-webkit-scrollbar { display: none; }
+        #slider::-webkit-scrollbar { display: none; }
 
-        .animal-card {
-            min-width: 280px; height: 380px; background: var(--glass);
+        .card {
+            min-width: 85vw; height: 450px; background: rgba(255,255,255,0.05);
             border-radius: 40px; scroll-snap-align: center;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px);
-            position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1); margin: 0 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
         }
 
-        /* ВЫРЕЗАЕМ ОДНОГО ЖИВОГО ЗВЕРЯ ИЗ ТВОЕЙ СЕТКИ */
-        .sprite-viewport {
-            width: 80px; height: 80px; overflow: hidden; position: relative;
-            transform: scale(3.5); image-rendering: pixelated; margin-bottom: 40px;
+        /* УМНОЕ ОКОШКО АНИМАЦИИ */
+        .sprite-box {
+            width: 64px; height: 64px; /* Размер одного зверя */
+            overflow: hidden; position: relative;
+            transform: scale(4); /* Увеличиваем в 4 раза */
+            image-rendering: pixelated;
         }
-        .sprite-sheet {
-            position: absolute; left: 0;
-            animation: walk 0.8s steps(6) infinite;
+        .sheet {
+            position: absolute; left: 0; top: 0;
+            /* Анимация: сдвигаем сетку, чтобы видеть только 1 кадр */
+            animation: play 0.8s steps(6) infinite; 
         }
-        @keyframes walk { from { left: 0; } to { left: -480px; } }
-
-        .shadow {
-            width: 100px; height: 20px; background: rgba(0,0,0,0.4);
-            filter: blur(10px); border-radius: 50%; margin-top: -20px;
-        }
-
-        /* КНОПКИ МАГАЗИНА */
-        #footer {
-            position: fixed; bottom: 0; width: 100%; padding: 20px;
-            display: flex; justify-content: center; gap: 15px; box-sizing: border-box;
+        @keyframes play {
+            from { transform: translateX(0); }
+            to { transform: translateX(-384px); } /* 64px * 6 кадров */
         }
 
-        .btn {
-            background: var(--neon); color: #000; border: none; padding: 15px 30px;
-            border-radius: 20px; font-weight: 900; font-size: 16px; cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0,255,136,0.3); transition: 0.2s;
-        }
-        .btn:active { transform: scale(0.9); }
+        .shadow { width: 120px; height: 15px; background: rgba(0,0,0,0.4); border-radius: 50%; filter: blur(8px); margin-top: 50px; }
 
-        #shop-panel {
-            position: fixed; bottom: -100%; left: 0; width: 100%; height: 70vh;
-            background: #0f140f; border-radius: 40px 40px 0 0; padding: 30px;
-            z-index: 1000; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            border-top: 2px solid var(--neon); overflow-y: auto;
+        /* МАГАЗИН */
+        #shop-btn {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: var(--neon); color: #000; border: none; padding: 18px 50px;
+            border-radius: 50px; font-weight: 900; font-size: 18px; box-shadow: 0 10px 30px rgba(0,255,136,0.4);
         }
 
-        .shop-item {
-            background: rgba(255,255,255,0.05); padding: 20px; border-radius: 25px;
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;
+        #shop {
+            position: fixed; bottom: -100%; left: 0; width: 100%; height: 60vh;
+            background: #111; border-radius: 40px 40px 0 0; padding: 30px;
+            z-index: 1000; transition: 0.5s; border-top: 3px solid var(--neon); box-sizing: border-box;
         }
-
-        /* ЭФФЕКТЫ */
-        .tap-vfx {
-            position: absolute; color: var(--neon); font-weight: 900;
-            font-size: 32px; pointer-events: none; animation: fly 0.6s forwards;
-        }
-        @keyframes fly { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-100px); } }
+        .item { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        
+        .vfx { position: absolute; color: var(--neon); font-weight: 900; font-size: 30px; animation: fly 0.6s forwards; pointer-events: none; }
+        @keyframes fly { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
     </style>
 </head>
 <body>
 
-    <div id="header">
-        <div class="stats-row">
-            <span style="color: #888;">Уровень <span id="lvl">1</span></span>
-            <span style="color: var(--neon);">Доход: +<span id="pwr">10</span></span>
-        </div>
-        <div class="main-balance"><img src="Gold_1.png" style="width:30px"> <span id="money">0</span></div>
-        <div class="xp-bar"><div id="xp-fill"></div></div>
+<div id="header">
+    <div class="balance">💰 <span id="money">0</span></div>
+    <div class="income">ПРИБЫЛЬ: +<span id="power">10</span></div>
+</div>
+
+<div id="slider"></div>
+
+<button id="shop-btn" onclick="openShop()">МАРКЕТ 🛒</button>
+
+<div id="shop">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2>Магазин</h2>
+        <button onclick="closeShop()" style="background:none; border:none; color:white; font-size:30px;">×</button>
     </div>
-
-    <div id="animal-slider">
-        <!-- Слайды создаются через JS -->
+    <div class="item">
+        <div><b>💪 Сила тапа</b><br><small id="cost-t">Цена: 100</small></div>
+        <button onclick="buy(1)" style="background:var(--neon); border:none; padding:10px 20px; border-radius:10px; font-weight:bold;">Купить</button>
     </div>
-
-    <div id="footer">
-        <button class="btn" onclick="toggleShop(true)">МАГАЗИН 🛒</button>
+    <div class="item">
+        <div><b>🤖 Авто-бот</b><br><small id="cost-a">Цена: 500</small></div>
+        <button onclick="buy(2)" style="background:var(--neon); border:none; padding:10px 20px; border-radius:10px; font-weight:bold;">Купить</button>
     </div>
+</div>
 
-    <div id="shop-panel">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h2>Улучшения</h2>
-            <button onclick="toggleShop(false)" style="background:none; border:none; color:#666; font-size:30px;">×</button>
-        </div>
-        
-        <div class="shop-item">
-            <div><b>💪 Сила тапа</b><br><small id="cost1">Цена: 100</small></div>
-            <button class="btn" onclick="buy(1)">Купить</button>
-        </div>
-        <div class="shop-item">
-            <div><b>⚡ Авто-клик</b><br><small id="cost2">Цена: 500</small></div>
-            <button class="btn" onclick="buy(2)">Купить</button>
-        </div>
-        <div class="shop-item">
-            <div><b>📈 Множитель XP</b><br><small id="cost3">Цена: 1000</small></div>
-            <button class="btn" onclick="buy(3)">Купить</button>
-        </div>
-    </div>
+<script>
+    let money = parseInt(localStorage.getItem('m')) || 0;
+    let power = parseInt(localStorage.getItem('p')) || 10;
+    let auto = parseInt(localStorage.getItem('a')) || 0;
+    let costT = parseInt(localStorage.getItem('ct')) || 100;
+    let costA = parseInt(localStorage.getItem('ca')) || 500;
 
-    <script>
-        let state = JSON.parse(localStorage.getItem('farm_save')) || {
-            money: 0, power: 10, lvl: 1, xp: 0, 
-            costs: [100, 500, 1000], auto: 0, mult: 1
-        };
-
-        const slider = document.getElementById('animal-slider');
-
-        function init() {
-            for(let i=1; i<=8; i++) {
-                const card = document.createElement('div');
-                card.className = 'animal-card';
-                card.innerHTML = `
-                    <div class="sprite-viewport">
-                        <img src="${i}.gif" class="sprite-sheet" style="width:480px">
-                    </div>
-                    <div class="shadow"></div>
-                    <h3 style="margin-top:20px">Зверь #${i}</h3>
-                    <p style="color:#666">Тапай, чтобы заработать</p>
-                `;
-                card.onclick = (e) => tap(e);
-                slider.appendChild(card);
-            }
-            update();
-            setInterval(() => { if(state.auto > 0) { state.money += state.auto; update(); } }, 1000);
+    function init() {
+        const slider = document.getElementById('slider');
+        for(let i=1; i<=8; i++) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div class="sprite-box">
+                    <img src="${i}.gif" class="sheet" style="height:100%">
+                </div>
+                <div class="shadow"></div>
+                <h2 style="margin-top:40px">УРОВЕНЬ ${i}</h2>
+                <p style="color:#666">Нажимай на зверя!</p>
+            `;
+            card.onclick = (e) => tap(e);
+            slider.appendChild(card);
         }
+        update();
+        setInterval(() => { if(auto > 0) { money += auto; update(); } }, 1000);
+    }
 
-        function tap(e) {
-            state.money += state.power;
-            state.xp += 2 * state.mult;
-            if(state.xp >= 100) { state.xp = 0; state.lvl++; }
-            
-            const v = document.createElement('div');
-            v.className = 'tap-vfx'; v.innerText = `+${state.power}`;
-            v.style.left = e.clientX + 'px'; v.style.top = e.clientY + 'px';
-            document.body.appendChild(v);
-            setTimeout(() => v.remove(), 600);
-            update();
+    function tap(e) {
+        money += power;
+        const v = document.createElement('div');
+        v.className = 'vfx'; v.innerText = `+${power}`;
+        v.style.left = e.clientX + 'px'; v.style.top = e.clientY + 'px';
+        document.body.appendChild(v);
+        setTimeout(() => v.remove(), 600);
+        update();
+    }
+
+    function buy(type) {
+        if(type === 1 && money >= costT) {
+            money -= costT; power += 5; costT = Math.round(costT * 1.6);
+        } else if(type === 2 && money >= costA) {
+            money -= costA; auto += 2; costA = Math.round(costA * 1.8);
         }
+        update();
+    }
 
-        function buy(type) {
-            let c = state.costs[type-1];
-            if(state.money >= c) {
-                state.money -= c;
-                if(type === 1) state.power += 5;
-                if(type === 2) state.auto += 2;
-                if(type === 3) state.mult += 0.5;
-                state.costs[type-1] = Math.round(c * 1.6);
-                update();
-            }
-        }
+    function update() {
+        document.getElementById('money').innerText = Math.floor(money);
+        document.getElementById('power').innerText = power;
+        document.getElementById('cost-t').innerText = `Цена: ${costT}`;
+        document.getElementById('cost-a').innerText = `Цена: ${costA}`;
+        localStorage.setItem('m', money);
+        localStorage.setItem('p', power);
+        localStorage.setItem('a', auto);
+        localStorage.setItem('ct', costT);
+        localStorage.setItem('ca', costA);
+    }
 
-        function update() {
-            document.getElementById('money').innerText = Math.floor(state.money);
-            document.getElementById('pwr').innerText = state.power;
-            document.getElementById('lvl').innerText = state.lvl;
-            document.getElementById('xp-fill').style.width = state.xp + '%';
-            document.getElementById('cost1').innerText = `Цена: ${state.costs[0]}`;
-            document.getElementById('cost2').innerText = `Цена: ${state.costs[1]}`;
-            document.getElementById('cost3').innerText = `Цена: ${state.costs[2]}`;
-            localStorage.setItem('farm_save', JSON.stringify(state));
-        }
+    function openShop() { document.getElementById('shop').style.bottom = '0'; }
+    function closeShop() { document.getElementById('shop').style.bottom = '-100%'; }
 
-        function toggleShop(show) {
-            document.getElementById('shop-panel').style.bottom = show ? '0' : '-100%';
-        }
-
-        init();
-    </script>
+    init();
+</script>
 </body>
 </html>
