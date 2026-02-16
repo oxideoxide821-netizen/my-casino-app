@@ -2,190 +2,464 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>GLARE x GIGACHAT</title>
-    <!-- Подключаем AdsGram для заработка TON -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>GLARE: QUANTUM NETIZEN</title>
+    <!-- SDK для Telegram и Рекламы -->
+    <script src="https://telegram.org"></script>
     <script src="https://sad.adsgram.ai"></script>
+    
     <style>
-        :root { --main: #00f2ff; --glass: rgba(255, 255, 255, 0.07); --border: rgba(255, 255, 255, 0.15); }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { 
-            margin: 0; padding: 0; background: #020205; color: white; 
-            font-family: 'Segoe UI', Roboto, sans-serif; 
-            display: flex; flex-direction: column; align-items: center; 
-            height: 100vh; overflow: hidden;
-        }
+        /* ==========================================================
+           1. CSS FRAMEWORK: ТЕМЫ, АНИМАЦИИ И ГЛИТЧ-ЭФФЕКТЫ
+           ========================================================== */
+        @font-face { font-family: 'Pixel'; src: url('https://fonts.cdnfonts.com'); }
         
-        /* Фон с анимированным градиентом */
-        .bg-glow { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #020205 100%); z-index: -1; }
-
-        /* Стеклянные панели */
-        .glass { 
-            background: var(--glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--border); border-radius: 24px; padding: 20px; 
-            margin: 15px; width: 90%; max-width: 400px; text-align: center;
-            box-shadow: 0 15px 45px rgba(0,0,0,0.7); position: relative;
+        :root {
+            --win: #c3c7cb; --blue: #000080; --blue-lite: #1084d0;
+            --sh-dk: #404040; --sh-md: #808080; --white: #ffffff;
+            --accent: #00f2ff; --warn: #ff0055; --text: #000; --bg: #008080;
         }
 
-        .ai-orb { 
-            width: 60px; height: 60px; background: radial-gradient(circle, var(--main) 0%, transparent 75%);
-            border-radius: 50%; margin: 0 auto 15px; position: relative;
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.3); animation: float 3s ease-in-out infinite;
+        /* ТЕМЫ */
+        body.matrix { --bg: #000; --accent: #0f0; --win: #010a01; --white: #0f0; --sh-md: #003b00; --blue: #003b00; --text: #0f0; }
+        body.cyber { --bg: #2d004d; --accent: #f0f; --win: #1a0033; --white: #f0f; --sh-md: #4a0080; --blue: #800080; --text: #f0f; }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; image-rendering: pixelated; }
+        
+        body { 
+            background: var(--bg); margin: 0; padding: 10px; 
+            font-family: 'Pixel', sans-serif; display: flex; 
+            flex-direction: column; align-items: center; 
+            height: 100vh; overflow: hidden; transition: 0.5s;
         }
-        @keyframes float { 0%, 100% { transform: translateY(0) scale(1); opacity: 0.7; } 50% { transform: translateY(-5px) scale(1.1); opacity: 1; } }
 
-        .stats-row { display: flex; justify-content: space-between; font-size: 14px; color: var(--main); font-weight: bold; letter-spacing: 1px; }
-
-        canvas { 
-            border-radius: 20px; border: 1px solid var(--border);
-            box-shadow: 0 0 35px rgba(0, 242, 255, 0.1); touch-action: none;
+        /* CRT SCANLINES & OVERLAY */
+        body::after {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
+            background-size: 100% 3px, 3px 100%; pointer-events: none; z-index: 9999;
         }
 
-        .btn { 
-            background: linear-gradient(135deg, rgba(0,242,255,0.2), rgba(0,102,255,0.2));
-            border: 1px solid var(--main); color: white; padding: 12px 24px;
-            border-radius: 50px; cursor: pointer; transition: 0.3s;
-            font-size: 13px; font-weight: 800; text-transform: uppercase;
+        /* ОСНОВНОЕ ОКНО WINDOWS 95 STYLE */
+        .window {
+            background: var(--win); border: 4px solid;
+            border-color: var(--white) var(--sh-dk) var(--sh-dk) var(--white);
+            width: 100%; max-width: 480px; padding: 4px;
+            box-shadow: 8px 8px 0px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column; position: relative;
+            animation: slideIn 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
         }
-        .btn:active { transform: scale(0.95); background: var(--main); color: black; }
 
-        /* Кастомный алерт при смерти */
-        #death-screen { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.9); display: none; z-index: 1000;
-            flex-direction: column; align-items: center; justify-content: center;
-            backdrop-filter: blur(10px);
+        @keyframes slideIn { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .title-bar {
+            background: linear-gradient(90deg, var(--blue), var(--blue-lite));
+            color: white; padding: 4px 10px; display: flex;
+            justify-content: space-between; align-items: center;
+            font-size: 13px; font-weight: bold;
+        }
+
+        .title-btns { display: flex; gap: 2px; }
+        .win-btn { 
+            background: var(--win); color: black; border: 2px solid;
+            border-color: var(--white) var(--sh-dk) var(--sh-dk) var(--white);
+            padding: 0 6px; font-size: 10px; cursor: pointer;
+        }
+
+        /* ДАШБОРД (LCD ТАБЛО) */
+        .dashboard {
+            background: #000; border: 4px inset var(--white);
+            margin: 8px 0; padding: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .lcd-box { display: flex; flex-direction: column; align-items: center; }
+        .lcd-label { color: var(--white); font-size: 8px; margin-bottom: 2px; text-transform: uppercase; }
+        
+        .lcd {
+            background: #1a0000; border: 2px solid #400;
+            color: #f00; font-family: 'Courier New', monospace;
+            font-size: 32px; font-weight: bold; padding: 2px 12px;
+            min-width: 90px; text-align: center; text-shadow: 0 0 8px #f00;
+        }
+
+        .smiley {
+            width: 50px; height: 50px; background: var(--win);
+            border: 3px solid; border-color: var(--white) var(--sh-md) var(--sh-md) var(--white);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 32px; cursor: pointer; transition: 0.1s;
+        }
+        .smiley:active { border-color: var(--sh-md) var(--white) var(--white) var(--sh-md); transform: translate(1px, 1px); }
+
+        /* ИГРОВАЯ ЗОНА */
+        .viewport {
+            position: relative; border: 4px inset var(--white);
+            background: #808080; overflow: auto;
+            max-height: 45vh; scrollbar-width: thin;
+        }
+        canvas { display: block; background: #bdbdbd; cursor: crosshair; }
+
+        /* ЭФФЕКТЫ */
+        .xp-popup {
+            position: absolute; color: #0f0; font-weight: bold;
+            font-size: 22px; pointer-events: none; z-index: 100;
+            text-shadow: 2px 2px #000, 0 0 10px #0f0;
+            animation: xpFloat 1s ease-out forwards;
+        }
+        @keyframes xpFloat { 0% { transform: scale(0.5); opacity: 0; } 50% { opacity: 1; transform: scale(1.3); } 100% { opacity: 0; transform: translateY(-70px); } }
+
+        /* ТЕРМИНАЛ GIGACHAT */
+        .terminal {
+            background: #050505; border: 4px inset var(--white);
+            color: var(--accent); font-family: 'Courier New', monospace;
+            font-size: 11px; padding: 10px; height: 70px;
+            margin: 8px 0; overflow: hidden; position: relative;
+        }
+        .terminal::after { content: "_"; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* КНОПКИ УПРАВЛЕНИЯ */
+        .controls { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; }
+        .btn {
+            background: var(--win); border: 3px solid;
+            border-color: var(--white) var(--sh-dk) var(--sh-dk) var(--white);
+            padding: 12px; font-size: 11px; font-weight: bold;
+            cursor: pointer; color: var(--text); display: flex;
+            align-items: center; justify-content: center; gap: 8px;
+            text-transform: uppercase;
+        }
+        .btn:active { border-color: var(--sh-dk) var(--white) var(--white) var(--sh-dk); transform: translate(1px, 1px); }
+        .btn-gold { background: linear-gradient(135deg, #ffd700, #ff8c00); color: #000; border: 3px solid #fff; }
+
+        /* МОДАЛЬНЫЕ ОКНА */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); display: none; z-index: 8000;
+            align-items: center; justify-content: center; backdrop-filter: blur(5px);
+        }
+        .modal {
+            background: var(--win); border: 5px solid var(--white);
+            padding: 20px; width: 90%; max-width: 400px;
+            box-shadow: 15px 15px 0 #000; position: relative;
         }
     </style>
 </head>
 <body>
-    <div class="bg-glow"></div>
-    
-    <!-- Экран смерти -->
-    <div id="death-screen">
-        <h1 style="color: #ff3366; text-shadow: 0 0 20px #ff3366;">GIGACHAT ВЫИГРАЛ</h1>
-        <p id="death-msg" style="text-align: center; padding: 0 20px;"></p>
-        <button class="btn" onclick="respawn()">ПОПРОБОВАТЬ СНОВА</button>
-    </div>
 
-    <div class="glass">
-        <div class="ai-orb" id="orb"></div>
-        <div id="ai-text" style="font-size: 12px; height: 30px; opacity: 0.9;">GIGACHAT ГОТОВИТ ЛОВУШКУ...</div>
-        <div class="stats-row">
-            <div>ОЧКИ: <span id="score">0</span></div>
-            <div>РЕКОРД: <span id="best">0</span></div>
+<div class="window">
+    <div class="title-bar">
+        <span>GLARE: NETIZEN_ELITE_PRO.SYS</span>
+        <div class="title-btns">
+            <span class="win-btn" onclick="ui.open('settings')">?</span>
+            <span class="win-btn" onclick="game.init()">R</span>
+            <span class="win-btn">X</span>
         </div>
     </div>
 
-    <canvas id="field"></canvas>
-
-    <div class="glass" style="margin-top: auto; padding: 10px;">
-        <button class="btn" id="ad-btn" onclick="useAd()">ПОДСКАЗКА (AD)</button>
-        <div style="font-size: 10px; margin-top: 10px; opacity: 0.5;">ЛИДЕР: <span id="leader">GigaForce (14k)</span></div>
+    <!-- ИНДИКАТОРЫ -->
+    <div class="dashboard">
+        <div class="lcd-box">
+            <span class="lcd-label">NETIZEN_XP</span>
+            <div class="lcd" id="score-val">0000</div>
+        </div>
+        <div class="smiley" id="smiley-btn" onclick="game.init()">😎</div>
+        <div class="lcd-box">
+            <span class="lcd-label">GIGA_TIME</span>
+            <div class="lcd" id="timer-val">00:00</div>
+        </div>
     </div>
 
-    <script>
-        const canvas = document.getElementById('field');
-        const ctx = canvas.getContext('2d');
-        const orb = document.getElementById('orb');
-        const aiText = document.getElementById('ai-text');
+    <!-- ВЬЮПОРТ -->
+    <div class="viewport" id="v-box">
+        <canvas id="game-canvas"></canvas>
+    </div>
+
+    <!-- ТЕРМИНАЛ ИИ -->
+    <div class="terminal" id="ai-log">
+        > ИНИЦИАЛИЗАЦИЯ GIGACHAT... [OK]<br>
+        > АНАЛИЗ ВАШЕЙ СТРАТЕГИИ... [СЛАБАЯ]<br>
+        > ОЖИДАНИЕ ВВОДА ДАННЫХ...
+    </div>
+
+    <!-- КНОПКИ -->
+    <div class="controls">
+        <button class="btn" onclick="ui.open('shop')">💰 SHOP & GRID</button>
+        <button class="btn" onclick="ui.open('rank')">🏆 LEADERS</button>
+        <button class="btn" onclick="ui.open('themes')">🎨 THEMES</button>
+        <button class="btn btn-gold" onclick="game.watchAd()">📺 +150 XP (AD)</button>
+        <button class="btn" style="grid-column: span 2; background: #000; color: var(--accent); border-color: var(--accent);" onclick="game.gigaHack()">
+            🧠 GIGACHAT: ГЛУБОКИЙ ВЗЛОМ (-200 XP)
+        </button>
+    </div>
+</div>
+
+<!-- МОДАЛКИ -->
+<div id="overlay" class="overlay" onclick="ui.close()">
+    <div class="modal" id="modal-box" onclick="event.stopPropagation()">
+        <h2 id="modal-title" style="margin-top: 0; color: var(--blue);">СИСТЕМА</h2>
+        <div id="modal-body"></div>
+        <button class="btn" style="width: 100%; margin-top: 15px;" onclick="ui.close()">ЗАКРЫТЬ</button>
+    </div>
+</div>
+
+<script>
+/**
+ * CORE MODULE: AUDIO SYNTHESIZER
+ * Профессиональная генерация звука на лету
+ */
+const audio = {
+    ctx: new (window.AudioContext || window.webkitAudioContext)(),
+    play(freq, dur, type = 'square', vol = 0.1) {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + dur);
+        osc.connect(gain); gain.connect(this.ctx.destination);
+        osc.start(); osc.stop(this.ctx.currentTime + dur);
+    }
+};
+
+/**
+ * CORE MODULE: PARTICLE ENGINE
+ * Физика осколков при клике
+ */
+class Particle {
+    constructor(x, y, color) {
+        this.x = x; this.y = y;
+        this.vx = (Math.random() - 0.5) * 12;
+        this.vy = (Math.random() - 0.5) * 12;
+        this.life = 1.0;
+        this.color = color;
+        this.size = Math.random() * 5 + 2;
+    }
+    update() {
+        this.x += this.vx; this.y += this.vy;
+        this.vy += 0.25; // Гравитация
+        this.life -= 0.02;
+    }
+    draw(ctx) {
+        ctx.globalAlpha = this.life;
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, this.size, this.size);
+        ctx.globalAlpha = 1.0;
+    }
+}
+
+/**
+ * CORE MODULE: GAME ENGINE
+ * Вся математика и логика GigaChat
+ */
+const game = {
+    canvas: document.getElementById('game-canvas'),
+    ctx: null,
+    gridSize: 10,
+    cellSize: 42,
+    score: 0,
+    traps: [],
+    revealed: [],
+    particles: [],
+    isGameOver: false,
+    startTime: 0,
+
+    init() {
+        this.ctx = this.canvas.getContext('2d');
+        window.Telegram.WebApp.expand();
+        this.resize();
+        this.reset();
+        this.animate();
+    },
+
+    resize() {
+        const w = Math.min(window.innerWidth - 60, 420);
+        this.cellSize = w / this.gridSize;
+        this.canvas.width = this.canvas.height = this.gridSize * this.cellSize;
+    },
+
+    reset() {
+        this.score = 0; this.traps = []; this.revealed = []; this.particles = [];
+        this.isGameOver = false; this.startTime = Date.now();
+        document.getElementById('score-val').innerText = '0000';
+        document.getElementById('smiley-btn').innerText = '😎';
         
-        let gridSize = 6, cell, player = {x:0, y:5}, traps = [], score = 0;
-        let record = localStorage.getItem('glare_rec') || 0;
-        
-        // ВСТАВЬ СЮДА СВОЙ BLOCK_ID ИЗ @AdsgramBot
-        const AdController = window.Adsgram ? window.Adsgram.init({ blockId: "YOUR_ID" }) : null;
-
-        const phrases = ["ВИЖУ ТЕБЯ", "ТЫ СДЕЛАЕШЬ ОШИБКУ", "МОЙ АНАЛИЗ ЗАВЕРШЕН", "ТЫ ПРЕДСКАЗУЕМ", "БЕГИ..."];
-
-        function init() {
-            const size = Math.min(window.innerWidth - 60, 380);
-            canvas.width = size; canvas.height = size;
-            cell = size / gridSize;
-            document.getElementById('best').innerText = record;
-            spawnTraps();
-            draw();
+        // GigaChat Trap Seeding
+        const total = this.gridSize * this.gridSize;
+        for (let i = 0; i < total; i++) {
+            if (Math.random() < 0.16) this.traps.push(i);
+            this.revealed[i] = false;
         }
+        this.logAI("СЕТКА СИНХРОНИЗИРОВАНА. ПОПРОБУЙ ВЫЖИТЬ.");
+        audio.play(440, 0.2, 'sine');
+    },
 
-        // Психологическая логика GigaChat (ставит мины там, где ты чаще всего ходишь)
-        function spawnTraps() {
-            traps = [];
-            aiText.innerText = phrases[Math.floor(Math.random()*phrases.length)];
-            orb.style.filter = `hue-rotate(${score}deg)`;
-            
-            for(let i=0; i < 6; i++) {
-                let tx = Math.floor(Math.random()*gridSize);
-                let ty = Math.floor(Math.random()*gridSize);
-                if(tx !== player.x || ty !== player.y) traps.push({x: tx, y: ty});
-            }
-        }
+    animate() {
+        this.draw();
+        this.particles = this.particles.filter(p => p.life > 0);
+        this.particles.forEach(p => { p.update(); p.draw(this.ctx); });
+        this.updateTimer();
+        requestAnimationFrame(() => this.animate());
+    },
 
-        function draw() {
-            ctx.clearRect(0,0, canvas.width, canvas.height);
-            for(let i=0; i<gridSize; i++) {
-                for(let j=0; j<gridSize; j++) {
-                    ctx.fillStyle = (i === player.x && j === player.y) ? 'rgba(0, 242, 255, 0.4)' : 'rgba(255,255,255,0.03)';
-                    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-                    ctx.lineWidth = 2;
-                    ctx.beginPath();
-                    ctx.roundRect(i*cell+4, j*cell+4, cell-8, cell-8, 12);
-                    ctx.fill(); ctx.stroke();
-                }
-            }
-        }
+    draw() {
+        this.ctx.fillStyle = '#808080';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        canvas.onclick = (e) => {
-            const rect = canvas.getBoundingClientRect();
-            const x = Math.floor((e.clientX - rect.left) / cell);
-            const y = Math.floor((e.clientY - rect.top) / cell);
-
-            if (Math.abs(x - player.x) <= 1 && Math.abs(y - player.y) <= 1) {
-                player = {x, y};
-                score += 100;
-                document.getElementById('score').innerText = score;
-
-                if (traps.some(t => t.x === x && t.y === y)) {
-                    die();
+        for (let x = 0; x < this.gridSize; x++) {
+            for (let y = 0; y < this.gridSize; y++) {
+                const idx = y * this.gridSize + x;
+                const px = x * this.cellSize, py = y * this.cellSize;
+                
+                if (!this.revealed[idx]) {
+                    this.drawBevel(px, py, this.cellSize, '#bdbdbd', true);
                 } else {
-                    spawnTraps(); // GigaChat реагирует на каждый шаг
-                    draw();
+                    this.ctx.fillStyle = this.traps.includes(idx) ? '#ff0000' : '#d1d1d1';
+                    this.ctx.fillRect(px, py, this.cellSize, this.cellSize);
+                    this.ctx.strokeStyle = '#666'; this.ctx.lineWidth = 1;
+                    this.ctx.strokeRect(px, py, this.cellSize, this.cellSize);
+                    if (this.traps.includes(idx)) {
+                        this.ctx.font = `${this.cellSize/2}px Arial`;
+                        this.ctx.fillText('💣', px + this.cellSize/4, py + this.cellSize/1.5);
+                    } else {
+                        this.ctx.fillStyle = '#000080';
+                        this.ctx.font = `bold ${this.cellSize/2.5}px Arial`;
+                        this.ctx.fillText('•', px + this.cellSize/2.5, py + this.cellSize/1.6);
+                    }
                 }
             }
-        };
+        }
+    },
 
-        function die() {
-            if(score > record) {
-                record = score;
-                localStorage.setItem('glare_rec', record);
-            }
-            document.getElementById('death-msg').innerText = `ТЫ НАБРАЛ ${score} XP, НО GIGACHAT ОКАЗАЛСЯ УМНЕЕ.`;
-            document.getElementById('death-screen').style.display = 'flex';
+    drawBevel(x, y, s, color, up) {
+        this.ctx.fillStyle = color;
+        this.ctx.fillRect(x, y, s, s);
+        this.ctx.strokeStyle = up ? '#fff' : '#808080';
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.moveTo(x, y+s); this.ctx.lineTo(x, y); this.ctx.lineTo(x+s, y);
+        this.ctx.stroke();
+        this.ctx.strokeStyle = up ? '#808080' : '#fff';
+        this.ctx.beginPath();
+        this.ctx.moveTo(x, y+s); this.ctx.lineTo(x+s, y+s); this.ctx.lineTo(x+s, y);
+        this.ctx.stroke();
+    },
+
+    handleInput(clientX, clientY) {
+        if (this.isGameOver) return;
+        const rect = this.canvas.getBoundingClientRect();
+        const x = Math.floor((clientX - rect.left) / this.cellSize);
+        const y = Math.floor((clientY - rect.top) / this.cellSize);
+        const idx = y * this.gridSize + x;
+
+        if (this.revealed[idx]) return;
+        this.revealed[idx] = true;
+
+        // Эффект частиц
+        for (let i = 0; i < 15; i++) {
+            this.particles.push(new Particle(clientX - rect.left, clientY - rect.top, this.traps.includes(idx) ? '#f00' : '#0ff'));
         }
 
-        function respawn() {
-            score = 0; player = {x:0, y:5};
-            document.getElementById('score').innerText = 0;
-            document.getElementById('death-screen').style.display = 'none';
-            spawnTraps();
-            draw();
+        if (this.traps.includes(idx)) {
+            this.boom();
+        } else {
+            const gain = 25 + Math.floor(this.score / 500);
+            this.score += gain;
+            this.showXP(clientX, clientY, gain);
+            audio.play(200 + (this.score % 1000), 0.1, 'triangle');
+            window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+            document.getElementById('score-val').innerText = String(this.score).padStart(4, '0');
         }
+    },
 
-        async function useAd() {
-            if(!AdController) return alert("AdsGram не подключен");
-            try {
-                const res = await AdController.show();
-                if(res.done) {
-                    aiText.innerText = "GIGACHAT ОТКРЫЛ ОДНУ МИНУ...";
-                    let t = traps[0];
-                    ctx.fillStyle = 'rgba(255, 50, 100, 0.6)';
-                    ctx.roundRect(t.x*cell+10, t.y*cell+10, cell-20, cell-20, 10);
-                    ctx.fill();
-                    setTimeout(draw, 1500);
-                }
-            } catch(e) { alert("Реклама еще не готова"); }
+    boom() {
+        this.isGameOver = true;
+        document.getElementById('smiley-btn').innerText = '😵';
+        this.traps.forEach(t => this.revealed[t] = true);
+        audio.play(60, 0.6, 'sawtooth', 0.3);
+        window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
+        this.logAI("GIGACHAT: ОБЪЕКТ УСТРАНЕН. ИГРА ОКОНЧЕНА.");
+    },
+
+    showXP(x, y, v) {
+        const el = document.createElement('div');
+        el.className = 'xp-popup';
+        el.innerText = `+${v}`;
+        el.style.left = `${x}px`; el.style.top = `${y}px`;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 1000);
+    },
+
+    logAI(msg) {
+        const log = document.getElementById('ai-log');
+        log.innerHTML = `> ${msg}<br>` + log.innerHTML.split('<br>').slice(0, 2).join('<br>');
+    },
+
+    updateTimer() {
+        if (this.isGameOver) return;
+        const diff = Math.floor((Date.now() - this.startTime) / 1000);
+        const m = String(Math.floor(diff / 60)).padStart(2, '0');
+        const s = String(diff % 60).padStart(2, '0');
+        document.getElementById('timer-val').innerText = `${m}:${s}`;
+    },
+
+    watchAd() {
+        this.score += 150;
+        document.getElementById('score-val').innerText = String(this.score).padStart(4, '0');
+        this.logAI("РЕКЛАМА ПРОСМОТРЕНА. +150 XP ПОЛУЧЕНО.");
+        audio.play(880, 0.3, 'sine');
+    },
+
+    gigaHack() {
+        if (this.score < 200) return alert("НЕДОСТАТОЧНО ЭНЕРГИИ (XP)!");
+        this.score -= 200;
+        document.getElementById('score-val').innerText = String(this.score).padStart(4, '0');
+        const hidden = this.traps.filter(t => !this.revealed[t]);
+        if (hidden.length > 0) {
+            const target = hidden[Math.floor(Math.random() * hidden.length)];
+            this.revealed[target] = true;
+            this.logAI("ВЗЛОМ УСПЕШЕН: GIGACHAT ВЫДАЛ МИНУ.");
         }
+    }
+};
 
-        window.onload = init;
-    </script>
+/**
+ * CORE MODULE: UI & MODALS
+ */
+const ui = {
+    open(type) {
+        const ov = document.getElementById('overlay');
+        const title = document.getElementById('modal-title');
+        const body = document.getElementById('modal-body');
+        ov.style.display = 'flex';
+        
+        if (type === 'shop') {
+            title.innerText = "QUANTUM SHOP";
+            body.innerHTML = `
+                <button class="btn" style="width:100%;margin-bottom:10px;" onclick="game.gridSize=20; game.resize(); game.reset(); ui.close();">СЕТКА 20x20 (500 XP)</button>
+                <button class="btn" style="width:100%;" onclick="game.gridSize=40; game.resize(); game.reset(); ui.close();">СЕТКА 40x40 (2000 XP)</button>
+            `;
+        } else if (type === 'themes') {
+            title.innerText = "THEME SELECT";
+            body.innerHTML = `
+                <button class="btn" style="width:100%;margin-bottom:8px;" onclick="document.body.className=''; ui.close();">CLASSIC 95</button>
+                <button class="btn" style="width:100%;margin-bottom:8px;" onclick="document.body.className='matrix'; ui.close();">MATRIX</button>
+                <button class="btn" style="width:100%;" onclick="document.body.className='neon'; ui.close();">CYBER NEON</button>
+            `;
+        } else if (type === 'rank') {
+            title.innerText = "HALL OF FAME";
+            body.innerHTML = "1. GigaForce: 99999<br>2. NetizenAdmin: 25400<br>3. ТЫ: " + game.score;
+        } else {
+            title.innerText = "SETTINGS";
+            body.innerHTML = "Звук: ВКЛ<br>Вибро: ВКЛ<br>Версия: 8.0.1";
+        }
+    },
+    close() { document.getElementById('overlay').style.display = 'none'; }
+};
+
+// INITIALIZATION
+game.canvas.addEventListener('click', (e) => game.handleInput(e.clientX, e.clientY));
+window.onload = () => game.init();
+</script>
 </body>
 </html>
