@@ -1,45 +1,230 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Elite Forest Farm</title>
     <style>
-        body { background: #2e7d32; margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; color: white; font-family: sans-serif; }
-        
-        /* Окно для кабанчика */
-        .box { 
-            position: absolute; width: 64px; height: 64px; 
-            border: 2px solid white; overflow: hidden;
-            animation: move 3s linear infinite; /* Движение по экрану */
-        }
-        
-        /* Сама картинка кабанчика */
-        .pig { 
-            height: 100%; 
-            animation: walk 0.6s steps(6) infinite; /* Анимация ножек */
+        :root {
+            --grass-dark: #2d5a27;
+            --grass-light: #3e7b36;
+            --gold: #ffcc00;
+            --ui-panel: rgba(0, 0, 0, 0.6);
         }
 
-        @keyframes walk {
-            from { transform: translateX(0); }
-            to { transform: translateX(-100%); }
+        body {
+            margin: 0; padding: 0; overflow: hidden;
+            background-color: var(--grass-dark);
+            /* Текстура травы с эффектом глубины */
+            background-image: 
+                radial-gradient(circle at 10% 10%, var(--grass-light) 1px, transparent 1px),
+                radial-gradient(circle at 90% 80%, var(--grass-light) 2px, transparent 2px);
+            background-size: 50px 50px;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            height: 100vh; touch-action: none;
         }
 
-        @keyframes move {
-            0% { left: -100px; top: 20%; }
-            50% { left: 50%; top: 50%; }
-            100% { left: 110%; top: 20%; }
+        /* Верхний интерфейс */
+        #header {
+            position: fixed; top: 0; width: 100%; height: 75px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            display: flex; align-items: center; justify-content: space-around;
+            padding: 0 15px; box-sizing: border-box; z-index: 100;
+        }
+
+        .stat-card {
+            background: var(--ui-panel); backdrop-filter: blur(12px);
+            padding: 8px 18px; border-radius: 40px; border: 1px solid rgba(255,255,255,0.15);
+            display: flex; align-items: center; gap: 12px; color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .coin-icon { width: 32px; height: 32px; filter: drop-shadow(0 0 5px var(--gold)); }
+
+        /* Сетка фермы */
+        #farm-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(4, 1fr);
+            gap: 15px; padding: 90px 20px 110px; height: 100vh; box-sizing: border-box;
+        }
+
+        .plot {
+            background: rgba(0, 0, 0, 0.12); border: 2px dashed rgba(255,255,255,0.08);
+            border-radius: 25px; display: flex; align-items: center; justify-content: center;
+            position: relative; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .plot:active { transform: scale(0.96); background: rgba(255,255,255,0.05); }
+
+        /* Контейнер животного и тени */
+        .actor-box {
+            position: relative; width: 90%; height: 90%;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .shadow-asset {
+            position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
+            width: 75%; opacity: 0.6; pointer-events: none;
+            filter: blur(1px); /* Мягкость тени */
+        }
+
+        .animal-asset {
+            position: relative; max-width: 100%; max-height: 100%;
+            cursor: pointer; transition: transform 0.1s;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2));
+            z-index: 5;
+        }
+
+        .animal-asset:active { transform: scale(1.4) translateY(-15px); }
+
+        /* Магазин */
+        #shop-btn {
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            color: white; padding: 14px 45px; border-radius: 50px;
+            font-weight: 900; border: none; box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            z-index: 1000; letter-spacing: 1px; cursor: pointer;
+        }
+
+        #shop-panel {
+            position: fixed; bottom: -100%; left: 0; width: 100%; height: 55vh;
+            background: #121212; border-radius: 35px 35px 0 0; padding: 30px;
+            box-sizing: border-box; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1001; border-top: 4px solid var(--gold); color: white;
+        }
+
+        .upgrade-card {
+            background: rgba(255,255,255,0.06); padding: 20px; border-radius: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid rgba(255,255,255,0.1); margin-top: 20px;
+        }
+
+        /* Вылетающие монетки */
+        .vfx-coin {
+            position: absolute; color: var(--gold); font-weight: 900; font-size: 26px;
+            pointer-events: none; animation: coinFly 0.8s forwards; z-index: 2000;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.5);
+        }
+
+        @keyframes coinFly {
+            0% { opacity: 1; transform: translate(0, 0) scale(1); }
+            100% { opacity: 0; transform: translate(20px, -120px) scale(1.5); }
         }
     </style>
 </head>
 <body>
 
-    <div style="text-align: center; z-index: 10;">
-        <h1>ТЕСТ: КАБАН ДОЛЖЕН БЕЖАТЬ</h1>
-        <p>Если видишь только белый квадрат — имя файла неверное.</p>
+    <div id="header">
+        <div class="stat-card">
+            <img src="Gold_1.png" class="coin-icon" alt="🪙">
+            <span id="bal-val" style="font-size: 28px; font-weight: 900;">0</span>
+        </div>
+        <div class="stat-card" style="font-size: 14px;">
+            💎 Доход: +<span id="click-val">10</span>
+        </div>
     </div>
 
-    <!-- Твой файл Boar_Walk.png -->
-    <div class="box">
-        <img src="Boar_Walk.png" class="pig" alt="!">
+    <div id="farm-grid"></div>
+
+    <button id="shop-btn" onclick="openShop()">МАРКЕТ 🍎</button>
+
+    <div id="shop-panel">
+        <h2 style="margin: 0 0 10px 0; color: var(--gold);">Лесные Улучшения</h2>
+        <p style="color: #888; font-size: 14px;">Прокачай свою ферму до максимума!</p>
+        
+        <div class="upgrade-card">
+            <div>
+                <b style="font-size: 18px;">Золотое зерно</b><br>
+                <span style="font-size: 12px; color: #aaa;">Увеличивает доход от тапа на +5</span>
+            </div>
+            <button id="buy-btn" onclick="purchaseUpgrade()" style="background:var(--gold); border:none; padding:12px 20px; border-radius:12px; font-weight:900; cursor:pointer;">100 💰</button>
+        </div>
+
+        <button onclick="closeShop()" style="width:100%; margin-top:40px; background:none; border:1px solid #333; color:#666; padding:12px; border-radius:15px; font-weight:bold;">ЗАКРЫТЬ</button>
     </div>
 
+    <script>
+        // Список имен для теней из твоей папки Shadows
+        const actors = ['Bull', 'calf', 'chick', 'lamb', 'piglet', 'rooster', 'sheep', 'turkey'];
+        
+        // Данные игрока (из памяти телефона)
+        let money = parseInt(localStorage.getItem('f_m')) || 0;
+        let power = parseInt(localStorage.getItem('f_p')) || 10;
+        let cost = parseInt(localStorage.getItem('f_c')) || 100;
+
+        const grid = document.getElementById('farm-grid');
+        const balEl = document.getElementById('bal-val');
+        const powEl = document.getElementById('click-val');
+        const buyBtn = document.getElementById('buy-btn');
+
+        // Создание фермы
+        function createFarm() {
+            for (let i = 0; i < 8; i++) {
+                const plot = document.createElement('div');
+                plot.className = 'plot';
+
+                const box = document.createElement('div');
+                box.className = 'actor-box';
+
+                // Слой Тени
+                const shad = document.createElement('img');
+                shad.src = `Shadows/${actors[i]}_shadow.png`;
+                shad.className = 'shadow-asset';
+                shad.onerror = () => shad.style.display = 'none';
+
+                // Слой Животного (твои GIF 1-8)
+                const anim = document.createElement('img');
+                anim.src = `${i + 1}.gif`;
+                anim.className = 'animal-asset';
+                
+                // Клик по животному
+                anim.onclick = (e) => {
+                    money += power;
+                    spawnVfx(e);
+                    refreshUI();
+                };
+
+                box.append(shad, anim);
+                plot.append(box);
+                grid.append(plot);
+            }
+            refreshUI();
+        }
+
+        function spawnVfx(e) {
+            const v = document.createElement('div');
+            v.className = 'vfx-coin';
+            v.innerText = `+${power}`;
+            v.style.left = `${e.clientX}px`;
+            v.style.top = `${e.clientY}px`;
+            document.body.append(v);
+            setTimeout(() => v.remove(), 800);
+        }
+
+        function purchaseUpgrade() {
+            if (money >= cost) {
+                money -= cost;
+                power += 5;
+                cost = Math.round(cost * 1.7);
+                refreshUI();
+            }
+        }
+
+        function refreshUI() {
+            balEl.innerText = Math.floor(money);
+            powEl.innerText = power;
+            buyBtn.innerText = `${cost} 💰`;
+            buyBtn.style.opacity = money >= cost ? '1' : '0.5';
+            
+            // Сохранение
+            localStorage.setItem('f_m', money);
+            localStorage.setItem('f_p', power);
+            localStorage.setItem('f_c', cost);
+        }
+
+        function openShop() { document.getElementById('shop-panel').style.bottom = '0'; }
+        function closeShop() { document.getElementById('shop-panel').style.bottom = '-100%'; }
+
+        createFarm();
+    </script>
 </body>
 </html>
