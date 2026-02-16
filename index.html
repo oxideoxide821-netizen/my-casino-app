@@ -3,112 +3,429 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Golden Farm 2D</title>
+    <title>Ultimate Frontier Farm</title>
     <style>
-        :root { --neon: #00ff88; --gold: #ffcc00; --bg: #0d130d; }
-        body { 
-            margin: 0; background: var(--bg); color: white; 
-            font-family: 'Segoe UI', sans-serif; overflow: hidden;
-            background-image: radial-gradient(circle at 50% 50%, #1a2e1a 0%, #0d130d 100%);
+        :root {
+            --neon: #00ff88; --gold: #ffcc00; --wood: #5d4037; --grass: #3e7b36;
+            --ui-bg: rgba(10, 20, 10, 0.85);
         }
 
-        /* GUI */
-        #header { padding: 20px; background: rgba(0,0,0,0.8); border-bottom: 2px solid var(--neon); text-align: center; }
-        .balance { font-size: 38px; font-weight: 900; color: var(--gold); }
-
-        /* СЕТКА ЗАГОНОВ */
-        #field {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
-            padding: 20px; height: 65vh; overflow-y: auto;
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            overflow: hidden; background: #2d5a27; font-family: 'Segoe UI', Tahoma, sans-serif;
+            user-select: none; touch-action: none;
         }
 
-        .plot {
-            background: rgba(255,255,255,0.05); border-radius: 30px; height: 160px;
+        /* КАНВАС ДВИЖОК */
+        #gameCanvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+
+        /* ИНТЕРФЕЙС (GUI) */
+        .overlay {
+            position: fixed; pointer-events: none; width: 100%; height: 100%;
+            display: flex; flex-direction: column; z-index: 100;
+        }
+
+        /* Верхняя панель */
+        .top-bar {
+            padding: 20px; display: flex; justify-content: space-between; align-items: flex-start;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            pointer-events: auto;
+        }
+
+        .stat-group {
+            background: var(--ui-bg); backdrop-filter: blur(10px);
+            padding: 10px 20px; border-radius: 20px; border: 2px solid var(--neon);
+            box-shadow: 0 0 20px rgba(0,255,136,0.2); color: white;
+        }
+
+        .balance-text { font-size: 32px; font-weight: 900; color: var(--gold); display: flex; align-items: center; gap: 10px; }
+
+        /* Система Уровней */
+        .lvl-container { width: 200px; margin-top: 10px; }
+        .lvl-bar { width: 100%; height: 6px; background: #222; border-radius: 3px; overflow: hidden; margin-top: 5px; }
+        #lvl-fill { width: 30%; height: 100%; background: var(--neon); box-shadow: 0 0 10px var(--neon); transition: 0.4s; }
+
+        /* МАГАЗИН И СТРОЙКА */
+        .bottom-nav {
+            margin-top: auto; padding: 20px; display: flex; gap: 15px;
+            overflow-x: auto; scrollbar-width: none; pointer-events: auto;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+        }
+        .bottom-nav::-webkit-scrollbar { display: none; }
+
+        .build-card {
+            min-width: 130px; height: 100px; background: var(--ui-bg);
+            border: 2px solid rgba(255,255,255,0.1); border-radius: 20px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            position: relative; border: 1px solid rgba(255,255,255,0.1);
+            color: white; transition: 0.3s; position: relative;
+        }
+        .build-card:active { transform: scale(0.9); border-color: var(--neon); }
+        .build-card img { width: 40px; margin-bottom: 5px; filter: drop-shadow(0 4px 4px black); }
+        .build-card .cost { font-size: 14px; font-weight: bold; color: var(--gold); }
+
+        /* Модальное окно Магазина */
+        #shop-modal {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            width: 90%; max-width: 400px; background: #1a1a1a; border: 3px solid var(--gold);
+            border-radius: 30px; padding: 30px; color: white; z-index: 1000;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: auto;
+        }
+        #shop-modal.active { transform: translate(-50%, -50%) scale(1); }
+
+        .shop-item {
+            background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px;
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
         }
 
-        /* ЖИВОЕ ЖИВОТНОЕ (Background метод) */
-        .animal-live {
-            width: 48px;  /* Ширина одного кадра */
-            height: 48px; /* Высота одного кадра */
-            background-repeat: no-repeat;
-            background-size: 288px 384px; /* Общий размер твоей сетки (6 кадров в ширину * 48 = 288) */
-            transform: scale(2.5); /* Увеличиваем */
-            image-rendering: pixelated;
-            /* Анимация: прыгаем по 6 кадрам в первом ряду */
-            animation: play-anim 0.8s steps(6) infinite;
-            cursor: pointer;
-        }
-
-        @keyframes play-anim {
-            from { background-position: 0 0; }
-            to { background-position: -288px 0; }
-        }
-
-        .shadow { width: 40px; height: 8px; background: rgba(0,0,0,0.4); border-radius: 50%; margin-top: 35px; }
-
-        .btn-buy {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: var(--neon); color: #000; border: none; padding: 15px 40px;
-            border-radius: 50px; font-weight: 900; box-shadow: 0 10px 20px rgba(0,255,136,0.3);
+        /* Ночной фильтр */
+        #night-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; opacity: 0; pointer-events: none; z-index: 50;
+            mix-blend-mode: multiply; transition: 5s linear;
         }
     </style>
 </head>
 <body>
 
-<div id="header"><div class="balance">💰 <span id="money">0</span></div></div>
-<div id="field"></div>
-<button class="btn-buy" onclick="buyPlot()">НОВЫЙ ЗАГОН: <span id="price">500</span></button>
+    <div id="night-overlay"></div>
+
+    <div class="overlay">
+        <div class="top-bar">
+            <div class="stat-group">
+                <div class="balance-text">💰 <span id="balance">0</span></div>
+                <div class="lvl-container">
+                    <div style="display:flex; justify-content:space-between; font-size:12px;">
+                        <span>УРОВЕНЬ <b id="lvl-num">1</b></span>
+                        <span id="xp-text">0/100</span>
+                    </div>
+                    <div class="lvl-bar"><div id="lvl-fill"></div></div>
+                </div>
+            </div>
+            <div class="stat-group" onclick="toggleShop(true)" style="cursor:pointer; border-color:var(--gold);">
+                🏛 МАРКЕТ
+            </div>
+        </div>
+
+        <div class="bottom-nav" id="build-menu">
+            <!-- Сюда добавляются карточки строительства -->
+        </div>
+    </div>
+
+    <!-- Модалка улучшений -->
+    <div id="shop-modal">
+        <h2 style="text-align:center; color:var(--gold); margin-top:0;">КУЗНИЦА УЛУЧШЕНИЙ</h2>
+        <div id="upgrades-list"></div>
+        <button onclick="toggleShop(false)" style="width:100%; background:none; border:1px solid #444; color:#888; padding:12px; border-radius:15px; margin-top:10px;">ЗАКРЫТЬ</button>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
 
 <script>
-    let money = parseInt(localStorage.getItem('f_m')) || 0;
-    let unlocked = parseInt(localStorage.getItem('f_u')) || 1;
+/**
+ * ФЕРМЕРСКИЙ ДВИЖОК v2.0
+ * Реализовано на чистом JavaScript Canvas
+ */
 
-    function render() {
-        const field = document.getElementById('field');
-        field.innerHTML = '';
-        for (let i = 1; i <= 8; i++) {
-            const plot = document.createElement('div');
-            plot.className = 'plot';
-            
-            if (i <= unlocked) {
-                const anim = document.createElement('div');
-                anim.className = 'animal-live';
-                // Устанавливаем твою картинку фоном
-                anim.style.backgroundImage = `url('${i}.gif')`;
-                
-                anim.onclick = () => { money += (unlocked * 10); update(); };
-                
-                const shadow = document.createElement('div');
-                shadow.className = 'shadow';
-                
-                plot.append(anim, shadow);
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const balanceEl = document.getElementById('balance');
+
+// Глобальное состояние
+const Game = {
+    money: parseInt(localStorage.getItem('farm_money')) || 100,
+    xp: parseInt(localStorage.getItem('farm_xp')) || 0,
+    lvl: parseInt(localStorage.getItem('farm_lvl')) || 1,
+    clickPower: parseInt(localStorage.getItem('farm_power')) || 10,
+    lastUpdate: Date.now(),
+    entities: [],
+    buildings: [],
+    particles: [],
+    dayTime: 0, // 0 - 24000
+    images: {}
+};
+
+// Конфигурация животных
+const AnimalSpecs = {
+    'Bull': { speed: 0.5, income: 5, sprite: '1.gif' },
+    'calf': { speed: 0.7, income: 3, sprite: '2.gif' },
+    'chick': { speed: 1.2, income: 1, sprite: '3.gif' },
+    'lamb': { speed: 0.6, income: 4, sprite: '4.gif' },
+    'piglet': { speed: 0.8, income: 4, sprite: '5.gif' },
+    'rooster': { speed: 1.5, income: 2, sprite: '6.gif' },
+    'sheep': { speed: 0.4, income: 6, sprite: '7.gif' },
+    'turkey': { speed: 1.0, income: 3, sprite: '8.gif' }
+};
+
+const upgradeTypes = [
+    { id: 'power', name: 'Золотые Тапки', desc: 'Удваивает силу клика', cost: 500 },
+    { id: 'luck', name: 'Клевер Удачи', desc: 'Шанс крит-дохода', cost: 1000 },
+    { id: 'speed', name: 'Турбо-корм', desc: 'Животные ходят быстрее', cost: 2000 }
+];
+
+/**
+ * КЛАСС ЖИВОТНОГО (AI)
+ */
+class Animal {
+    constructor(type, x, y) {
+        this.type = type;
+        this.x = x || Math.random() * canvas.width;
+        this.y = y || Math.random() * canvas.height;
+        this.targetX = this.x;
+        this.targetY = this.y;
+        this.spec = AnimalSpecs[type];
+        this.frame = 0;
+        this.flip = false;
+        this.state = 'idle'; // idle, walk, eat
+        this.timer = 0;
+    }
+
+    update() {
+        this.timer--;
+        
+        if (this.state === 'idle' && this.timer <= 0) {
+            this.state = 'walk';
+            this.targetX = Math.max(50, Math.min(canvas.width - 50, this.x + (Math.random() - 0.5) * 400));
+            this.targetY = Math.max(100, Math.min(canvas.height - 150, this.y + (Math.random() - 0.5) * 300));
+        }
+
+        if (this.state === 'walk') {
+            const dx = this.targetX - this.x;
+            const dy = this.targetY - this.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist > 5) {
+                this.x += (dx / dist) * this.spec.speed;
+                this.y += (dy / dist) * this.spec.speed;
+                this.flip = dx < 0;
+                this.frame = (this.frame + 0.1) % 6; // Анимация 6 кадров
             } else {
-                plot.style.opacity = "0.3";
-                plot.innerHTML = "🔒";
+                this.state = 'idle';
+                this.timer = Math.random() * 200 + 100;
             }
-            field.appendChild(plot);
-        }
-        update();
-    }
-
-    function buyPlot() {
-        let cost = unlocked * 500;
-        if (money >= cost && unlocked < 8) {
-            money -= cost; unlocked++; render();
         }
     }
 
-    function update() {
-        document.getElementById('money').innerText = Math.floor(money);
-        document.getElementById('price').innerText = unlocked * 500;
-        localStorage.setItem('f_m', money);
-        localStorage.setItem('f_u', unlocked);
+    draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        
+        // Рисуем Тень
+        ctx.fillStyle = 'rgba(0,0,0,0.2)';
+        ctx.beginPath();
+        ctx.ellipse(0, 5, 20, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (this.flip) ctx.scale(-1, 1);
+
+        // Рисуем Спрайт (Окошко)
+        const img = Game.images[this.type];
+        if (img) {
+            const sWidth = img.width / 6; // 6 кадров в ряд
+            const sHeight = img.height / 8; // Предположим 8 рядов
+            ctx.drawImage(
+                img,
+                Math.floor(this.frame) * sWidth, 0, sWidth, sHeight,
+                -25, -45, 50, 50
+            );
+        } else {
+            // Заглушка если картинка не загрузилась
+            ctx.fillStyle = 'white';
+            ctx.fillRect(-10, -30, 20, 30);
+        }
+        
+        ctx.restore();
+    }
+}
+
+/**
+ * СИСТЕМА ЭФФЕКТОВ (Particles)
+ */
+class Particle {
+    constructor(x, y, text, color) {
+        this.x = x; this.y = y; this.text = text; this.color = color;
+        this.life = 1.0; this.vy = -2;
+    }
+    update() { this.y += this.vy; this.life -= 0.02; }
+    draw() {
+        ctx.globalAlpha = this.life;
+        ctx.fillStyle = this.color;
+        ctx.font = 'bold 24px Segoe UI';
+        ctx.fillText(this.text, this.x, this.y);
+        ctx.globalAlpha = 1.0;
+    }
+}
+
+/**
+ * ИНИЦИАЛИЗАЦИЯ
+ */
+function init() {
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Загрузка ресурсов
+    Object.keys(AnimalSpecs).forEach((key, index) => {
+        const img = new Image();
+        img.src = `${index + 1}.gif`;
+        img.onload = () => Game.images[key] = img;
+    });
+
+    // Создаем стартовое меню построек
+    const menu = document.getElementById('build-menu');
+    Object.keys(AnimalSpecs).forEach(key => {
+        const card = document.createElement('div');
+        card.className = 'build-card';
+        card.innerHTML = `
+            <span>🐾</span>
+            <div style="font-weight:bold">${key}</div>
+            <div class="cost">${AnimalSpecs[key].income * 50} 💰</div>
+        `;
+        card.onclick = () => spawnAnimal(key);
+        menu.appendChild(card);
+    });
+
+    // Восстанавливаем животных
+    const savedCount = parseInt(localStorage.getItem('animal_count')) || 1;
+    for(let i=0; i<savedCount; i++) {
+        const keys = Object.keys(AnimalSpecs);
+        Game.entities.push(new Animal(keys[i % keys.length]));
     }
 
-    setInterval(() => { money += (unlocked * 0.5); update(); }, 1000);
-    render();
+    renderUpgrades();
+    loop();
+}
+
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+
+/**
+ * ИГРОВОЙ ЦИКЛ (60 FPS)
+ */
+function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // 1. Рисуем фон (Траву)
+    drawBackground();
+
+    // 2. Обновляем и рисуем животных
+    // Сортировка по Y для правильного наложения (Z-index)
+    Game.entities.sort((a, b) => a.y - b.y);
+    Game.entities.forEach(entity => {
+        entity.update();
+        entity.draw();
+    });
+
+    // 3. Частицы
+    Game.particles = Game.particles.filter(p => p.life > 0);
+    Game.particles.forEach(p => { p.update(); p.draw(); });
+
+    // 4. Логика экономики
+    processEconomy();
+
+    // 5. День/Ночь
+    updateDayNight();
+
+    requestAnimationFrame(loop);
+}
+
+function drawBackground() {
+    // Рисуем сетку травы
+    const size = 60;
+    ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+    for(let x=0; x<canvas.width; x+=size) {
+        for(let y=0; y<canvas.height; y+=size) {
+            ctx.strokeRect(x, y, size, size);
+        }
+    }
+}
+
+function processEconomy() {
+    const now = Date.now();
+    if (now - Game.lastUpdate > 1000) {
+        let income = 0;
+        Game.entities.forEach(e => income += e.spec.income);
+        Game.money += income;
+        addXP(income / 10);
+        Game.lastUpdate = now;
+        updateUI();
+    }
+}
+
+function updateDayNight() {
+    Game.dayTime = (Game.dayTime + 1) % 24000;
+    const overlay = document.getElementById('night-overlay');
+    // Пик ночи на 12000
+    const intensity = Math.max(0, Math.sin(Game.dayTime * Math.PI / 12000) * 0.4);
+    overlay.style.opacity = intensity;
+}
+
+/**
+ * ДЕЙСТВИЯ ПОЛЬЗОВАТЕЛЯ
+ */
+canvas.addEventListener('pointerdown', (e) => {
+    // Проверка клика по животному
+    let hit = false;
+    Game.entities.forEach(entity => {
+        const d = Math.sqrt((e.clientX - entity.x)**2 + (e.clientY - entity.y)**2);
+        if (d = cost) {
+        Game.money -= cost;
+        Game.entities.push(new Animal(type));
+        localStorage.setItem('animal_count', Game.entities.length);
+        updateUI();
+    }
+}
+
+function addXP(amount) {
+    Game.xp += amount;
+    const target = Game.lvl * 100;
+    if (Game.xp >= target) {
+        Game.xp = 0;
+        Game.lvl++;
+        Game.particles.push(new Particle(canvas.width/2, canvas.height/2, 'LEVEL UP!', '#00ff88'));
+    }
+}
+
+function updateUI() {
+    balanceEl.innerText = Math.floor(Game.money);
+    document.getElementById('lvl-num').innerText = Game.lvl;
+    document.getElementById('xp-text').innerText = `${Math.floor(Game.xp)}/${Game.lvl * 100}`;
+    document.getElementById('lvl-fill').style.width = (Game.xp / (Game.lvl * 100)) * 100 + '%';
+    
+    localStorage.setItem('farm_money', Game.money);
+    localStorage.setItem('farm_lvl', Game.lvl);
+    localStorage.setItem('farm_xp', Game.xp);
+}
+
+function toggleShop(open) {
+    document.getElementById('shop-modal').className = open ? 'active' : '';
+}
+
+function renderUpgrades() {
+    const list = document.getElementById('upgrades-list');
+    upgradeTypes.forEach(upg => {
+        const item = document.createElement('div');
+        item.className = 'shop-item';
+        item.innerHTML = `
+            <div><b>${upg.name}</b><br><small>${upg.desc}</small></div>
+            <button onclick="buyUpgrade('${upg.id}', ${upg.cost})" style="background:var(--gold); border:none; padding:8px 12px; border-radius:8px; font-weight:bold;">${upg.cost}</button>
+        `;
+        list.appendChild(item);
+    });
+}
+
+function buyUpgrade(id, cost) {
+    if (Game.money >= cost) {
+        Game.money -= cost;
+        if (id === 'power') Game.clickPower *= 2;
+        updateUI();
+        alert('Улучшение куплено!');
+    }
+}
+
+// Поехали!
+init();
+
 </script>
 </body>
 </html>
