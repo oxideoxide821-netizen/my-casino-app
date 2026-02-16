@@ -3,40 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Лесной Загон</title>
+    <title>Лесная Ферма: Сбор животных</title>
     <style>
         body { background: #1a1a1a; margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
-        
-        /* Загон (Трава и Забор) */
         #farm { 
             width: 100vw; height: 100vh; background: #4caf50; 
             position: relative; overflow: hidden; border: 15px solid #5d4037; box-sizing: border-box; 
         }
-
-        /* Настройка анимации из спрайт-листа */
         .animal-wrap { 
             position: absolute; width: 64px; height: 64px; 
             overflow: hidden; cursor: pointer; 
-            transition: all 1.8s linear; /* Плавное движение */
-            z-index: 5;
+            transition: all 1.8s linear; z-index: 5;
         }
+        .sprite { height: 100%; display: block; animation: walk-anim 0.6s steps(6) infinite; }
+        @keyframes walk-anim { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+        
+        .big { transform: scale(2.5); z-index: 10; } 
+        .bomb { filter: brightness(0.2) sepia(1) hue-rotate(-50deg) saturate(5); } 
+        .collected { transform: scale(0) translateY(-100px) !important; opacity: 0; transition: 0.4s !important; }
 
-        .sprite {
-            height: 100%; display: block;
-            animation: walk-anim 0.6s steps(6) infinite; /* Режем картинку на 6 кадров */
-        }
-
-        @keyframes walk-anim {
-            from { transform: translateX(0); }
-            to { transform: translateX(-100%); }
-        }
-
-        /* Виды зверей */
-        .big { transform: scale(2.5); z-index: 10; } /* Большие дают 100 монет */
-        .bomb { filter: brightness(0.2) sepia(1) hue-rotate(-50deg) saturate(5); } /* Свинья-бомба */
-        .dead { transform: scale(0) rotate(360deg) !important; transition: 0.3s !important; }
-
-        /* Интерфейс */
         #ui { position: fixed; top: 20px; width: 100%; text-align: center; z-index: 100; color: gold; font-size: 28px; text-shadow: 2px 2px 4px #000; font-weight: bold; }
         #overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
@@ -48,26 +33,24 @@
     </style>
 </head>
 <body>
-
-    <div id="ui">💰: <span id="score">0</span> | ⏳: <span id="timer">5</span>с</div>
-
+    <div id="ui">💰 Счёт: <span id="score">0</span> | ⏳ Время: <span id="timer">5</span>с</div>
     <div id="overlay">
         <h1 id="msg">ЗАГОН ЗАКРЫТ</h1>
         <div id="countdown"></div>
         <button id="startBtn" onclick="prepareFarm()">ОТКРЫТЬ ЗАГОН</button>
     </div>
-
     <div id="farm"></div>
 
 <script>
     let score = 0;
     let gameActive = false;
+    const farm = document.getElementById('farm');
 
-    // ТОЧНЫЕ НАЗВАНИЯ ТВОИХ ФАЙЛОВ С ГИТХАБА (Буква в букву!)
+    // Названия файлов СТРОГО по твоему списку
     const animalFiles = [
         'Boar_Walk.png',
         'Deer_Walk.png',
-        'Fox_walk.png', // на скрине у тебя маленькая "w"
+        'Fox_walk.png', // Тут маленькая "w", как в твоем списке
         'Hare_Walk.png',
         'Black_grouse_Walk.png'
     ];
@@ -96,43 +79,32 @@
         sprite.src = animalFiles[Math.floor(Math.random() * animalFiles.length)];
         sprite.className = 'sprite';
         wrap.className = 'animal-wrap';
-
-        // Ставим в случайное место
         wrap.style.left = Math.random() * 80 + 'vw';
         wrap.style.top = Math.random() * 80 + 'vh';
 
-        // Настройка типов
-        if (chance < 0.2) { // БОМБА
+        if (chance < 0.2) { 
             wrap.className += ' bomb'; wrap.dataset.type = 'bomb';
-        } else if (chance < 0.4) { // ГИГАНТ
+        } else if (chance < 0.4) { 
             wrap.className += ' big'; wrap.dataset.pts = 100;
-        } else { // ОБЫЧНЫЙ
+        } else { 
             wrap.dataset.pts = 20;
         }
 
         wrap.onclick = function() {
             if (this.dataset.type === 'bomb') {
                 gameActive = false;
-                alert("💥 БАБАХ! Взорвалась свинья-бомба!");
+                alert("💥 Ой! Это была свинья-бомба! Загон закрывается.");
                 location.reload();
             } else {
                 score += parseInt(this.dataset.pts || 20);
                 document.getElementById('score').innerText = score;
-                this.className += ' dead';
-                setTimeout(() => this.remove(), 300);
+                this.className += ' collected';
+                setTimeout(() => this.remove(), 400);
             }
         };
 
-        document.getElementById('farm').appendChild(wrap);
-
-        // --- ДВИЖЕНИЕ ---
-        setTimeout(() => {
-            if (wrap) {
-                wrap.style.left = Math.random() * 80 + 'vw';
-                wrap.style.top = Math.random() * 80 + 'vh';
-            }
-        }, 100);
-
+        farm.appendChild(wrap);
+        setTimeout(() => { if (wrap) { wrap.style.left = Math.random() * 80 + 'vw'; wrap.style.top = Math.random() * 80 + 'vh'; } }, 100);
         setTimeout(() => { if(wrap) wrap.remove(); }, 2000);
     }
 
@@ -140,8 +112,6 @@
         score = 0; document.getElementById('score').innerText = "0";
         gameActive = true;
         let timeLeft = 5;
-        document.getElementById('timer').innerText = timeLeft;
-
         const spawner = setInterval(spawn, 400);
         const timer = setInterval(() => {
             timeLeft--;
@@ -150,7 +120,7 @@
                 clearInterval(spawner); clearInterval(timer);
                 gameActive = false;
                 document.getElementById('overlay').style.display = 'flex';
-                document.getElementById('msg').innerText = "ВЫРУЧКА: " + score;
+                document.getElementById('msg').innerText = "СОБРАНО ЖИВОТНЫХ НА: " + score;
                 document.getElementById('startBtn').style.display = 'block';
             }
         }, 1000);
