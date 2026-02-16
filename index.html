@@ -1,142 +1,45 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Лесная Ферма</title>
     <style>
-        body { background: #1a1a1a; margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
-        #farm { 
-            width: 100vw; height: 100vh; background: #4caf50; 
-            position: relative; overflow: hidden; border: 15px solid #5d4037; box-sizing: border-box; 
+        body { background: #2e7d32; margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; color: white; font-family: sans-serif; }
+        
+        /* Окно для кабанчика */
+        .box { 
+            position: absolute; width: 64px; height: 64px; 
+            border: 2px solid white; overflow: hidden;
+            animation: move 3s linear infinite; /* Движение по экрану */
         }
         
-        /* Окно для одного кабанчика */
-        .animal-wrap { 
-            position: absolute; 
-            width: 48px; height: 48px; /* Размер одного кадра из твоего файла */
-            overflow: hidden; cursor: pointer; 
-            transition: all 1.8s linear; z-index: 5;
+        /* Сама картинка кабанчика */
+        .pig { 
+            height: 100%; 
+            animation: walk 0.6s steps(6) infinite; /* Анимация ножек */
         }
 
-        /* Твоя картинка 6x4 внутри окна */
-        .sprite {
-            width: 288px; /* 48px * 6 кадров в ширину */
-            height: 192px; /* 48px * 4 ряда в высоту */
-            display: block;
-            animation: walk-anim 0.6s steps(6) infinite;
+        @keyframes walk {
+            from { transform: translateX(0); }
+            to { transform: translateX(-100%); }
         }
 
-        @keyframes walk-anim {
-            from { transform: translate(0, 0); }
-            to { transform: translate(-100%, 0); }
+        @keyframes move {
+            0% { left: -100px; top: 20%; }
+            50% { left: 50%; top: 50%; }
+            100% { left: 110%; top: 20%; }
         }
-
-        .big { transform: scale(2.5); z-index: 10; } 
-        .bomb { filter: brightness(0.2) sepia(1) hue-rotate(-50deg) saturate(5); } 
-        .collected { transform: scale(0) translateY(-100px) !important; opacity: 0; transition: 0.4s !important; }
-
-        #ui { position: fixed; top: 20px; width: 100%; text-align: center; z-index: 100; color: gold; font-size: 28px; text-shadow: 2px 2px 4px #000; font-weight: bold; }
-        #overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.85); display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; z-index: 200; color: white; 
-        }
-        #countdown { font-size: 100px; color: #ffeb3b; margin: 20px; }
-        button { padding: 20px 50px; font-size: 24px; cursor: pointer; background: #ff9800; border: none; border-radius: 15px; color: white; box-shadow: 0 6px 0 #e68a00; }
     </style>
 </head>
 <body>
-    <div id="ui">💰 Счёт: <span id="score">0</span> | ⏳ Время: <span id="timer">5</span>с</div>
-    <div id="overlay">
-        <h1 id="msg">ЗАГОН ЗАКРЫТ</h1>
-        <div id="countdown"></div>
-        <button id="startBtn" onclick="prepareFarm()">ОТКРЫТЬ ЗАГОН</button>
+
+    <div style="text-align: center; z-index: 10;">
+        <h1>ТЕСТ: КАБАН ДОЛЖЕН БЕЖАТЬ</h1>
+        <p>Если видишь только белый квадрат — имя файла неверное.</p>
     </div>
-    <div id="farm"></div>
 
-<script>
-    let score = 0;
-    let gameActive = false;
-    const farm = document.getElementById('farm');
+    <!-- Твой файл Boar_Walk.png -->
+    <div class="box">
+        <img src="Boar_Walk.png" class="pig" alt="!">
+    </div>
 
-    // Твои файлы (я оставил только те, что на Гитхабе)
-    const animalFiles = ['Boar_Walk.png', 'Deer_Walk.png', 'Fox_walk.png', 'Hare_Walk.png', 'Black_grouse_Walk.png'];
-
-    function prepareFarm() {
-        document.getElementById('startBtn').style.display = 'none';
-        let count = 5;
-        const countInt = setInterval(() => {
-            document.getElementById('countdown').innerText = count;
-            count--;
-            if (count < 0) {
-                clearInterval(countInt);
-                document.getElementById('overlay').style.display = 'none';
-                document.getElementById('countdown').innerText = "";
-                startGame();
-            }
-        }, 1000);
-    }
-
-    function spawn() {
-        if (!gameActive) return;
-        const wrap = document.createElement('div');
-        const sprite = document.createElement('img');
-        const chance = Math.random();
-        
-        sprite.src = animalFiles[Math.floor(Math.random() * animalFiles.length)];
-        sprite.className = 'sprite';
-        wrap.className = 'animal-wrap';
-        wrap.style.left = Math.random() * 80 + 'vw';
-        wrap.style.top = Math.random() * 80 + 'vh';
-
-        // Рандомный ряд (у тебя их 4 на картинке)
-        const row = Math.floor(Math.random() * 4) * -48;
-        sprite.style.marginTop = row + 'px';
-
-        if (chance < 0.2) { 
-            wrap.className += ' bomb'; wrap.dataset.type = 'bomb';
-        } else if (chance < 0.4) { 
-            wrap.className += ' big'; wrap.dataset.pts = 100;
-        } else { 
-            wrap.dataset.pts = 20;
-        }
-
-        wrap.onclick = function() {
-            if (this.dataset.type === 'bomb') {
-                gameActive = false;
-                alert("💥 БАБАХ! Загон закрывается.");
-                location.reload();
-            } else {
-                score += parseInt(this.dataset.pts || 20);
-                document.getElementById('score').innerText = score;
-                this.className += ' collected';
-                setTimeout(() => this.remove(), 400);
-            }
-        };
-
-        farm.appendChild(wrap);
-        setTimeout(() => { if (wrap) { wrap.style.left = Math.random() * 80 + 'vw'; wrap.style.top = Math.random() * 80 + 'vh'; } }, 100);
-        setTimeout(() => { if(wrap) wrap.remove(); }, 2000);
-    }
-
-    function startGame() {
-        score = 0; document.getElementById('score').innerText = "0";
-        gameActive = true;
-        let timeLeft = 5;
-        const spawner = setInterval(spawn, 400);
-        const timer = setInterval(() => {
-            timeLeft--;
-            document.getElementById('timer').innerText = timeLeft;
-            if (timeLeft <= 0) {
-                clearInterval(spawner); clearInterval(timer);
-                gameActive = false;
-                document.getElementById('overlay').style.display = 'flex';
-                document.getElementById('msg').innerText = "СОБРАНО НА: " + score;
-                document.getElementById('startBtn').style.display = 'block';
-            }
-        }, 1000);
-    }
-</script>
 </body>
 </html>
