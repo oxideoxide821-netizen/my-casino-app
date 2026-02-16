@@ -3,30 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>MINES ULTIMATE PVP 2026</title>
+    <title>САПЕР ОНЛАЙН - PVP ДУЭЛИ</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.cdnfonts.com/css/pixelated');
-
-        :root {
-            --bg: #c0c0c0;
-            --win-light: #ffffff;
-            --win-dark: #808080;
-            --win-darker: #404040;
-            --accent: #008000;
-            --danger: #ff0000;
-            --pvp: #ff6600;
-            --lcd-bg: #000000;
-            --blue-num: #0000ff;
-            --green-num: #008000;
-            --red-num: #ff0000;
-            --darkblue-num: #000080;
-            --maroon-num: #800000;
-            --cyan-num: #008080;
-            --black-num: #000000;
-            --gray-num: #808080;
-        }
 
         * { 
             box-sizing: border-box; 
@@ -37,7 +18,7 @@
         }
         
         body { 
-            background: #1a1a2e;
+            background: #0f1419;
             color: #000; 
             margin: 0; 
             display: flex; 
@@ -49,33 +30,30 @@
             position: relative;
         }
 
-        /* ОБОИ С ПАТТЕРНОМ */
+        /* ФОН С АНИМАЦИЕЙ */
         body::before {
             content: '';
             position: fixed;
             inset: 0;
-            background-image: 
-                radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 40% 20%, rgba(120, 219, 255, 0.15) 0%, transparent 50%),
-                repeating-linear-gradient(45deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 11px),
-                repeating-linear-gradient(-45deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 11px);
-            z-index: -2;
-        }
-
-        body::after {
-            content: '';
-            position: fixed;
-            inset: 0;
             background: 
-                linear-gradient(180deg, rgba(26,26,46,0.9) 0%, rgba(22,33,62,0.8) 100%);
+                radial-gradient(ellipse at 20% 80%, rgba(120, 119, 198, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(255, 119, 198, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(100, 200, 255, 0.05) 0%, transparent 70%),
+                repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 40px),
+                repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 40px);
             z-index: -1;
+            animation: bg-move 20s linear infinite;
+        }
+        @keyframes bg-move {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(40px, 40px); }
         }
 
-        /* ЗАГРУЗКА */
-        #boot {
-            position: fixed; inset: 0; 
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        /* ЭКРАН ЗАГРУЗКИ */
+        #boot-screen {
+            position: fixed; 
+            inset: 0; 
+            background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 50%, #16213e 100%);
             z-index: 2000;
             display: flex; 
             flex-direction: column; 
@@ -84,559 +62,790 @@
             color: #eaeaea;
             transition: opacity 0.5s;
         }
-        .boot-logo {
-            font-size: 56px;
+        .boot-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(145deg, #e94560, #c03550);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
             margin-bottom: 30px;
-            text-shadow: 0 0 20px rgba(233, 69, 96, 0.5);
-            animation: pulse 2s infinite;
+            box-shadow: 
+                0 20px 40px rgba(233, 69, 96, 0.3),
+                inset 0 2px 4px rgba(255,255,255,0.2);
+            animation: boot-bounce 1s ease infinite;
         }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+        @keyframes boot-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
-        .boot-text { 
-            font-size: 18px; 
+        .boot-title { 
+            font-size: 28px; 
+            font-weight: bold;
             letter-spacing: 4px; 
-            margin-bottom: 30px;
-            color: #e94560;
-            text-shadow: 0 0 10px rgba(233, 69, 96, 0.5);
+            margin-bottom: 10px;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .boot-subtitle {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
         }
         .boot-bar { 
             width: 280px; 
-            height: 8px; 
+            height: 6px; 
             background: rgba(255,255,255,0.1);
-            border-radius: 4px;
+            border-radius: 3px;
             overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.2);
         }
         .boot-fill { 
             height: 100%; 
-            background: linear-gradient(90deg, #e94560, #ff6b6b);
+            background: linear-gradient(90deg, #e94560, #ff6b6b, #e94560);
+            background-size: 200% 100%;
             width: 0%;
+            animation: shimmer 1s infinite;
             box-shadow: 0 0 20px rgba(233, 69, 96, 0.5);
-            transition: width 0.1s;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
         }
 
-        /* ОСНОВНОЕ ОКНО */
-        .mines-app {
-            background: var(--bg);
-            border: 4px solid var(--win-light);
-            border-right-color: var(--win-darker); 
-            border-bottom-color: var(--win-darker);
+        /* ГЛАВНОЕ ОКНО ПРИЛОЖЕНИЯ */
+        .game-window {
+            background: #c0c0c0;
+            border: 3px solid #fff;
+            border-right-color: #404040; 
+            border-bottom-color: #404040;
             box-shadow: 
                 0 0 0 2px #000,
-                0 20px 50px rgba(0,0,0,0.5),
-                0 0 100px rgba(233, 69, 96, 0.1);
+                0 25px 50px rgba(0,0,0,0.5);
             position: relative; 
             width: 400px; 
+            height: 700px;
             display: none;
+            flex-direction: column;
             padding: 4px;
-            border-radius: 2px;
         }
 
-        /* ЗАГОЛОВОК */
-        .window-title {
-            background: linear-gradient(90deg, #16213e 0%, #0f3460 50%, #16213e 100%);
-            color: #eaeaea;
+        /* ШАПКА ОКНА */
+        .window-header {
+            background: linear-gradient(90deg, #1e3a5f 0%, #2e5a8f 50%, #1e3a5f 100%);
+            color: #fff;
             padding: 6px 8px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 4px;
-            border: 2px outset var(--win-light);
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            border: 2px outset #fff;
         }
-        .window-title-text::before {
-            content: '💣 ';
-            filter: drop-shadow(0 0 4px #e94560);
-        }
-        .window-buttons {
-            display: flex;
-            gap: 4px;
-        }
-        .win-btn {
-            width: 20px;
-            height: 18px;
-            background: var(--bg);
-            border: 2px outset var(--win-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            cursor: pointer;
-            font-weight: bold;
-            color: #000;
-        }
-        .win-btn:hover {
-            background: #e94560;
-            color: white;
-        }
-        .win-btn:active {
-            border-style: inset;
-        }
-
-        /* ТУТОРИАЛ */
-        .tutorial-overlay {
-            position: absolute; 
-            inset: 4px; 
-            top: 32px;
-            background: var(--bg); 
-            z-index: 500;
-            display: flex; 
-            flex-direction: column; 
-            padding: 20px;
-            border: 3px inset var(--win-light);
-        }
-        .tut-header { 
-            text-align: center; 
-            font-size: 20px; 
-            padding: 10px;
-            border: 3px outset var(--win-light);
-            margin-bottom: 20px;
-            background: linear-gradient(180deg, #e0e0e0 0%, #c0c0c0 100%);
-            text-shadow: 1px 1px 0 var(--win-light);
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
-        }
-        .tut-card {
-            flex: 1; 
-            background: linear-gradient(180deg, #ffffff 0%, #f0f0f0 100%);
-            border: 3px inset var(--win-light);
-            padding: 25px; 
-            text-align: center; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center;
-            margin-bottom: 20px;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .tut-img-box {
-            width: 140px; 
-            height: 140px; 
-            background: linear-gradient(145deg, #d0d0d0, #b0b0b0);
-            margin: 20px 0;
-            border: 4px inset var(--win-light);
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            position: relative;
-            box-shadow: inset 0 4px 8px rgba(0,0,0,0.2);
-        }
-
-        /* МОДЕЛИ */
-        .bomb-3d {
-            width: 60px; 
-            height: 60px; 
-            background: radial-gradient(circle at 30% 30%, #666, #111);
-            border-radius: 50%; 
-            position: relative; 
-            box-shadow: 
-                0 8px 16px rgba(0,0,0,0.4),
-                inset -4px -4px 8px rgba(0,0,0,0.3),
-                inset 4px 4px 8px rgba(255,255,255,0.1);
-        }
-        .bomb-3d::before { 
-            content: ''; 
-            position: absolute; 
-            top: -10px; 
-            left: 22px; 
-            width: 16px; 
-            height: 14px; 
-            background: linear-gradient(180deg, #444, #222);
-            border: 2px outset #666;
-            border-radius: 2px;
-        }
-        .bomb-3d::after { 
-            content: ''; 
-            position: absolute; 
-            top: -22px; 
-            left: 20px; 
-            width: 20px; 
-            height: 20px;
-            background: radial-gradient(circle at 30% 30%, #ff6b6b, #e94560);
-            border-radius: 50%;
-            box-shadow: 0 0 20px #e94560;
-            animation: flicker 0.3s infinite alternate;
-        }
-        
-        .gem-3d {
-            width: 50px; 
-            height: 50px; 
-            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 50%, #d299c2 100%);
-            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
-            border: 3px solid rgba(255,255,255,0.3);
-            box-shadow: 
-                0 8px 16px rgba(0,0,0,0.3),
-                inset 0 0 20px rgba(255,255,255,0.5);
-            animation: gem-shine 2s infinite;
-        }
-
-        /* МЕНЮ */
-        .menu-overlay {
-            position: absolute; 
-            inset: 4px;
-            top: 32px;
-            background: var(--bg); 
-            z-index: 400;
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: flex-start; 
-            padding: 30px 25px;
-            border: 3px inset var(--win-light);
-            overflow-y: auto;
-        }
-        .menu-title {
-            font-size: 32px;
-            margin-bottom: 10px;
-            text-align: center;
-            text-shadow: 
-                2px 2px 0 var(--win-dark),
-                -1px -1px 0 var(--win-light);
-            letter-spacing: 4px;
-            color: #16213e;
-            line-height: 1.2;
-        }
-        .menu-subtitle {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 25px;
-            letter-spacing: 2px;
-        }
-
-        /* КРУТЫЕ КНОПКИ */
-        .btn-retro {
-            width: 100%; 
-            padding: 16px 20px; 
-            margin: 8px 0; 
-            font-family: 'Pixelated', 'Courier New', monospace;
-            background: linear-gradient(180deg, #e8e8e8 0%, #c0c0c0 100%);
-            border: 3px outset var(--win-light);
-            cursor: pointer; 
-            font-size: 16px; 
-            font-weight: bold; 
-            transition: all 0.1s;
-            position: relative;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 
-                0 4px 0 var(--win-dark),
-                0 6px 4px rgba(0,0,0,0.3);
-        }
-        .btn-retro::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, transparent 50%);
-            pointer-events: none;
-        }
-        .btn-retro:hover { 
-            background: linear-gradient(180deg, #f0f0f0 0%, #d0d0d0 100%);
-            transform: translateY(-2px);
-            box-shadow: 
-                0 6px 0 var(--win-dark),
-                0 8px 8px rgba(0,0,0,0.3);
-        }
-        .btn-retro:active { 
-            border-style: inset;
-            transform: translateY(4px);
-            box-shadow: 
-                0 0 0 var(--win-dark),
-                inset 0 4px 8px rgba(0,0,0,0.2);
-        }
-        .btn-pvp { 
-            background: linear-gradient(180deg, #ffaa44 0%, #ff8800 100%);
-            color: #000;
-            border-color: #ffcc88;
-        }
-        .btn-pvp:hover {
-            background: linear-gradient(180deg, #ffbb55 0%, #ff9922 100%);
-        }
-        .btn-green {
-            background: linear-gradient(180deg, #44aa44 0%, #228822 100%);
-            color: white;
-            border-color: #66cc66;
-        }
-        .btn-green:hover {
-            background: linear-gradient(180deg, #55bb55 0%, #339933 100%);
-        }
-        .btn-blue {
-            background: linear-gradient(180deg, #4488ff 0%, #2266dd 100%);
-            color: white;
-            border-color: #88bbff;
-        }
-
-        /* ПАНЕЛЬКИ В МЕНЮ */
-        .mode-tabs {
-            display: flex;
-            gap: 4px;
-            margin-bottom: 20px;
-            width: 100%;
-        }
-        .mode-tab {
-            flex: 1;
-            padding: 10px;
-            background: linear-gradient(180deg, #d0d0d0 0%, #b0b0b0 100%);
-            border: 3px outset var(--win-light);
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-            text-align: center;
-        }
-        .mode-tab.active {
-            background: linear-gradient(180deg, #e94560 0%, #c03550 100%);
-            color: white;
-            border-style: inset;
-        }
-
-        /* СТАТИСТИКА */
-        .stats-panel {
-            width: 100%;
-            background: linear-gradient(180deg, #f5f5f5 0%, #e0e0e0 100%);
-            border: 3px inset var(--win-light);
-            padding: 15px;
-            margin-top: 15px;
-        }
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #ccc;
-            font-size: 13px;
-        }
-        .stat-row:last-child { border-bottom: none; }
-        .stat-label {
+        .window-title {
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        .online-dot {
+        .window-icon {
+            width: 20px;
+            height: 20px;
+            background: #e94560;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        .window-controls {
+            display: flex;
+            gap: 4px;
+        }
+        .win-btn {
+            width: 22px;
+            height: 20px;
+            background: #c0c0c0;
+            border: 2px outset #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #000;
+        }
+        .win-btn:hover { background: #e94560; color: #fff; }
+        .win-btn:active { border-style: inset; }
+
+        /* КОНТЕНТНАЯ ОБЛАСТЬ */
+        .window-content {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            border: 2px inset #fff;
+            background: #c0c0c0;
+        }
+
+        /* ЭКРАН ТУТОРИАЛА */
+        .tutorial-screen {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, #d4d4d4 0%, #c0c0c0 100%);
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            z-index: 100;
+        }
+        .tutorial-header { 
+            background: linear-gradient(180deg, #e8e8e8 0%, #d0d0d0 100%);
+            padding: 15px;
+            text-align: center; 
+            font-size: 18px; 
+            font-weight: bold;
+            border-bottom: 3px solid #a0a0a0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .tutorial-progress {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .progress-dot {
             width: 10px;
             height: 10px;
-            background: #00ff00;
+            background: #888;
             border-radius: 50%;
-            box-shadow: 0 0 10px #00ff00;
-            animation: blink 2s infinite;
+            border: 2px outset #fff;
+        }
+        .progress-dot.active {
+            background: #e94560;
+            box-shadow: 0 0 10px #e94560;
+        }
+        .tutorial-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .tutorial-body::-webkit-scrollbar {
+            width: 12px;
+        }
+        .tutorial-body::-webkit-scrollbar-track {
+            background: #a0a0a0;
+            border-left: 2px solid #fff;
+        }
+        .tutorial-body::-webkit-scrollbar-thumb {
+            background: #c0c0c0;
+            border: 2px outset #fff;
+        }
+        .tutorial-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f0f0f0 100%);
+            border: 3px outset #fff;
+            padding: 25px;
+            width: 100%;
+            max-width: 340px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .tutorial-visual {
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(145deg, #e0e0e0, #c0c0c0);
+            border: 4px inset #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .tutorial-text {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #333;
+        }
+        .tutorial-text b {
+            color: #e94560;
+        }
+        .tutorial-footer {
+            padding: 15px 20px 20px;
+            display: flex;
+            gap: 10px;
+            background: linear-gradient(0deg, #b0b0b0 0%, #c0c0c0 100%);
+            border-top: 2px solid #a0a0a0;
+        }
+
+        /* 3D МОДЕЛИ */
+        .model-bomb {
+            width: 70px;
+            height: 70px;
+            background: radial-gradient(circle at 30% 30%, #666, #111);
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            animation: bomb-pulse 2s infinite;
+        }
+        @keyframes bomb-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .model-bomb::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 26px;
+            width: 18px;
+            height: 14px;
+            background: linear-gradient(180deg, #555, #333);
+            border: 2px outset #777;
+        }
+        .model-bomb::after {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 24px;
+            width: 22px;
+            height: 22px;
+            background: radial-gradient(circle at 30% 30%, #ff8888, #e94560);
+            border-radius: 50%;
+            box-shadow: 0 0 20px #e94560;
+            animation: fuse-flicker 0.3s infinite alternate;
+        }
+        @keyframes fuse-flicker {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0.7; transform: scale(0.9); }
+        }
+
+        .model-gem {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 50%, #d299c2 100%);
+            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+            border: 3px solid rgba(255,255,255,0.5);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            animation: gem-sparkle 2s infinite;
+        }
+        @keyframes gem-sparkle {
+            0%, 100% { filter: brightness(1) drop-shadow(0 0 5px rgba(255,255,255,0.5)); }
+            50% { filter: brightness(1.3) drop-shadow(0 0 15px rgba(255,255,255,0.8)); }
+        }
+
+        /* ГЛАВНОЕ МЕНЮ */
+        .main-menu {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, #d0d0d0 0%, #c0c0c0 100%);
+            display: none;
+            flex-direction: column;
+            padding: 25px;
+            overflow-y: auto;
+        }
+        .menu-logo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .menu-logo-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(145deg, #e94560, #c03550);
+            border-radius: 20px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            box-shadow: 
+                0 10px 30px rgba(233, 69, 96, 0.3),
+                inset 0 2px 4px rgba(255,255,255,0.2);
+            border: 3px outset rgba(255,255,255,0.3);
+        }
+        .menu-logo-title {
+            font-size: 26px;
+            font-weight: bold;
+            color: #1e3a5f;
+            text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+            letter-spacing: 3px;
+        }
+        .menu-logo-subtitle {
+            font-size: 12px;
+            color: #666;
+            letter-spacing: 4px;
+            margin-top: 5px;
+        }
+
+        /* ВКЛАДКИ РЕЖИМОВ */
+        .mode-selector {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 20px;
+            background: #a0a0a0;
+            padding: 4px;
+            border: 2px inset #fff;
+        }
+        .mode-tab {
+            flex: 1;
+            padding: 12px 8px;
+            background: linear-gradient(180deg, #d0d0d0 0%, #b0b0b0 100%);
+            border: 2px outset #fff;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.1s;
+        }
+        .mode-tab:hover {
+            background: linear-gradient(180deg, #e0e0e0 0%, #c0c0c0 100%);
+        }
+        .mode-tab.active {
+            background: linear-gradient(180deg, #e94560 0%, #c03550 100%);
+            color: #fff;
+            border-style: inset;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* КНОПКИ МЕНЮ */
+        .menu-button {
+            width: 100%;
+            padding: 18px 20px;
+            margin: 8px 0;
+            background: linear-gradient(180deg, #e8e8e8 0%, #d0d0d0 50%, #c0c0c0 100%);
+            border: 3px outset #fff;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.1s;
+            box-shadow: 0 4px 0 #808080, 0 6px 10px rgba(0,0,0,0.2);
+        }
+        .menu-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, transparent 100%);
+            pointer-events: none;
+        }
+        .menu-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #808080, 0 8px 15px rgba(0,0,0,0.25);
+            background: linear-gradient(180deg, #f0f0f0 0%, #d8d8d8 50%, #c8c8c8 100%);
+        }
+        .menu-button:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #808080, inset 0 4px 8px rgba(0,0,0,0.2);
+            border-style: inset;
+        }
+        .menu-button-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(145deg, #fff, #e0e0e0);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            border: 2px outset #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .menu-button-text {
+            flex: 1;
+            text-align: left;
+        }
+        .menu-button-arrow {
+            font-size: 20px;
+            color: #888;
+        }
+        .menu-button:hover .menu-button-arrow {
+            color: #e94560;
+            transform: translateX(5px);
+        }
+
+        .menu-button.primary {
+            background: linear-gradient(180deg, #ffaa44 0%, #ff8800 50%, #ee7700 100%);
+            border-color: #ffcc88;
+        }
+        .menu-button.primary:hover {
+            background: linear-gradient(180deg, #ffbb55 0%, #ff9922 50%, #ff8800 100%);
+        }
+        .menu-button.success {
+            background: linear-gradient(180deg, #44aa44 0%, #228822 50%, #117711 100%);
+            color: #fff;
+            border-color: #66cc66;
+        }
+        .menu-button.success:hover {
+            background: linear-gradient(180deg, #55bb55 0%, #339933 50%, #228822 100%);
+        }
+
+        /* ПАНЕЛЬ СТАТИСТИКИ */
+        .stats-box {
+            margin-top: 15px;
+            background: linear-gradient(180deg, #e8e8e8 0%, #d0d0d0 100%);
+            border: 3px inset #fff;
+            padding: 15px;
+        }
+        .stats-title {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            text-align: center;
+            border-bottom: 2px solid #b0b0b0;
+            padding-bottom: 8px;
+        }
+        .stat-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dotted #999;
+            font-size: 13px;
+        }
+        .stat-line:last-child { border-bottom: none; }
+        .stat-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .online-pulse {
+            width: 10px;
+            height: 10px;
+            background: #00dd00;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00dd00;
+            animation: pulse-green 2s infinite;
+        }
+        @keyframes pulse-green {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
         }
         .stat-value {
             font-weight: bold;
-            color: #16213e;
+            color: #1e3a5f;
         }
-        .stat-value.highlight {
-            color: #e94560;
-        }
+        .stat-value.highlight { color: #e94560; }
+        .stat-value.gold { color: #ff8800; }
 
-        /* ИГРОВОЙ ИНТЕРФЕЙС */
-        .game-wrapper {
+        /* ЭКРАН ПОИСКА */
+        .search-screen {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, #d0d0d0 0%, #c0c0c0 100%);
             display: none;
             flex-direction: column;
-            height: 100%;
-        }
-        .status-panel {
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            background: linear-gradient(180deg, #d0d0d0 0%, #c0c0c0 100%);
-            padding: 8px; 
-            border: 3px inset var(--win-light); 
-            margin-bottom: 8px;
-        }
-        .lcd-display {
-            background: #000;
-            border: 3px inset var(--win-dark);
-            padding: 6px 12px;
-            font-family: 'Courier New', monospace;
-            font-size: 28px;
-            font-weight: bold;
-            color: #ff0000;
-            text-shadow: 0 0 10px rgba(255,0,0,0.5);
-            min-width: 70px;
-            text-align: center;
-            letter-spacing: 3px;
-            box-shadow: inset 0 0 10px rgba(255,0,0,0.2);
-        }
-        .smiley-btn {
-            width: 44px;
-            height: 44px;
-            background: linear-gradient(145deg, #f0f0f0, #d0d0d0);
-            border: 3px outset var(--win-light);
-            font-size: 28px;
-            display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 0 var(--win-dark);
+            padding: 30px;
         }
-        .smiley-btn:active {
-            border-style: inset;
-            transform: translateY(4px);
-            box-shadow: none;
-        }
-        .smiley-btn.scared::after { content: '😰'; }
-        .smiley-btn.cool::after { content: '😎'; }
-        .smiley-btn.dead::after { content: '💀'; }
-        .smiley-btn::after { content: '🙂'; }
-
-        /* ИГРОВОЕ ПОЛЕ */
-        .game-container {
-            border: 3px inset var(--win-light);
-            background: var(--bg);
-            padding: 10px;
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .game-grid {
-            display: grid; 
-            grid-template-columns: repeat(5, 1fr); 
-            gap: 2px;
-            border: 4px inset var(--win-light);
-            background: var(--win-dark);
-            padding: 4px;
-        }
-
-        .cell {
-            width: 52px;
-            height: 52px;
-            background: linear-gradient(145deg, #e0e0e0, #c0c0c0);
-            border: 3px outset var(--win-light); 
-            cursor: pointer;
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 22px;
-            font-weight: bold;
-            transition: all 0.05s;
+        .search-spinner {
+            width: 100px;
+            height: 100px;
             position: relative;
+            margin-bottom: 30px;
         }
-        .cell::before {
+        .search-spinner::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%);
-            pointer-events: none;
-        }
-        .cell:active, .cell.open { 
-            border-style: inset; 
-            background: linear-gradient(145deg, #b0b0b0, #c0c0c0);
-        }
-        .cell.open {
-            font-family: 'Courier New', monospace;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
-        }
-        .cell.mine-open {
-            background: #ff0000;
-            border-color: #cc0000;
-            animation: explode 0.3s ease-out;
-        }
-        @keyframes explode {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); background: #ff6600; }
-            100% { transform: scale(1); background: #ff0000; }
-        }
-        .cell.flagged::after {
-            content: '🚩';
-            font-size: 24px;
-            filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.3));
-        }
-        .cell.question::after {
-            content: '?';
-            font-size: 24px;
-            color: #000;
-            font-weight: bold;
-        }
-
-        .cell.open[data-num="1"] { color: var(--blue-num); }
-        .cell.open[data-num="2"] { color: var(--green-num); }
-        .cell.open[data-num="3"] { color: var(--red-num); }
-        .cell.open[data-num="4"] { color: var(--darkblue-num); }
-        .cell.open[data-num="5"] { color: var(--maroon-num); }
-        .cell.open[data-num="6"] { color: var(--cyan-num); }
-        .cell.open[data-num="7"] { color: var(--black-num); }
-        .cell.open[data-num="8"] { color: var(--gray-num); }
-
-        /* НИЖНЯЯ ПАНЕЛЬ С КНОПКАМИ */
-        .bottom-panel {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 2px solid var(--win-dark);
-        }
-        .bottom-panel .btn-retro {
-            flex: 1;
-            margin: 0;
-            padding: 14px 10px;
-            font-size: 13px;
-        }
-
-        /* ПОИСК ИГРЫ */
-        .search-overlay {
-            position: absolute;
-            inset: 4px;
-            top: 32px;
-            background: var(--bg);
-            z-index: 600;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-            border: 3px inset var(--win-light);
-        }
-        .search-spinner {
-            width: 80px;
-            height: 80px;
-            border: 6px solid var(--win-dark);
+            border: 8px solid #a0a0a0;
             border-top-color: #e94560;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-bottom: 30px;
-            box-shadow: 0 0 20px rgba(233, 69, 96, 0.3);
+        }
+        .search-spinner::after {
+            content: '⚔️';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
         }
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
         .search-title {
             font-size: 24px;
+            font-weight: bold;
+            color: #1e3a5f;
             margin-bottom: 10px;
-            color: #16213e;
         }
         .search-subtitle {
             font-size: 13px;
             color: #666;
             margin-bottom: 30px;
         }
+        .search-timer {
+            font-size: 48px;
+            font-weight: bold;
+            color: #e94560;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
         .opponent-card {
             display: none;
-            background: linear-gradient(180deg, #fff 0%, #f0f0f0 100%);
-            border: 3px outset var(--win-light);
-            padding: 20px;
+            background: linear-gradient(145deg, #fff, #f0f0f0);
+            border: 3px outset #fff;
+            padding: 25px;
             width: 100%;
-            margin-bottom: 20px;
+            max-width: 280px;
+            margin-bottom: 25px;
             text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            animation: opponent-appear 0.5s ease-out;
+        }
+        @keyframes opponent-appear {
+            0% { transform: scale(0.8) translateY(-20px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
         }
         .opponent-avatar {
-            width: 60px;
-            height: 60px;
+            width: 80px;
+            height: 80px;
             background: linear-gradient(145deg, #e94560, #c03550);
             border-radius: 50%;
             margin: 0 auto 15px;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 40px;
+            border: 4px outset #fff;
+            box-shadow: 0 8px 20px rgba(233, 69, 96, 0.3);
+        }
+        .opponent-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e3a5f;
+            margin-bottom: 5px;
+        }
+        .opponent-stats {
+            font-size: 12px;
+            color: #666;
+        }
+        .opponent-found-badge {
+            display: inline-block;
+            background: #00dd00;
+            color: #fff;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 15px;
+            border: 2px outset #fff;
+            animation: badge-pulse 1s infinite;
+        }
+        @keyframes badge-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0,221,0,0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(0,221,0,0); }
+        }
+        .bet-display {
+            background: #000;
+            color: #0f0;
+            padding: 15px 30px;
+            font-family: 'Courier New', monospace;
+            font-size: 20px;
+            font-weight: bold;
+            border: 3px inset #fff;
+            margin-bottom: 25px;
+            box-shadow: inset 0 0 20px rgba(0,255,0,0.1);
+        }
+
+        /* ИГРОВОЙ ЭКРАН */
+        .game-screen {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, #d0d0d0 0%, #c0c0c0 100%);
+            display: none;
+            flex-direction: column;
+            padding: 10px;
+        }
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(180deg, #e0e0e0 0%, #c0c0c0 100%);
+            padding: 10px;
+            border: 3px inset #fff;
+            margin-bottom: 10px;
+        }
+        .game-counter {
+            background: #000;
+            border: 3px inset #808080;
+            padding: 8px 15px;
+            font-family: 'Courier New', monospace;
             font-size: 32px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            font-weight: bold;
+            color: #ff0000;
+            text-shadow: 0 0 10px rgba(255,0,0,0.5);
+            min-width: 80px;
+            text-align: center;
+            letter-spacing: 3px;
+            box-shadow: inset 0 0 10px rgba(255,0,0,0.2);
+        }
+        .game-smiley {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(145deg, #f0f0f0, #d0d0d0);
+            border: 3px outset #fff;
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #808080;
+            transition: all 0.1s;
+        }
+        .game-smiley:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #808080;
+        }
+        .game-smiley:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #808080;
+            border-style: inset;
+        }
+        .game-smiley.scared::after { content: '😰'; }
+        .game-smiley.cool::after { content: '😎'; }
+        .game-smiley.dead::after { content: '💀'; }
+        .game-smiley::after { content: '🙂'; }
+
+        .game-field {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px inset #fff;
+            background: #a0a0a0;
+            padding: 10px;
+        }
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 3px;
+            background: #808080;
+            padding: 6px;
+            border: 4px inset #fff;
+        }
+        .cell {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(145deg, #e8e8e8, #c8c8c8);
+            border: 3px outset #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            position: relative;
+            transition: all 0.05s;
+        }
+        .cell::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, transparent 100%);
+            pointer-events: none;
+        }
+        .cell:hover:not(.open) {
+            background: linear-gradient(145deg, #f0f0f0, #d8d8d8);
+            transform: scale(1.02);
+        }
+        .cell:active, .cell.open {
+            border-style: inset;
+            background: linear-gradient(145deg, #b8b8b8, #c8c8c8);
+        }
+        .cell.open {
+            font-family: 'Courier New', monospace;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .cell.mine {
+            background: #ff0000 !important;
+            border-color: #cc0000 !important;
+            animation: cell-explode 0.3s ease-out;
+        }
+        @keyframes cell-explode {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); background: #ff6600; }
+            100% { transform: scale(1); }
+        }
+        .cell.flagged::after {
+            content: '🚩';
+            font-size: 28px;
+            filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.3));
+        }
+        .cell.question::after {
+            content: '?';
+            font-size: 28px;
+            color: #000;
+            font-weight: bold;
+        }
+        .cell[data-num="1"] { color: #0000ff; }
+        .cell[data-num="2"] { color: #008000; }
+        .cell[data-num="3"] { color: #ff0000; }
+        .cell[data-num="4"] { color: #000080; }
+        .cell[data-num="5"] { color: #800000; }
+        .cell[data-num="6"] { color: #008080; }
+        .cell[data-num="7"] { color: #000000; }
+        .cell[data-num="8"] { color: #808080; }
+
+        .game-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 3px solid #a0a0a0;
+        }
+        .game-btn {
+            flex: 1;
+            padding: 14px;
+            background: linear-gradient(180deg, #e0e0e0 0%, #c0c0c0 100%);
+            border: 3px outset #fff;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 0 #808080;
+            transition: all 0.1s;
+        }
+        .game-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #808080;
+        }
+        .game-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #808080;
+            border-style: inset;
+        }
+        .game-btn.active {
+            background: linear-gradient(180deg, #d0d0d0 0%, #b0b0b0 100%);
+            border-style: inset;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.2);
         }
 
         /* МОДАЛЬНОЕ ОКНО */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.7);
             display: none;
             align-items: center;
             justify-content: center;
@@ -644,484 +853,564 @@
             backdrop-filter: blur(4px);
         }
         .modal-window {
-            background: var(--bg);
-            border: 4px solid var(--win-light);
-            border-right-color: var(--win-darker);
-            border-bottom-color: var(--win-darker);
-            width: 320px;
-            box-shadow: 
-                0 0 0 2px #000,
-                0 20px 60px rgba(0,0,0,0.5);
+            background: #c0c0c0;
+            border: 4px solid #fff;
+            border-right-color: #404040;
+            border-bottom-color: #404040;
+            width: 340px;
+            box-shadow: 0 0 0 2px #000, 0 20px 60px rgba(0,0,0,0.5);
             animation: modal-pop 0.3s ease-out;
         }
         @keyframes modal-pop {
-            0% { transform: scale(0.8) translateY(-20px); opacity: 0; }
+            0% { transform: scale(0.8) translateY(-30px); opacity: 0; }
             100% { transform: scale(1) translateY(0); opacity: 1; }
         }
         .modal-header {
-            background: linear-gradient(90deg, #16213e 0%, #0f3460 100%);
-            color: white;
-            padding: 8px 12px;
+            background: linear-gradient(90deg, #1e3a5f 0%, #2e5a8f 50%, #1e3a5f 100%);
+            color: #fff;
+            padding: 10px 15px;
             font-size: 14px;
             font-weight: bold;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid var(--win-dark);
+            border-bottom: 2px solid #404040;
         }
         .modal-body {
-            padding: 30px;
+            padding: 35px;
             text-align: center;
         }
         .modal-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 25px;
+            background: linear-gradient(145deg, #e8e8e8, #d0d0d0);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            border: 4px outset #fff;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         }
         .modal-title {
-            font-size: 24px;
-            margin-bottom: 10px;
+            font-size: 28px;
             font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .modal-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
         }
         .modal-amount {
-            font-size: 32px;
-            margin-bottom: 25px;
+            font-size: 42px;
             font-family: 'Courier New', monospace;
             font-weight: bold;
+            margin-bottom: 25px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .modal-footer {
-            padding: 0 30px 30px;
+            padding: 0 35px 35px;
         }
 
         /* УТИЛИТЫ */
         .hidden { display: none !important; }
         
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-        @keyframes shake { 
-            0%, 100% { transform: translate(0,0); } 
-            25% { transform: translate(-5px, 5px); } 
-            75% { transform: translate(5px, -5px); } 
+        @keyframes shake {
+            0%, 100% { transform: translate(0,0); }
+            25% { transform: translate(-5px, 5px); }
+            75% { transform: translate(5px, -5px); }
         }
         .shake { animation: shake 0.1s 4; }
-
-        @keyframes flicker {
-            0% { opacity: 1; transform: scale(1); }
-            100% { opacity: 0.8; transform: scale(0.95); }
-        }
-        @keyframes gem-shine {
-            0%, 100% { filter: brightness(1) saturate(1); }
-            50% { filter: brightness(1.3) saturate(1.2); }
-        }
     </style>
 </head>
 <body>
 
     <!-- ЗАГРУЗКА -->
-    <div id="boot">
-        <div class="boot-logo">💣</div>
-        <div class="boot-text">MINES ULTIMATE PVP</div>
+    <div id="boot-screen">
+        <div class="boot-icon">💣</div>
+        <div class="boot-title">САПЕР ОНЛАЙН</div>
+        <div class="boot-subtitle">PVP ДУЭЛИ • ТУРНИРЫ • НАГРАДЫ</div>
         <div class="boot-bar"><div class="boot-fill" id="boot-fill"></div></div>
-        <div style="margin-top: 20px; font-size: 12px; color: #888;">Загрузка ресурсов...</div>
     </div>
 
-    <div class="mines-app" id="app">
-        <!-- ЗАГОЛОВОК -->
-        <div class="window-title">
-            <span class="window-title-text">MINES ULTIMATE PVP 2026</span>
-            <div class="window-buttons">
-                <div class="win-btn">_</div>
-                <div class="win-btn">□</div>
-                <div class="win-btn">×</div>
+    <!-- ГЛАВНОЕ ОКНО -->
+    <div class="game-window" id="app">
+        
+        <!-- ШАПКА -->
+        <div class="window-header">
+            <div class="window-title">
+                <div class="window-icon">💣</div>
+                <span>САПЕР ОНЛАЙН - PVP ДУЭЛИ</span>
+            </div>
+            <div class="window-controls">
+                <button class="win-btn">_</button>
+                <button class="win-btn">□</button>
+                <button class="win-btn">×</button>
             </div>
         </div>
 
-        <!-- ТУТОРИАЛ -->
-        <div id="tut" class="tutorial-overlay">
-            <div class="tut-header">● КАК ИГРАТЬ ●</div>
-            <div class="tut-card">
-                <div style="font-size: 12px; color: #666; margin-bottom: 15px; font-weight: bold;">ШАГ <span id="tut-step">1</span> ИЗ 3</div>
-                <div class="tut-img-box" id="tut-img">
-                    <div class="gem-3d"></div>
-                </div>
-                <div style="font-size: 14px; line-height: 1.6; text-align: left; width: 100%;" id="tut-text">
-                    <b style="color: #e94560;">Цель:</b> Открывай клетки и находи кристаллы.<br><br>
-                    <b style="color: #e94560;">Осторожно:</b> Под некоторыми клетками спрятаны мины!<br><br>
-                    <b>Числа</b> показывают сколько мин вокруг.
-                </div>
-            </div>
-            <div style="display: flex; gap: 10px; width: 100%;">
-                <button class="btn-retro" style="flex: 1;" onclick="prevTut()" id="tut-prev">◀ НАЗАД</button>
-                <button class="btn-retro btn-green" style="flex: 2;" onclick="nextTut()" id="tut-next">ДАЛЕЕ ▶</button>
-            </div>
-        </div>
+        <!-- КОНТЕНТ -->
+        <div class="window-content">
 
-        <!-- ГЛАВНОЕ МЕНЮ -->
-        <div id="menu" class="menu-overlay" style="display:none">
-            <div class="menu-title">💣<br>MINES<br>NETWORK</div>
-            <div class="menu-subtitle">ULTIMATE PVP EDITION v2.0</div>
-            
-            <div class="mode-tabs">
-                <div class="mode-tab active" onclick="setMode(this, 'classic')">КЛАССИКА</div>
-                <div class="mode-tab" onclick="setMode(this, 'pvp')">PVP</div>
-                <div class="mode-tab" onclick="setMode(this, 'tournament')">ТУРНИР</div>
-            </div>
-
-            <button class="btn-retro" onclick="startGame(false)">
-                <span style="font-size: 20px; margin-right: 10px;">▶</span> НОВАЯ ИГРА
-            </button>
-            <button class="btn-retro btn-pvp" onclick="findMatch()">
-                <span style="font-size: 20px; margin-right: 10px;">⚔</span> ОНЛАЙН ДУЭЛЬ
-            </button>
-            <button class="btn-retro btn-blue" onclick="showStats()">
-                <span style="font-size: 20px; margin-right: 10px;">📊</span> СТАТИСТИКА
-            </button>
-            
-            <div class="stats-panel">
-                <div class="stat-row">
-                    <span class="stat-label"><span class="online-dot"></span> СЕРВЕР</span>
-                    <span class="stat-value" style="color: #00aa00;">ONLINE</span>
+            <!-- ТУТОРИАЛ -->
+            <div class="tutorial-screen" id="tutorial">
+                <div class="tutorial-header">
+                    📖 КАК ИГРАТЬ
+                    <div class="tutorial-progress">
+                        <div class="progress-dot active" id="dot-1"></div>
+                        <div class="progress-dot" id="dot-2"></div>
+                        <div class="progress-dot" id="dot-3"></div>
+                    </div>
                 </div>
-                <div class="stat-row">
-                    <span class="stat-label">👥 ИГРОКОВ</span>
-                    <span class="stat-value" id="online-count">8,421</span>
+                <div class="tutorial-body">
+                    <div class="tutorial-card">
+                        <div class="tutorial-visual" id="tut-visual">
+                            <div class="model-gem"></div>
+                        </div>
+                        <div class="tutorial-text" id="tut-text">
+                            <b>Цель игры:</b> Открывай клетки и находи кристаллы, чтобы заработать очки.<br><br>
+                            <b>Осторожно:</b> Под некоторыми клетками спрятаны мины! Если наступишь на мину — игра окончена.<br><br>
+                            <b>Числа</b> на открытых клетках показывают, сколько мин находится вокруг.
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-row">
-                    <span class="stat-label">🏆 РЕЙТИНГ</span>
-                    <span class="stat-value highlight">#1,204</span>
+                <div class="tutorial-footer">
+                    <button class="menu-button" onclick="prevTutorial()" id="btn-tut-prev" style="flex: 1;">
+                        <span class="menu-button-icon">◀</span>
+                        <span class="menu-button-text">НАЗАД</span>
+                    </button>
+                    <button class="menu-button success" onclick="nextTutorial()" id="btn-tut-next" style="flex: 2;">
+                        <span class="menu-button-icon">▶</span>
+                        <span class="menu-button-text">ДАЛЕЕ</span>
+                        <span class="menu-button-arrow">➤</span>
+                    </button>
                 </div>
-                <div class="stat-row">
-                    <span class="stat-label">🔥 СЕРИЯ</span>
-                    <span class="stat-value" style="color: #ff6600;">3 ПОБЕДЫ</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- ПОИСК ИГРЫ -->
-        <div id="search" class="search-overlay">
-            <div class="search-spinner"></div>
-            <div class="search-title">ПОИСК ОППОНЕНТА</div>
-            <div class="search-subtitle">Подбор по вашему рейтингу...</div>
-            
-            <div class="opponent-card" id="opp-card">
-                <div class="opponent-avatar">🎮</div>
-                <div style="font-size: 18px; font-weight: bold; color: #16213e; margin-bottom: 5px;">ProGamer_99</div>
-                <div style="font-size: 13px; color: #666;">Рейтинг: #892 • Уровень: 42</div>
-                <div style="margin-top: 15px; padding: 10px; background: #e94560; color: white; font-weight: bold; border-radius: 4px;">
-                    ⚡ НАЙДЕН ⚡
-                </div>
-            </div>
-            
-            <div style="background: #000; color: #0f0; padding: 10px 20px; font-family: monospace; font-size: 18px; margin-bottom: 20px; border: 2px inset;">
-                СТАВКА: 1,000 $
-            </div>
-            
-            <button class="btn-retro" onclick="cancelSearch()" style="width: 200px;">ОТМЕНА</button>
-        </div>
-
-        <!-- ИГРА -->
-        <div id="game" class="game-wrapper">
-            <div class="status-panel">
-                <div class="lcd-display" id="mine-count">004</div>
-                <div class="smiley-btn" id="smiley" onclick="restartGame()"></div>
-                <div class="lcd-display" id="timer" style="color: #ff0000;">000</div>
-            </div>
-            
-            <div class="game-container">
-                <div id="grid" class="game-grid"></div>
             </div>
 
-            <div class="bottom-panel">
-                <button class="btn-retro" onclick="exitGame()">🏠 МЕНЮ</button>
-                <button class="btn-retro" onclick="toggleFlag()" id="flag-btn">🚩 ФЛАГ</button>
-                <button class="btn-retro btn-green" onclick="restartGame()">🔄 ЗАНОВО</button>
+            <!-- ГЛАВНОЕ МЕНЮ -->
+            <div class="main-menu" id="main-menu">
+                <div class="menu-logo">
+                    <div class="menu-logo-icon">💣</div>
+                    <div class="menu-logo-title">САПЕР ОНЛАЙН</div>
+                    <div class="menu-logo-subtitle">PVP ДУЭЛИ • ТУРНИРЫ</div>
+                </div>
+
+                <div class="mode-selector">
+                    <button class="mode-tab active" onclick="selectMode(this, 'classic')">КЛАССИКА</button>
+                    <button class="mode-tab" onclick="selectMode(this, 'pvp')">PVP ДУЭЛЬ</button>
+                    <button class="mode-tab" onclick="selectMode(this, 'tournament')">ТУРНИР</button>
+                </div>
+
+                <button class="menu-button" onclick="startGame(false)">
+                    <div class="menu-button-icon">▶</div>
+                    <div class="menu-button-text">ИГРАТЬ ОДНОМУ</div>
+                    <div class="menu-button-arrow">➤</div>
+                </button>
+
+                <button class="menu-button primary" onclick="findOpponent()">
+                    <div class="menu-button-icon">⚔️</div>
+                    <div class="menu-button-text">НАЙТИ СОПЕРНИКА</div>
+                    <div class="menu-button-arrow">➤</div>
+                </button>
+
+                <button class="menu-button" onclick="showLeaderboard()">
+                    <div class="menu-button-icon">🏆</div>
+                    <div class="menu-button-text">ТАБЛИЦА ЛИДЕРОВ</div>
+                    <div class="menu-button-arrow">➤</div>
+                </button>
+
+                <div class="stats-box">
+                    <div class="stats-title">📊 Статистика сервера</div>
+                    <div class="stat-line">
+                        <span class="stat-indicator"><span class="online-pulse"></span> Статус сервера</span>
+                        <span class="stat-value" style="color: #00aa00;">ОНЛАЙН</span>
+                    </div>
+                    <div class="stat-line">
+                        <span class="stat-indicator">👥 Игроков онлайн</span>
+                        <span class="stat-value" id="online-count">8,421</span>
+                    </div>
+                    <div class="stat-line">
+                        <span class="stat-indicator">🎯 Ваш рейтинг</span>
+                        <span class="stat-value highlight">#1,204</span>
+                    </div>
+                    <div class="stat-line">
+                        <span class="stat-indicator">🔥 Побед подряд</span>
+                        <span class="stat-value gold">3</span>
+                    </div>
+                </div>
             </div>
+
+            <!-- ПОИСК СОПЕРНИКА -->
+            <div class="search-screen" id="search-screen">
+                <div class="search-spinner"></div>
+                <div class="search-title">ПОИСК СОПЕРНИКА</div>
+                <div class="search-subtitle">Подбираем равного по силе противника...</div>
+                <div class="search-timer" id="search-timer">00:00</div>
+                
+                <div class="opponent-card" id="opponent-card">
+                    <div class="opponent-avatar">🎮</div>
+                    <div class="opponent-name">ProGamer_99</div>
+                    <div class="opponent-stats">Рейтинг: #892 • Уровень: 42 • Побед: 67%</div>
+                    <div class="opponent-found-badge">✓ НАЙДЕН</div>
+                </div>
+
+                <div class="bet-display">💰 СТАВКА: 1,000 $</div>
+                
+                <button class="menu-button" onclick="cancelSearch()" style="width: 200px;">
+                    <span class="menu-button-icon">✕</span>
+                    <span class="menu-button-text">ОТМЕНИТЬ</span>
+                </button>
+            </div>
+
+            <!-- ИГРОВОЙ ЭКРАН -->
+            <div class="game-screen" id="game-screen">
+                <div class="game-header">
+                    <div class="game-counter" id="mine-counter">004</div>
+                    <div class="game-smiley" id="game-smiley" onclick="restartGame()"></div>
+                    <div class="game-counter" id="time-counter" style="color: #ff0000;">000</div>
+                </div>
+
+                <div class="game-field">
+                    <div class="game-grid" id="game-grid"></div>
+                </div>
+
+                <div class="game-controls">
+                    <button class="game-btn" onclick="exitToMenu()">
+                        🏠 МЕНЮ
+                    </button>
+                    <button class="game-btn" onclick="toggleFlagMode()" id="btn-flag">
+                        🚩 ФЛАГ
+                    </button>
+                    <button class="game-btn" onclick="restartGame()" style="background: linear-gradient(180deg, #66bb66 0%, #44aa44 100%); color: #fff;">
+                        🔄 ЗАНОВО
+                    </button>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <!-- МОДАЛЬ -->
-    <div class="modal-overlay" id="modal">
+    <!-- МОДАЛЬНОЕ ОКНО РЕЗУЛЬТАТА -->
+    <div class="modal-overlay" id="result-modal">
         <div class="modal-window">
             <div class="modal-header">
-                <span>РЕЗУЛЬТАТ ИГРЫ</span>
-                <div class="win-btn" onclick="closeModal()">×</div>
+                <span>🎮 РЕЗУЛЬТАТ МАТЧА</span>
+                <button class="win-btn" onclick="closeResult()">×</button>
             </div>
             <div class="modal-body">
-                <div class="modal-icon" id="modal-icon">🏆</div>
-                <div class="modal-title" id="modal-title" style="color: #008000;">ПОБЕДА!</div>
-                <div class="modal-amount" id="modal-amount" style="color: #008000;">+$2,500</div>
+                <div class="modal-icon" id="result-icon">🏆</div>
+                <div class="modal-title" id="result-title" style="color: #008000;">ПОБЕДА!</div>
+                <div class="modal-subtitle" id="result-subtitle">Вы отлично справились!</div>
+                <div class="modal-amount" id="result-amount" style="color: #008000;">+$2,500</div>
             </div>
             <div class="modal-footer">
-                <button class="btn-retro btn-green" onclick="closeModal()" style="width: 100%;">ПРОДОЛЖИТЬ</button>
+                <button class="menu-button success" onclick="closeResult()" style="width: 100%;">
+                    <span class="menu-button-icon">✓</span>
+                    <span class="menu-button-text">ПРОДОЛЖИТЬ</span>
+                </button>
             </div>
         </div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        let balance = 0, time = 0, gameTimer, isPvP = false, isAlive = false;
+        let currentScreen = 'boot';
+        let tutorialStep = 1;
+        let gameMode = 'classic';
+        let isGameActive = false;
+        let flagMode = false;
+        let gameBoard = [];
+        let openedCells = 0;
+        let gameTimer = null;
+        let gameTime = 0;
         let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let flagMode = false, board = [], openedCells = 0, currentTutStep = 1;
 
-        const tutData = [
-            {
-                img: '<div class="gem-3d"></div>',
-                text: '<b style="color: #e94560;">Цель:</b> Открывай клетки и находи кристаллы.<br><br><b style="color: #e94560;">Осторожно:</b> Под некоторыми клетками спрятаны мины!<br><br><b>Числа</b> показывают сколько мин вокруг.'
-            },
-            {
-                img: '<div style="display:grid;grid-template-columns:repeat(3,40px);gap:3px;"><div class="cell open" style="width:40px;height:40px;font-size:16px;color:blue">1</div><div class="cell" style="width:40px;height:40px"></div><div class="cell flagged" style="width:40px;height:40px"></div><div class="cell open" style="width:40px;height:40px;font-size:16px;color:red">3</div><div class="cell mine-open" style="width:40px;height:40px;font-size:20px">💣</div><div class="cell" style="width:40px;height:40px"></div><div class="cell open" style="width:40px;height:40px;font-size:16px;color:green">2</div><div class="cell question" style="width:40px;height:40px"></div><div class="cell" style="width:40px;height:40px"></div></div>',
-                text: '<b style="color: blue;">1-2-3</b> = количество мин рядом.<br><br>💣 = <b style="color: red;">МИНА</b> (не наступи!)<br><br>🚩 = ФЛАГ (правый клик или кнопка)'
-            },
-            {
-                img: '<div style="font-size: 60px;">⚔️</div>',
-                text: '<b style="color: #e94560;">PVP РЕЖИМ:</b><br>Соревнуйся с реальными игроками!<br><br>Кто быстрее найдет все кристаллы — забирает банк.<br><br><b>Удачи!</b>'
-            }
-        ];
-
-        function beep(freq, type, dur, vol = 0.1) {
+        // Звуки
+        function playSound(freq, type, duration, volume = 0.1) {
             const osc = audioCtx.createOscillator();
-            const g = audioCtx.createGain();
-            osc.type = type; 
+            const gain = audioCtx.createGain();
+            osc.type = type;
             osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            osc.connect(g); 
-            g.connect(audioCtx.destination);
-            g.gain.setValueAtTime(vol, audioCtx.currentTime);
-            g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
-            osc.start(); 
-            osc.stop(audioCtx.currentTime + dur);
+            gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
         }
 
-        function bootSystem() {
-            let p = 0;
+        function playClick() { playSound(800, 'square', 0.05); }
+        function playSuccess() { 
+            playSound(523, 'sine', 0.1);
+            setTimeout(() => playSound(659, 'sine', 0.1), 80);
+        }
+        function playError() { playSound(150, 'sawtooth', 0.4, 0.2); }
+        function playWin() {
+            playSound(523, 'sine', 0.1);
+            setTimeout(() => playSound(659, 'sine', 0.1), 100);
+            setTimeout(() => playSound(784, 'sine', 0.2), 200);
+        }
+
+        // Загрузка
+        function startBoot() {
+            let progress = 0;
             const fill = document.getElementById('boot-fill');
-            const int = setInterval(() => {
-                p += Math.random() * 10;
-                fill.style.width = Math.min(p, 100) + '%';
-                if(p >= 100) {
-                    clearInterval(int);
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
                     setTimeout(() => {
-                        document.getElementById('boot').style.opacity = '0';
+                        document.getElementById('boot-screen').style.opacity = '0';
                         setTimeout(() => {
-                            document.getElementById('boot').remove();
-                            document.getElementById('app').style.display = 'block';
+                            document.getElementById('boot-screen').remove();
+                            document.getElementById('app').style.display = 'flex';
+                            showScreen('tutorial');
                         }, 500);
                     }, 500);
                 }
-            }, 80);
+                fill.style.width = progress + '%';
+            }, 100);
         }
 
-        function updateTut() {
-            document.getElementById('tut-step').innerText = currentTutStep;
-            document.getElementById('tut-img').innerHTML = tutData[currentTutStep - 1].img;
-            document.getElementById('tut-text').innerHTML = tutData[currentTutStep - 1].text;
-            document.getElementById('tut-prev').style.visibility = currentTutStep === 1 ? 'hidden' : 'visible';
-            document.getElementById('tut-next').innerHTML = currentTutStep === 3 ? 'НАЧАТЬ ▶' : 'ДАЛЕЕ ▶';
-        }
-
-        function nextTut() {
-            beep(800, 'square', 0.05);
-            if(currentTutStep >= 3) {
-                document.getElementById('tut').style.display = 'none';
-                document.getElementById('menu').style.display = 'flex';
-                currentTutStep = 1;
-                updateTut();
-            } else {
-                currentTutStep++;
-                updateTut();
-            }
-        }
-        
-        function prevTut() {
-            if(currentTutStep > 1) {
-                currentTutStep--;
-                updateTut();
-            }
-        }
-
-        function setMode(el, mode) {
-            document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
-            beep(600, 'square', 0.05);
-        }
-
-        function findMatch() {
-            beep(400, 'square', 0.05);
-            document.getElementById('menu').style.display = 'none';
-            document.getElementById('search').style.display = 'flex';
-            document.getElementById('opp-card').style.display = 'none';
+        // Навигация
+        function showScreen(screen) {
+            currentScreen = screen;
+            document.querySelectorAll('.tutorial-screen, .main-menu, .search-screen, .game-screen').forEach(el => {
+                el.style.display = 'none';
+            });
             
-            let s = 0;
-            const timer = setInterval(() => {
-                s++;
-                if(s === 3) {
-                    document.getElementById('opp-card').style.display = 'block';
-                    beep(800, 'sine', 0.3);
+            if (screen === 'tutorial') {
+                document.getElementById('tutorial').style.display = 'flex';
+                updateTutorial();
+            } else if (screen === 'menu') {
+                document.getElementById('main-menu').style.display = 'flex';
+            } else if (screen === 'search') {
+                document.getElementById('search-screen').style.display = 'flex';
+            } else if (screen === 'game') {
+                document.getElementById('game-screen').style.display = 'flex';
+            }
+        }
+
+        // Туториал
+        const tutorialData = [
+            {
+                visual: '<div class="model-gem"></div>',
+                text: '<b>Цель игры:</b> Открывай клетки и находи кристаллы, чтобы заработать очки.<br><br><b>Осторожно:</b> Под некоторыми клетками спрятаны мины! Если наступишь на мину — игра окончена.<br><br><b>Числа</b> на открытых клетках показывают, сколько мин находится вокруг.'
+            },
+            {
+                visual: '<div style="display:grid;grid-template-columns:repeat(3,45px);gap:4px;"><div class="cell open" data-num="1" style="width:45px;height:45px;font-size:18px;">1</div><div class="cell" style="width:45px;height:45px"></div><div class="cell flagged" style="width:45px;height:45px"></div><div class="cell open" data-num="3" style="width:45px;height:45px;font-size:18px;color:red">3</div><div class="cell mine" style="width:45px;height:45px;font-size:24px;">💣</div><div class="cell" style="width:45px;height:45px"></div><div class="cell open" data-num="2" style="width:45px;height:45px;font-size:18px;color:green">2</div><div class="cell question" style="width:45px;height:45px"></div><div class="cell" style="width:45px;height:45px"></div></div>',
+                text: '<b style="color:blue">1, 2, 3</b> — количество мин в соседних клетках.<br><br>💣 <b style="color:red">МИНА</b> — не наступай! Игра закончится.<br><br>🚩 <b>ФЛАЖОК</b> — пометь опасную клетку (правый клик или кнопка).<br><br>❓ <b>Вопрос</b> — не уверен? Отметь вопросом.'
+            },
+            {
+                visual: '<div style="font-size:80px;">⚔️</div>',
+                text: '<b style="color:#e94560">PVP ДУЭЛЬ:</b><br>Соревнуйся с реальными игроками в реальном времени!<br><br>Кто быстрее найдет все кристаллы — получает весь банк.<br><br>Делай ставки, повышай рейтинг, стань лучшим сапером мира!'
+            }
+        ];
+
+        function updateTutorial() {
+            document.getElementById('tut-visual').innerHTML = tutorialData[tutorialStep - 1].visual;
+            document.getElementById('tut-text').innerHTML = tutorialData[tutorialStep - 1].text;
+            
+            document.querySelectorAll('.progress-dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i + 1 === tutorialStep);
+            });
+            
+            document.getElementById('btn-tut-prev').style.visibility = tutorialStep === 1 ? 'hidden' : 'visible';
+            document.getElementById('btn-tut-next').querySelector('.menu-button-text').textContent = 
+                tutorialStep === 3 ? 'НАЧАТЬ ИГРУ' : 'ДАЛЕЕ';
+        }
+
+        function nextTutorial() {
+            playClick();
+            if (tutorialStep >= 3) {
+                showScreen('menu');
+                tutorialStep = 1;
+            } else {
+                tutorialStep++;
+                updateTutorial();
+            }
+        }
+
+        function prevTutorial() {
+            playClick();
+            if (tutorialStep > 1) {
+                tutorialStep--;
+                updateTutorial();
+            }
+        }
+
+        // Меню
+        function selectMode(btn, mode) {
+            playClick();
+            gameMode = mode;
+            document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function findOpponent() {
+            playClick();
+            showScreen('search');
+            
+            let seconds = 0;
+            const timerEl = document.getElementById('search-timer');
+            const opponentCard = document.getElementById('opponent-card');
+            
+            opponentCard.style.display = 'none';
+            
+            const interval = setInterval(() => {
+                seconds++;
+                timerEl.textContent = `00:${seconds.toString().padStart(2, '0')}`;
+                
+                if (seconds === 3) {
+                    opponentCard.style.display = 'block';
+                    playSuccess();
                 }
-                if(s > 4) {
-                    clearInterval(timer);
+                
+                if (seconds >= 5) {
+                    clearInterval(interval);
                     startGame(true);
                 }
             }, 1000);
-            window.searchTimer = timer;
+            
+            window.searchInterval = interval;
         }
 
         function cancelSearch() {
-            if(window.searchTimer) clearInterval(window.searchTimer);
-            beep(200, 'sine', 0.1);
-            document.getElementById('search').style.display = 'none';
-            document.getElementById('menu').style.display = 'flex';
+            if (window.searchInterval) clearInterval(window.searchInterval);
+            playClick();
+            showScreen('menu');
         }
 
-        function startGame(pvp) {
-            isPvP = pvp; 
-            isAlive = true; 
-            time = 0; 
-            openedCells = 0;
+        function showLeaderboard() {
+            playClick();
+            alert('🏆 ТАБЛИЦА ЛИДЕРОВ\n\n1. MineMaster - $999,999\n2. BombExpert - $888,888\n3. CrystalKing - $777,777\n...\n124. Вы - $12,500');
+        }
+
+        // Игра
+        function startGame(isPvp) {
+            playClick();
+            showScreen('game');
+            isGameActive = true;
             flagMode = false;
+            openedCells = 0;
+            gameTime = 0;
             
-            document.getElementById('menu').style.display = 'none';
-            document.getElementById('tut').style.display = 'none';
-            document.getElementById('search').style.display = 'none';
-            document.getElementById('game').style.display = 'flex';
-            document.getElementById('grid').innerHTML = '';
-            document.getElementById('timer').innerText = '000';
-            document.getElementById('mine-count').innerText = '004';
-            document.getElementById('smiley').className = 'smiley-btn';
-            document.getElementById('flag-btn').style.background = '';
-            document.getElementById('flag-btn').style.borderStyle = '';
+            document.getElementById('mine-counter').textContent = '004';
+            document.getElementById('time-counter').textContent = '000';
+            document.getElementById('game-smiley').className = 'game-smiley';
+            document.getElementById('btn-flag').classList.remove('active');
             
             clearInterval(gameTimer);
             gameTimer = setInterval(() => {
-                time++;
-                document.getElementById('timer').innerText = time.toString().padStart(3, '0');
+                gameTime++;
+                document.getElementById('time-counter').textContent = gameTime.toString().padStart(3, '0');
             }, 1000);
-
-            board = Array(25).fill(0);
+            
+            // Генерация поля
+            gameBoard = Array(25).fill(0);
             let mines = 0;
-            while(mines < 4) {
+            while (mines < 4) {
                 const pos = Math.floor(Math.random() * 25);
-                if(board[pos] !== -1) {
-                    board[pos] = -1;
+                if (gameBoard[pos] !== -1) {
+                    gameBoard[pos] = -1;
                     mines++;
                 }
             }
             
-            for(let i = 0; i < 25; i++) {
-                if(board[i] === -1) continue;
+            // Подсчет чисел
+            for (let i = 0; i < 25; i++) {
+                if (gameBoard[i] === -1) continue;
                 let count = 0;
                 const x = i % 5, y = Math.floor(i / 5);
-                for(let dy = -1; dy <= 1; dy++) {
-                    for(let dx = -1; dx <= 1; dx++) {
+                for (let dy = -1; dy <= 1; dy++) {
+                    for (let dx = -1; dx <= 1; dx++) {
                         const nx = x + dx, ny = y + dy;
-                        if(nx >= 0 && nx < 5 && ny >= 0 && ny < 5) {
-                            if(board[ny * 5 + nx] === -1) count++;
+                        if (nx >= 0 && nx < 5 && ny >= 0 && ny < 5) {
+                            if (gameBoard[ny * 5 + nx] === -1) count++;
                         }
                     }
                 }
-                board[i] = count;
+                gameBoard[i] = count;
             }
-
-            for(let i = 0; i < 25; i++) {
+            
+            // Создание клеток
+            const grid = document.getElementById('game-grid');
+            grid.innerHTML = '';
+            for (let i = 0; i < 25; i++) {
                 const cell = document.createElement('div');
                 cell.className = 'cell';
                 cell.dataset.index = i;
-                cell.addEventListener('click', (e) => handleCellClick(e, cell, i));
+                cell.addEventListener('click', () => handleCellClick(cell, i));
                 cell.addEventListener('contextmenu', (e) => {
                     e.preventDefault();
                     toggleCellFlag(cell);
                 });
-                document.getElementById('grid').appendChild(cell);
+                grid.appendChild(cell);
             }
         }
 
-        function toggleFlag() {
-            flagMode = !flagMode;
-            const btn = document.getElementById('flag-btn');
-            if(flagMode) {
-                btn.style.background = 'linear-gradient(180deg, #d0d0d0 0%, #b0b0b0 100%)';
-                btn.style.borderStyle = 'inset';
-            } else {
-                btn.style.background = '';
-                btn.style.borderStyle = '';
-            }
-        }
-
-        function toggleCellFlag(cell) {
-            if(!isAlive || cell.classList.contains('open')) return;
-            beep(300, 'square', 0.05);
-            if(cell.classList.contains('flagged')) {
-                cell.classList.remove('flagged');
-                cell.classList.add('question');
-            } else if(cell.classList.contains('question')) {
-                cell.classList.remove('question');
-            } else {
-                cell.classList.add('flagged');
-            }
-            updateMineCount();
-        }
-
-        function updateMineCount() {
-            const flagged = document.querySelectorAll('.cell.flagged').length;
-            document.getElementById('mine-count').innerText = (4 - flagged).toString().padStart(3, '0');
-        }
-
-        function handleCellClick(e, cell, index) {
-            if(!isAlive || cell.classList.contains('open')) return;
-            if(flagMode && !e.shiftKey) {
+        function handleCellClick(cell, index) {
+            if (!isGameActive || cell.classList.contains('open')) return;
+            
+            if (flagMode) {
                 toggleCellFlag(cell);
                 return;
             }
-            if(cell.classList.contains('flagged')) return;
-
+            
+            if (cell.classList.contains('flagged')) return;
+            
             cell.classList.add('open');
             openedCells++;
-
-            if(board[index] === -1) {
+            
+            if (gameBoard[index] === -1) {
+                // Мина
                 gameOver(cell);
             } else {
-                if(board[index] > 0) {
-                    cell.innerText = board[index];
-                    cell.dataset.num = board[index];
+                // Безопасно
+                if (gameBoard[index] > 0) {
+                    cell.textContent = gameBoard[index];
+                    cell.dataset.num = gameBoard[index];
                 } else {
-                    cell.style.background = '#d0d0d0';
-                    openEmpty(index);
+                    cell.style.background = '#c0c0c0';
+                    openEmptyCells(index);
                 }
                 
-                if(openedCells === 21) {
+                if (openedCells === 21) {
                     victory();
                 } else {
-                    beep(500 + board[index] * 100, 'sine', 0.1);
+                    playSuccess();
                 }
             }
         }
 
-        function openEmpty(start) {
+        function openEmptyCells(start) {
             const queue = [start];
             const visited = new Set([start]);
             
-            while(queue.length) {
+            while (queue.length) {
                 const idx = queue.shift();
                 const x = idx % 5, y = Math.floor(idx / 5);
                 
-                for(let dy = -1; dy <= 1; dy++) {
-                    for(let dx = -1; dx <= 1; dx++) {
+                for (let dy = -1; dy <= 1; dy++) {
+                    for (let dx = -1; dx <= 1; dx++) {
                         const nx = x + dx, ny = y + dy;
-                        if(nx >= 0 && nx < 5 && ny >= 0 && ny < 5) {
+                        if (nx >= 0 && nx < 5 && ny >= 0 && ny < 5) {
                             const ni = ny * 5 + nx;
-                            if(!visited.has(ni)) {
+                            if (!visited.has(ni)) {
                                 visited.add(ni);
                                 const cell = document.querySelector(`[data-index="${ni}"]`);
-                                if(!cell.classList.contains('open') && !cell.classList.contains('flagged')) {
+                                if (!cell.classList.contains('open') && !cell.classList.contains('flagged')) {
                                     cell.classList.add('open');
                                     openedCells++;
-                                    if(board[ni] === 0) {
+                                    if (gameBoard[ni] === 0) {
                                         queue.push(ni);
-                                        cell.style.background = '#d0d0d0';
-                                    } else if(board[ni] > 0) {
-                                        cell.innerText = board[ni];
-                                        cell.dataset.num = board[ni];
+                                        cell.style.background = '#c0c0c0';
+                                    } else if (gameBoard[ni] > 0) {
+                                        cell.textContent = gameBoard[ni];
+                                        cell.dataset.num = gameBoard[ni];
                                     }
                                 }
                             }
@@ -1131,40 +1420,67 @@
             }
         }
 
-        function gameOver(cell) {
-            isAlive = false;
-            clearInterval(gameTimer);
-            cell.classList.add('mine-open');
-            cell.innerText = '💣';
-            document.getElementById('smiley').className = 'smiley-btn dead';
+        function toggleCellFlag(cell) {
+            if (!isGameActive || cell.classList.contains('open')) return;
+            playClick();
             
+            if (cell.classList.contains('flagged')) {
+                cell.classList.remove('flagged');
+                cell.classList.add('question');
+            } else if (cell.classList.contains('question')) {
+                cell.classList.remove('question');
+            } else {
+                cell.classList.add('flagged');
+            }
+            updateMineCounter();
+        }
+
+        function toggleFlagMode() {
+            playClick();
+            flagMode = !flagMode;
+            document.getElementById('btn-flag').classList.toggle('active', flagMode);
+        }
+
+        function updateMineCounter() {
+            const flagged = document.querySelectorAll('.cell.flagged').length;
+            document.getElementById('mine-counter').textContent = (4 - flagged).toString().padStart(3, '0');
+        }
+
+        function gameOver(cell) {
+            isGameActive = false;
+            clearInterval(gameTimer);
+            
+            cell.classList.add('mine');
+            cell.textContent = '💣';
+            document.getElementById('game-smiley').className = 'game-smiley dead';
+            
+            // Показать все мины
             document.querySelectorAll('.cell').forEach((c, i) => {
-                if(board[i] === -1 && !c.classList.contains('mine-open')) {
+                if (gameBoard[i] === -1 && !c.classList.contains('mine')) {
                     setTimeout(() => {
-                        c.innerText = '💣';
-                        c.style.opacity = '0.6';
-                    }, i * 30);
+                        c.textContent = '💣';
+                        c.style.opacity = '0.5';
+                    }, i * 50);
                 }
             });
             
             document.getElementById('app').classList.add('shake');
-            beep(150, 'sawtooth', 0.5);
-            if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+            playError();
+            
+            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
             
             setTimeout(() => showResult(false), 1500);
         }
 
         function victory() {
-            isAlive = false;
+            isGameActive = false;
             clearInterval(gameTimer);
-            document.getElementById('smiley').className = 'smiley-btn cool';
+            document.getElementById('game-smiley').className = 'game-smiley cool';
             
-            const bonus = Math.max(0, 100 - time) * 10;
-            balance = 2000 + bonus;
+            const bonus = Math.max(0, 100 - gameTime) * 10;
+            const total = 2000 + bonus;
             
-            beep(523, 'sine', 0.1);
-            setTimeout(() => beep(659, 'sine', 0.1), 100);
-            setTimeout(() => beep(784, 'sine', 0.2), 200);
+            playWin();
             
             confetti({
                 particleCount: 150,
@@ -1173,63 +1489,67 @@
                 colors: ['#e94560', '#ff6b6b', '#ffd93d', '#6bcf7f']
             });
             
-            setTimeout(() => showResult(true), 600);
+            setTimeout(() => showResult(true, total), 600);
         }
 
-        function showResult(win) {
-            const modal = document.getElementById('modal');
-            const icon = document.getElementById('modal-icon');
-            const title = document.getElementById('modal-title');
-            const amount = document.getElementById('modal-amount');
+        function showResult(isWin, amount = 0) {
+            const modal = document.getElementById('result-modal');
+            const icon = document.getElementById('result-icon');
+            const title = document.getElementById('result-title');
+            const subtitle = document.getElementById('result-subtitle');
+            const amountEl = document.getElementById('result-amount');
             
             modal.style.display = 'flex';
-            if(win) {
-                icon.innerText = '🏆';
-                title.innerText = 'ПОБЕДА!';
+            
+            if (isWin) {
+                icon.textContent = '🏆';
+                title.textContent = 'ПОБЕДА!';
                 title.style.color = '#008000';
-                amount.innerText = `+$${balance}`;
-                amount.style.color = '#008000';
+                subtitle.textContent = gameMode === 'pvp' ? 'Вы выиграли дуэль!' : 'Все кристаллы найдены!';
+                amountEl.textContent = `+$${amount}`;
+                amountEl.style.color = '#008000';
             } else {
-                icon.innerText = '💥';
-                title.innerText = 'ПРОИГРЫШ';
+                icon.textContent = '💥';
+                title.textContent = 'ПОРАЖЕНИЕ';
                 title.style.color = '#ff0000';
-                amount.innerText = isPvP ? '-1,000 $' : '$0';
-                amount.style.color = '#ff0000';
+                subtitle.textContent = gameMode === 'pvp' ? 'Соперник оказался сильнее!' : 'Вы подорвались на мине!';
+                amountEl.textContent = gameMode === 'pvp' ? '-1,000 $' : '$0';
+                amountEl.style.color = '#ff0000';
             }
         }
 
-        function closeModal() {
-            document.getElementById('modal').style.display = 'none';
-            exitGame();
+        function closeResult() {
+            playClick();
+            document.getElementById('result-modal').style.display = 'none';
+            exitToMenu();
         }
 
         function restartGame() {
-            startGame(isPvP);
+            playClick();
+            startGame(gameMode === 'pvp');
         }
 
-        function exitGame() {
-            isAlive = false;
+        function exitToMenu() {
+            playClick();
+            isGameActive = false;
             clearInterval(gameTimer);
-            if(window.searchTimer) clearInterval(window.searchTimer);
-            document.getElementById('game').style.display = 'none';
-            document.getElementById('menu').style.display = 'flex';
+            if (window.searchInterval) clearInterval(window.searchInterval);
             document.getElementById('app').classList.remove('shake');
+            showScreen('menu');
         }
 
-        function showStats() {
-            alert('📊 ВАША СТАТИСТИКА:\n\nИгр сыграно: 47\nПобед: 32 (68%)\nПоражений: 15\nМаксимальный выигрыш: $12,500\nРекордная серия: 7 побед');
-        }
-
+        // Обновление онлайна
         setInterval(() => {
-            const count = document.getElementById('online-count');
-            if(count) {
-                const cur = parseInt(count.innerText.replace(',', ''));
-                count.innerText = (cur + Math.floor(Math.random() * 20) - 10).toLocaleString();
+            const el = document.getElementById('online-count');
+            if (el) {
+                const current = parseInt(el.textContent.replace(',', ''));
+                el.textContent = (current + Math.floor(Math.random() * 20) - 10).toLocaleString();
             }
         }, 3000);
 
-        bootSystem();
-        if(tg) tg.expand();
+        // Старт
+        startBoot();
+        if (tg) tg.expand();
     </script>
 </body>
 </html>
