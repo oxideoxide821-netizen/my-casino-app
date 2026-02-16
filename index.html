@@ -3,36 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forest Farm Clicker</title>
+    <title>Лесной Загон</title>
     <style>
-        body { background: #1a1a1a; margin: 0; overflow: hidden; font-family: 'Arial', sans-serif; }
+        body { background: #1a1a1a; margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
         
-        /* Загон (Ферма) */
+        /* Загон (Трава и Забор) */
         #farm { 
-            width: 100vw; height: 100vh; background: #388e3c; 
+            width: 100vw; height: 100vh; background: #4caf50; 
             position: relative; overflow: hidden; border: 15px solid #5d4037; box-sizing: border-box; 
         }
 
-        /* Животные */
-        .animal-wrap { position: absolute; width: 64px; height: 64px; overflow: hidden; cursor: pointer; transition: all 1.8s linear; }
-        .sprite { height: 100%; display: block; animation: walk-anim 0.6s steps(6) infinite; }
-        @keyframes walk-anim { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+        /* Настройка анимации из спрайт-листа */
+        .animal-wrap { 
+            position: absolute; width: 64px; height: 64px; 
+            overflow: hidden; cursor: pointer; 
+            transition: all 1.8s linear; /* Плавное движение */
+            z-index: 5;
+        }
 
-        /* Типы животных */
-        .big { transform: scale(2.5); z-index: 10; } /* Большие дают больше денег */
-        .bomb { filter: brightness(0.2) sepia(1) hue-rotate(-50deg) saturate(5); } /* Свинья-бомба (черная/красная) */
+        .sprite {
+            height: 100%; display: block;
+            animation: walk-anim 0.6s steps(6) infinite; /* Режем картинку на 6 кадров */
+        }
+
+        @keyframes walk-anim {
+            from { transform: translateX(0); }
+            to { transform: translateX(-100%); }
+        }
+
+        /* Виды зверей */
+        .big { transform: scale(2.5); z-index: 10; } /* Большие дают 100 монет */
+        .bomb { filter: brightness(0.2) sepia(1) hue-rotate(-50deg) saturate(5); } /* Свинья-бомба */
         .dead { transform: scale(0) rotate(360deg) !important; transition: 0.3s !important; }
 
-        /* UI и Таймер */
-        #ui { position: fixed; top: 20px; width: 100%; text-align: center; z-index: 100; color: gold; font-size: 30px; font-weight: bold; text-shadow: 2px 2px 5px #000; }
+        /* Интерфейс */
+        #ui { position: fixed; top: 20px; width: 100%; text-align: center; z-index: 100; color: gold; font-size: 28px; text-shadow: 2px 2px 4px #000; font-weight: bold; }
         #overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.85); display: flex; flex-direction: column; 
             justify-content: center; align-items: center; z-index: 200; color: white; 
         }
-        #countdown { font-size: 80px; color: #ffeb3b; margin-bottom: 20px; }
-        button { padding: 20px 50px; font-size: 25px; cursor: pointer; background: #ff9800; border: none; border-radius: 15px; color: white; box-shadow: 0 8px 0 #e68a00; }
-        button:active { transform: translateY(4px); box-shadow: 0 4px 0 #e68a00; }
+        #countdown { font-size: 100px; color: #ffeb3b; margin: 20px; }
+        button { padding: 20px 50px; font-size: 24px; cursor: pointer; background: #ff9800; border: none; border-radius: 15px; color: white; box-shadow: 0 6px 0 #e68a00; }
     </style>
 </head>
 <body>
@@ -50,19 +62,24 @@
 <script>
     let score = 0;
     let gameActive = false;
-    const farm = document.getElementById('farm');
 
-    // Твои файлы (проверь Fox_walk.png — на скрине маленькая "w")
-    const animalFiles = ['Boar_Walk.png', 'Deer_Walk.png', 'Fox_walk.png', 'Hare_Walk.png'];
+    // ТОЧНЫЕ НАЗВАНИЯ ТВОИХ ФАЙЛОВ С ГИТХАБА (Буква в букву!)
+    const animalFiles = [
+        'Boar_Walk.png',
+        'Deer_Walk.png',
+        'Fox_walk.png', // на скрине у тебя маленькая "w"
+        'Hare_Walk.png',
+        'Black_grouse_Walk.png'
+    ];
 
     function prepareFarm() {
         document.getElementById('startBtn').style.display = 'none';
         let count = 5;
-        const countInterval = setInterval(() => {
+        const countInt = setInterval(() => {
             document.getElementById('countdown').innerText = count;
             count--;
             if (count < 0) {
-                clearInterval(countInterval);
+                clearInterval(countInt);
                 document.getElementById('overlay').style.display = 'none';
                 document.getElementById('countdown').innerText = "";
                 startGame();
@@ -80,22 +97,23 @@
         sprite.className = 'sprite';
         wrap.className = 'animal-wrap';
 
-        // Рандомный тип
-        if (chance < 0.2) { // БОМБА
-            wrap.className += ' bomb'; wrap.dataset.type = 'bomb';
-        } else if (chance < 0.4) { // БОЛЬШАЯ (х2.5 размер)
-            wrap.className += ' big'; wrap.dataset.pts = 100;
-        } else { // ОБЫЧНАЯ
-            wrap.dataset.pts = 20;
-        }
-
+        // Ставим в случайное место
         wrap.style.left = Math.random() * 80 + 'vw';
         wrap.style.top = Math.random() * 80 + 'vh';
+
+        // Настройка типов
+        if (chance < 0.2) { // БОМБА
+            wrap.className += ' bomb'; wrap.dataset.type = 'bomb';
+        } else if (chance < 0.4) { // ГИГАНТ
+            wrap.className += ' big'; wrap.dataset.pts = 100;
+        } else { // ОБЫЧНЫЙ
+            wrap.dataset.pts = 20;
+        }
 
         wrap.onclick = function() {
             if (this.dataset.type === 'bomb') {
                 gameActive = false;
-                alert("💥 БАБАХ! Вы взорвались на свинье-бомбе!");
+                alert("💥 БАБАХ! Взорвалась свинья-бомба!");
                 location.reload();
             } else {
                 score += parseInt(this.dataset.pts || 20);
@@ -105,28 +123,34 @@
             }
         };
 
-        farm.appendChild(wrap);
-        // Анимация бега
-        setTimeout(() => { if (wrap) { wrap.style.left = Math.random() * 85 + 'vw'; wrap.style.top = Math.random() * 85 + 'vh'; } }, 100);
+        document.getElementById('farm').appendChild(wrap);
+
+        // --- ДВИЖЕНИЕ ---
+        setTimeout(() => {
+            if (wrap) {
+                wrap.style.left = Math.random() * 80 + 'vw';
+                wrap.style.top = Math.random() * 80 + 'vh';
+            }
+        }, 100);
+
         setTimeout(() => { if(wrap) wrap.remove(); }, 2000);
     }
 
     function startGame() {
-        score = 0;
+        score = 0; document.getElementById('score').innerText = "0";
         gameActive = true;
-        let gameTime = 5; // Время раунда 5 секунд
-        document.getElementById('timer').innerText = gameTime;
+        let timeLeft = 5;
+        document.getElementById('timer').innerText = timeLeft;
 
         const spawner = setInterval(spawn, 400);
         const timer = setInterval(() => {
-            gameTime--;
-            document.getElementById('timer').innerText = gameTime;
-            if (gameTime <= 0) {
-                clearInterval(spawner);
-                clearInterval(timer);
+            timeLeft--;
+            document.getElementById('timer').innerText = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(spawner); clearInterval(timer);
                 gameActive = false;
                 document.getElementById('overlay').style.display = 'flex';
-                document.getElementById('msg').innerText = "РАУНД ОКОНЧЕН! ВЫРУЧКА: " + score;
+                document.getElementById('msg').innerText = "ВЫРУЧКА: " + score;
                 document.getElementById('startBtn').style.display = 'block';
             }
         }, 1000);
