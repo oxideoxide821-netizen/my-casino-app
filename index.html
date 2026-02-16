@@ -3,463 +3,891 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>GLARE: QUANTUM NETIZEN</title>
-    <!-- SDK для Telegram и Рекламы -->
-    <script src="https://telegram.org"></script>
-    <script src="https://sad.adsgram.ai"></script>
+    <title>GLARE: QUANTUM NETIZEN [ULTIMATE]</title>
     
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
     <style>
-        /* ==========================================================
-           1. CSS FRAMEWORK: ТЕМЫ, АНИМАЦИИ И ГЛИТЧ-ЭФФЕКТЫ
-           ========================================================== */
-        @font-face { font-family: 'Pixel'; src: url('https://fonts.cdnfonts.com'); }
+        @import url('https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap');
         
         :root {
-            --win: #c3c7cb; --blue: #000080; --blue-lite: #1084d0;
-            --sh-dk: #404040; --sh-md: #808080; --white: #ffffff;
-            --accent: #00f2ff; --warn: #ff0055; --text: #000; --bg: #008080;
+            --win-bg: #c3c7cb;
+            --win-blue: #000080;
+            --win-blue-light: #1084d0;
+            --win-shadow-dark: #404040;
+            --win-shadow-mid: #808080;
+            --win-light: #ffffff;
+            --accent: #00f2ff;
+            --warn: #ff0055;
+            --success: #00ff41;
+            --text-main: #000;
+            --bg-color: #008080;
+            --scanline-opacity: 0.15;
         }
 
-        /* ТЕМЫ */
-        body.matrix { --bg: #000; --accent: #0f0; --win: #010a01; --white: #0f0; --sh-md: #003b00; --blue: #003b00; --text: #0f0; }
-        body.cyber { --bg: #2d004d; --accent: #f0f; --win: #1a0033; --white: #f0f; --sh-md: #4a0080; --blue: #800080; --text: #f0f; }
+        body.theme-matrix {
+            --bg-color: #000; --accent: #0f0; --win-bg: #010a01; --win-light: #0f0;
+            --win-shadow-mid: #003b00; --win-blue: #003b00; --text-main: #0f0; --warn: #00ff00;
+            --scanline-opacity: 0.3;
+        }
+        body.theme-neon {
+            --bg-color: #1a0033; --accent: #f0f; --win-bg: #2d004d; --win-light: #f0f;
+            --win-shadow-mid: #4a0080; --win-blue: #800080; --text-main: #f0f; --warn: #ff00ff;
+            --scanline-opacity: 0.2;
+        }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; image-rendering: pixelated; }
-        
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            image-rendering: pixelated; 
+            user-select: none;
+        }
+
         body { 
-            background: var(--bg); margin: 0; padding: 10px; 
-            font-family: 'Pixel', sans-serif; display: flex; 
-            flex-direction: column; align-items: center; 
-            height: 100vh; overflow: hidden; transition: 0.5s;
+            background: var(--bg-color); margin: 0; padding: 0;
+            font-family: 'VT323', monospace; height: 100vh; 
+            overflow: hidden; transition: background 0.5s ease;
         }
 
-        /* CRT SCANLINES & OVERLAY */
         body::after {
             content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
-            background-size: 100% 3px, 3px 100%; pointer-events: none; z-index: 9999;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, var(--scanline-opacity)) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 2px, 3px 100%; pointer-events: none; z-index: 99999;
+            animation: scanline 8s linear infinite;
         }
 
-        /* ОСНОВНОЕ ОКНО WINDOWS 95 STYLE */
+        @keyframes scanline {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(10px); }
+        }
+
+        .screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: none; flex-direction: column; align-items: center; 
+            justify-content: center; padding: 15px; z-index: 10;
+        }
+        .screen.active { display: flex; animation: glitchIn 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
+        
+        @keyframes glitchIn {
+            0% { opacity: 0; transform: scale(0.9) translateY(20px) skewX(10deg); filter: hue-rotate(90deg); }
+            50% { opacity: 0.8; transform: scale(1.02) translateY(-5px) skewX(-5deg); }
+            100% { opacity: 1; transform: scale(1) translateY(0) skewX(0); filter: hue-rotate(0); }
+        }
+
         .window {
-            background: var(--win); border: 4px solid;
-            border-color: var(--white) var(--sh-dk) var(--sh-dk) var(--white);
-            width: 100%; max-width: 480px; padding: 4px;
-            box-shadow: 8px 8px 0px rgba(0,0,0,0.5);
-            display: flex; flex-direction: column; position: relative;
-            animation: slideIn 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            background: var(--win-bg); border: 4px solid;
+            border-color: var(--win-light) var(--win-shadow-dark) var(--win-shadow-dark) var(--win-light);
+            width: 100%; max-width: 440px; padding: 4px;
+            box-shadow: 8px 8px 0px rgba(0,0,0,0.6); display: flex; flex-direction: column;
+            animation: windowFloat 6s ease-in-out infinite;
         }
 
-        @keyframes slideIn { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes windowFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
 
         .title-bar {
-            background: linear-gradient(90deg, var(--blue), var(--blue-lite));
+            background: linear-gradient(90deg, var(--win-blue), var(--win-blue-light));
             color: white; padding: 4px 10px; display: flex;
-            justify-content: space-between; align-items: center;
-            font-size: 13px; font-weight: bold;
+            justify-content: space-between; align-items: center; font-size: 14px; 
+            font-family: 'Press Start 2P', cursive; font-size: 10px;
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
         }
-
-        .title-btns { display: flex; gap: 2px; }
+        .title-controls { display: flex; gap: 2px; }
         .win-btn { 
-            background: var(--win); color: black; border: 2px solid;
-            border-color: var(--white) var(--sh-dk) var(--sh-dk) var(--white);
-            padding: 0 6px; font-size: 10px; cursor: pointer;
+            background: var(--win-bg); color: black; border: 2px solid;
+            border-color: var(--win-light) var(--win-shadow-dark) var(--win-shadow-dark) var(--win-light);
+            padding: 0 6px; font-size: 10px; cursor: pointer; font-family: 'Press Start 2P';
+            transition: all 0.1s;
+        }
+        .win-btn:hover { background: var(--win-blue-light); color: white; }
+        .win-btn:active { 
+            border-color: var(--win-shadow-dark) var(--win-light) var(--win-light) var(--win-shadow-dark); 
+            transform: translate(1px, 1px); 
         }
 
-        /* ДАШБОРД (LCD ТАБЛО) */
         .dashboard {
-            background: #000; border: 4px inset var(--white);
-            margin: 8px 0; padding: 10px;
-            display: flex; justify-content: space-between; align-items: center;
+            background: #000; border: 4px inset var(--win-light);
+            margin: 8px 0; padding: 12px; display: flex;
+            justify-content: space-between; align-items: center;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
         }
-
-        .lcd-box { display: flex; flex-direction: column; align-items: center; }
-        .lcd-label { color: var(--white); font-size: 8px; margin-bottom: 2px; text-transform: uppercase; }
-        
+        .lcd-container { display: flex; flex-direction: column; align-items: center; }
+        .lcd-label { 
+            color: var(--win-light); font-size: 10px; margin-bottom: 4px; 
+            text-transform: uppercase; letter-spacing: 2px;
+            font-family: 'Press Start 2P'; opacity: 0.8;
+        }
         .lcd {
-            background: #1a0000; border: 2px solid #400;
-            color: #f00; font-family: 'Courier New', monospace;
-            font-size: 32px; font-weight: bold; padding: 2px 12px;
-            min-width: 90px; text-align: center; text-shadow: 0 0 8px #f00;
+            background: #1a0000; border: 3px solid #400;
+            color: #f00; font-family: 'VT323', monospace;
+            font-size: 36px; font-weight: bold; padding: 4px 12px;
+            min-width: 100px; text-align: center; text-shadow: 0 0 10px #f00, 0 0 20px #f00;
+            box-shadow: inset 0 0 10px rgba(255,0,0,0.3);
+            animation: lcdPulse 2s ease-in-out infinite;
         }
-
+        @keyframes lcdPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
         .smiley {
-            width: 50px; height: 50px; background: var(--win);
-            border: 3px solid; border-color: var(--white) var(--sh-md) var(--sh-md) var(--white);
+            width: 54px; height: 54px; background: var(--win-bg);
+            border: 3px solid; border-color: var(--win-light) var(--win-shadow-mid) var(--win-shadow-mid) var(--win-light);
             display: flex; align-items: center; justify-content: center;
-            font-size: 32px; cursor: pointer; transition: 0.1s;
+            font-size: 34px; cursor: pointer; transition: transform 0.1s;
+            box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
         }
-        .smiley:active { border-color: var(--sh-md) var(--white) var(--white) var(--sh-md); transform: translate(1px, 1px); }
+        .smiley:hover { transform: scale(1.05); }
+        .smiley:active { 
+            border-color: var(--win-shadow-mid) var(--win-light) var(--win-light) var(--win-shadow-mid); 
+            transform: scale(0.95); 
+        }
 
-        /* ИГРОВАЯ ЗОНА */
         .viewport {
-            position: relative; border: 4px inset var(--white);
-            background: #808080; overflow: auto;
-            max-height: 45vh; scrollbar-width: thin;
+            position: relative; border: 4px inset var(--win-light);
+            background: #808080; overflow: hidden; max-height: 48vh;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         }
         canvas { display: block; background: #bdbdbd; cursor: crosshair; }
 
-        /* ЭФФЕКТЫ */
-        .xp-popup {
-            position: absolute; color: #0f0; font-weight: bold;
-            font-size: 22px; pointer-events: none; z-index: 100;
-            text-shadow: 2px 2px #000, 0 0 10px #0f0;
-            animation: xpFloat 1s ease-out forwards;
+        .xp-pop {
+            position: absolute; color: var(--success); font-weight: 900;
+            font-size: 28px; pointer-events: none; z-index: 999;
+            text-shadow: 2px 2px #000, 0 0 15px var(--success), 0 0 30px var(--success);
+            animation: xpRise 1.2s forwards;
+            font-family: 'Press Start 2P';
         }
-        @keyframes xpFloat { 0% { transform: scale(0.5); opacity: 0; } 50% { opacity: 1; transform: scale(1.3); } 100% { opacity: 0; transform: translateY(-70px); } }
+        @keyframes xpRise { 
+            0% { opacity: 0; transform: scale(0.3) rotate(-10deg); } 
+            20% { opacity: 1; transform: scale(1.3) rotate(5deg); } 
+            100% { opacity: 0; transform: translateY(-100px) rotate(0deg); } 
+        }
 
-        /* ТЕРМИНАЛ GIGACHAT */
         .terminal {
-            background: #050505; border: 4px inset var(--white);
-            color: var(--accent); font-family: 'Courier New', monospace;
-            font-size: 11px; padding: 10px; height: 70px;
+            background: #050505; border: 4px inset var(--win-light);
+            color: var(--accent); font-family: 'VT323', monospace;
+            font-size: 14px; padding: 10px; height: 90px;
             margin: 8px 0; overflow: hidden; position: relative;
+            box-shadow: inset 0 0 15px rgba(0,255,255,0.1);
+            text-shadow: 0 0 5px var(--accent);
         }
-        .terminal::after { content: "_"; animation: blink 1s infinite; }
+        .terminal-cursor { 
+            display: inline-block; width: 10px; height: 18px; 
+            background: var(--accent); animation: blink 0.7s infinite; 
+            box-shadow: 0 0 10px var(--accent);
+        }
         @keyframes blink { 50% { opacity: 0; } }
 
-        /* КНОПКИ УПРАВЛЕНИЯ */
-        .controls { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; }
+        .controls { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; width: 100%; }
         .btn {
-            background: var(--win); border: 3px solid;
-            border-color: var(--white) var(--sh-dk) var(--sh-dk) var(--white);
-            padding: 12px; font-size: 11px; font-weight: bold;
-            cursor: pointer; color: var(--text); display: flex;
+            background: var(--win-bg); border: 3px solid;
+            border-color: var(--win-light) var(--win-shadow-dark) var(--win-shadow-dark) var(--win-light);
+            padding: 14px; font-size: 11px; font-weight: bold;
+            cursor: pointer; color: var(--text-main); display: flex;
             align-items: center; justify-content: center; gap: 8px;
-            text-transform: uppercase;
+            text-transform: uppercase; transition: all 0.15s;
+            font-family: 'Press Start 2P'; font-size: 9px;
+            position: relative; overflow: hidden;
         }
-        .btn:active { border-color: var(--sh-dk) var(--white) var(--white) var(--sh-dk); transform: translate(1px, 1px); }
-        .btn-gold { background: linear-gradient(135deg, #ffd700, #ff8c00); color: #000; border: 3px solid #fff; }
+        .btn::before {
+            content: ''; position: absolute; top: 0; left: -100%;
+            width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+        .btn:hover::before { left: 100%; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+        .btn:active { 
+            border-color: var(--win-shadow-dark) var(--win-light) var(--win-light) var(--win-shadow-dark); 
+            transform: translateY(0); 
+        }
+        .btn-gold { 
+            background: linear-gradient(135deg, #ffd700, #ff8c00); 
+            color: #000; text-shadow: 0 1px 0 rgba(255,255,255,0.4);
+            box-shadow: 0 4px 0 #b8860b;
+        }
+        .btn-gold:active { box-shadow: 0 2px 0 #b8860b; transform: translateY(2px); }
 
-        /* МОДАЛЬНЫЕ ОКНА */
-        .overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); display: none; z-index: 8000;
-            align-items: center; justify-content: center; backdrop-filter: blur(5px);
+        .menu-box {
+            background: #fff; border: 4px inset var(--win-light);
+            width: 100%; height: 250px; overflow-y: auto; padding: 10px;
+            color: #000; font-size: 12px; font-family: 'VT323';
         }
-        .modal {
-            background: var(--win); border: 5px solid var(--white);
-            padding: 20px; width: 90%; max-width: 400px;
-            box-shadow: 15px 15px 0 #000; position: relative;
+        .menu-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px; border-bottom: 1px solid #ddd;
+            transition: all 0.2s;
         }
+        .menu-row:hover { 
+            background: #f0f0f0; 
+            transform: translateX(5px);
+            box-shadow: -3px 0 0 var(--win-blue-light);
+        }
+        .menu-row b { font-family: 'Press Start 2P'; font-size: 9px; }
+
+        .glitch-text {
+            animation: glitch 3s infinite;
+            position: relative;
+        }
+        @keyframes glitch {
+            0%, 90%, 100% { transform: translate(0); }
+            92% { transform: translate(-2px, 2px); }
+            94% { transform: translate(2px, -2px); }
+            96% { transform: translate(-1px, -1px); }
+            98% { transform: translate(1px, 1px); }
+        }
+
+        .combo-counter {
+            position: absolute; top: 10px; right: 10px;
+            font-family: 'Press Start 2P'; font-size: 20px;
+            color: var(--warn); text-shadow: 0 0 10px var(--warn);
+            opacity: 0; transition: opacity 0.3s;
+            z-index: 100;
+        }
+        .combo-counter.show { opacity: 1; animation: comboPulse 0.5s; }
+        @keyframes comboPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .quest-box {
+            background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,140,0,0.2));
+            border: 2px solid #ffd700; padding: 10px; margin: 8px 0;
+            font-size: 11px;
+        }
+        .quest-title { color: #ffd700; font-weight: bold; margin-bottom: 5px; }
+        .quest-progress { background: #333; height: 10px; margin-top: 5px; }
+        .quest-fill { background: #ffd700; height: 100%; transition: width 0.3s; }
+
+        .trade-panel {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: var(--win-bg); border: 4px solid var(--accent);
+            padding: 20px; z-index: 100000; transition: transform 0.3s;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            width: 300px;
+        }
+        .trade-panel.show { transform: translate(-50%, -50%) scale(1); }
+        .trade-slot {
+            width: 60px; height: 60px; border: 3px inset var(--win-light);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 30px; margin: 10px auto; cursor: pointer;
+            background: rgba(0,0,0,0.1);
+        }
+        .trade-btns { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
+
+        .notification {
+            position: fixed; top: 20px; left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--win-bg); border: 3px solid var(--accent);
+            padding: 15px 25px; font-family: 'Press Start 2P'; font-size: 10px;
+            box-shadow: 0 0 20px var(--accent);
+            z-index: 100001; transition: transform 0.3s;
+            text-align: center;
+        }
+        .notification.show { transform: translateX(-50%) translateY(0); }
     </style>
 </head>
-<body>
+<body class="theme-classic">
 
-<div class="window">
-    <div class="title-bar">
-        <span>GLARE: NETIZEN_ELITE_PRO.SYS</span>
-        <div class="title-btns">
-            <span class="win-btn" onclick="ui.open('settings')">?</span>
-            <span class="win-btn" onclick="game.init()">R</span>
-            <span class="win-btn">X</span>
+    <div id="notification" class="notification">
+        <div style="color: var(--accent)">ДОСТИЖЕНИЕ!</div>
+        <div id="notif-text" style="font-size: 9px; margin-top: 5px;">Текст</div>
+    </div>
+
+    <div id="trade-panel" class="trade-panel">
+        <div style="text-align: center; font-family: 'Press Start 2P'; font-size: 10px; margin-bottom: 15px;">
+            ОБМЕН С <span id="trade-partner">ДРУГ</span>
+        </div>
+        <div style="display: flex; justify-content: space-around; align-items: center;">
+            <div style="text-align: center;">
+                <div>Вы</div>
+                <div class="trade-slot" id="my-item" onclick="engine.selectTradeItem()">?</div>
+            </div>
+            <div style="font-size: 24px;">⇄</div>
+            <div style="text-align: center;">
+                <div>Друг</div>
+                <div class="trade-slot" id="partner-item">?</div>
+            </div>
+        </div>
+        <div class="trade-btns">
+            <button class="btn btn-gold" onclick="engine.confirmTrade()">ОБМЕН</button>
+            <button class="btn" onclick="engine.closeTrade()">X</button>
         </div>
     </div>
 
-    <!-- ИНДИКАТОРЫ -->
-    <div class="dashboard">
-        <div class="lcd-box">
-            <span class="lcd-label">NETIZEN_XP</span>
-            <div class="lcd" id="score-val">0000</div>
+    <div id="combo" class="combo-counter">COMBO x0</div>
+
+    <div id="scr-game" class="screen active">
+        <div class="window">
+            <div class="title-bar">
+                <span class="glitch-text">GLARE_QUANTUM.SYS [v9.9]</span>
+                <div class="title-controls">
+                    <span class="win-btn" onclick="gui.to('opts')">?</span>
+                    <span class="win-btn" onclick="engine.reset()">R</span>
+                </div>
+            </div>
+            
+            <div class="quest-box" id="daily-quest">
+                <div class="quest-title">📜 ЗАДАЧА ДНЯ: <span id="quest-name">Открой 20 ячеек</span></div>
+                <div style="display: flex; justify-content: space-between; font-size: 10px;">
+                    <span>Прогресс: <span id="quest-progress">0</span>/<span id="quest-target">20</span></span>
+                    <span>Награда: <span id="quest-reward">500 XP</span></span>
+                </div>
+                <div class="quest-progress">
+                    <div class="quest-fill" id="quest-bar" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="dashboard">
+                <div class="lcd-container">
+                    <span class="lcd-label">SCORE_XP</span>
+                    <div class="lcd" id="score-lcd">0000</div>
+                </div>
+                <div class="smiley" id="face" onclick="engine.reset()">😎</div>
+                <div class="lcd-container">
+                    <span class="lcd-label">TIME_ELAPSED</span>
+                    <div class="lcd" id="timer-lcd">00:00</div>
+                </div>
+            </div>
+            <div class="viewport" id="vp">
+                <canvas id="main-canvas"></canvas>
+            </div>
+            <div class="terminal" id="terminal">
+                > GIGACHAT CORE: АКТИВАЦИЯ... [OK]<br>
+                > ЖДУ ТВОЙ ХОД, ЧЕЛОВЕК.<br>
+                > СКОРО ТЫ ПОЖАЛЕЕШЬ ОБ ЭТОМ.
+            </div>
+            <div class="controls">
+                <button class="btn" onclick="gui.to('shop')">💰 SHOP</button>
+                <button class="btn" onclick="gui.to('rank')">🏆 LEADERS</button>
+                <button class="btn" onclick="gui.to('trade')">🤝 TRADE</button>
+                <button class="btn" onclick="gui.to('quests')">📜 QUESTS</button>
+                <button class="btn" onclick="gui.to('opts')">⚙️ OPTIONS</button>
+                <button class="btn" style="grid-column: span 2; background: #000; color: var(--accent); border-color: var(--accent);" onclick="engine.gigaHint()">
+                    🧠 GIGACHAT ANALYZE (-150 XP)
+                </button>
+            </div>
         </div>
-        <div class="smiley" id="smiley-btn" onclick="game.init()">😎</div>
-        <div class="lcd-box">
-            <span class="lcd-label">GIGA_TIME</span>
-            <div class="lcd" id="timer-val">00:00</div>
+    </div>
+
+    <div id="scr-shop" class="screen">
+        <div class="window">
+            <div class="title-bar">
+                <span>SYSTEM_MARKET.INI</span>
+                <span class="win-btn" onclick="gui.to('game')">X</span>
+            </div>
+            <div class="menu-box">
+                <div class="menu-row">
+                    <span><b>GRID 15x15</b> - Новичок</span>
+                    <button class="win-btn" onclick="engine.buyGrid(15, 500)">500 XP</button>
+                </div>
+                <div class="menu-row">
+                    <span><b>GRID 30x30</b> - Профи</span>
+                    <button class="win-btn" onclick="engine.buyGrid(30, 1500)">1500 XP</button>
+                </div>
+                <div class="menu-row">
+                    <span><b>GRID 50x50</b> - Легенда</span>
+                    <button class="win-btn" onclick="engine.buyGrid(50, 5000)">5000 XP</button>
+                </div>
+                <div class="menu-row">
+                    <span><b>SHIELD</b> - Защита от 1 мины</span>
+                    <button class="win-btn" onclick="engine.buyShield()">200 XP</button>
+                </div>
+                <div class="menu-row">
+                    <span><b>TIME FREEZE</b> - Пауза 10с</span>
+                    <button class="win-btn" onclick="engine.buyTime()">300 XP</button>
+                </div>
+            </div>
+            <button class="btn" style="width:100%; margin-top:10px" onclick="gui.to('game')">ВЕРНУТЬСЯ К ИГРЕ</button>
         </div>
     </div>
 
-    <!-- ВЬЮПОРТ -->
-    <div class="viewport" id="v-box">
-        <canvas id="game-canvas"></canvas>
+    <div id="scr-rank" class="screen">
+        <div class="window">
+            <div class="title-bar">
+                <span>GLOBAL_RANK.LOG</span>
+                <span class="win-btn" onclick="gui.to('game')">X</span>
+            </div>
+            <div class="menu-box" id="leader-data">
+                <div class="menu-row"><b>1. GIGACHAT_ELITE</b> <span style="color:gold">999999</span></div>
+                <div class="menu-row"><b>2. NETIZEN_ADMIN</b> <span style="color:silver">154000</span></div>
+                <div class="menu-row"><b>3. CYBER_NINJA</b> <span style="color:#cd7f32">89000</span></div>
+                <div class="menu-row"><b>4. PIXEL_HUNTER</b> <span>45000</span></div>
+                <div class="menu-row"><b>5. ТЫ</b> <span id="my-stat" style="color:var(--win-blue-light); font-weight:bold">0</span></div>
+            </div>
+            <button class="btn" style="width:100%; margin-top:10px" onclick="gui.to('game')">ЗАКРЫТЬ ЛОГИ</button>
+        </div>
     </div>
 
-    <!-- ТЕРМИНАЛ ИИ -->
-    <div class="terminal" id="ai-log">
-        > ИНИЦИАЛИЗАЦИЯ GIGACHAT... [OK]<br>
-        > АНАЛИЗ ВАШЕЙ СТРАТЕГИИ... [СЛАБАЯ]<br>
-        > ОЖИДАНИЕ ВВОДА ДАННЫХ...
+    <div id="scr-trade" class="screen">
+        <div class="window">
+            <div class="title-bar">
+                <span>TRADE_CENTER.exe</span>
+                <span class="win-btn" onclick="gui.to('game')">X</span>
+            </div>
+            <div class="menu-box">
+                <div class="menu-row" onclick="engine.openTrade('CYBER_NINJA')">
+                    <span><b>👤 CYBER_NINJA</b><br>🟢 Онлайн | Рейтинг: #3</span>
+                    <button class="win-btn">ТОРГОВАТЬ</button>
+                </div>
+                <div class="menu-row" onclick="engine.openTrade('PIXEL_MASTER')">
+                    <span><b>👤 PIXEL_MASTER</b><br>🟡 В игре | Рейтинг: #7</span>
+                    <button class="win-btn">ТОРГОВАТЬ</button>
+                </div>
+                <div class="menu-row" onclick="engine.openTrade('NEON_RIDER')">
+                    <span><b>👤 NEON_RIDER</b><br>🔴 Офлайн | Рейтинг: #12</span>
+                    <button class="win-btn">ТОРГОВАТЬ</button>
+                </div>
+            </div>
+            <div style="padding: 10px; font-size: 11px; color: #666; text-align: center;">
+                Выберите игрока для обмена предметами
+            </div>
+            <button class="btn" style="width:100%; margin-top:10px" onclick="gui.to('game')">НАЗАД</button>
+        </div>
     </div>
 
-    <!-- КНОПКИ -->
-    <div class="controls">
-        <button class="btn" onclick="ui.open('shop')">💰 SHOP & GRID</button>
-        <button class="btn" onclick="ui.open('rank')">🏆 LEADERS</button>
-        <button class="btn" onclick="ui.open('themes')">🎨 THEMES</button>
-        <button class="btn btn-gold" onclick="game.watchAd()">📺 +150 XP (AD)</button>
-        <button class="btn" style="grid-column: span 2; background: #000; color: var(--accent); border-color: var(--accent);" onclick="game.gigaHack()">
-            🧠 GIGACHAT: ГЛУБОКИЙ ВЗЛОМ (-200 XP)
-        </button>
+    <div id="scr-quests" class="screen">
+        <div class="window">
+            <div class="title-bar">
+                <span>QUEST_LOG.dat</span>
+                <span class="win-btn" onclick="gui.to('game')">X</span>
+            </div>
+            <div class="menu-box">
+                <div class="menu-row">
+                    <span><b>⚡ Скорость</b><br>Набери комбо x10</span>
+                    <span style="color: var(--success)">200 XP</span>
+                </div>
+                <div class="menu-row">
+                    <span><b>🛡️ Выживший</b><br>Используй щит 3 раза</span>
+                    <span style="color: var(--success)">300 XP</span>
+                </div>
+                <div class="menu-row">
+                    <span><b>💰 Богач</b><br>Накопи 5000 XP</span>
+                    <span style="color: var(--success)">1000 XP</span>
+                </div>
+                <div class="menu-row">
+                    <span><b>🎯 Снайпер</b><br>Открой 50 ячеек без промаха</span>
+                    <span style="color: var(--success)">500 XP</span>
+                </div>
+            </div>
+            <button class="btn" style="width:100%; margin-top:10px" onclick="gui.to('game')">НАЗАД</button>
+        </div>
     </div>
-</div>
 
-<!-- МОДАЛКИ -->
-<div id="overlay" class="overlay" onclick="ui.close()">
-    <div class="modal" id="modal-box" onclick="event.stopPropagation()">
-        <h2 id="modal-title" style="margin-top: 0; color: var(--blue);">СИСТЕМА</h2>
-        <div id="modal-body"></div>
-        <button class="btn" style="width: 100%; margin-top: 15px;" onclick="ui.close()">ЗАКРЫТЬ</button>
+    <div id="scr-opts" class="screen">
+        <div class="window">
+            <div class="title-bar">
+                <span>CONFIG_SYSTEM.CFG</span>
+                <span class="win-btn" onclick="gui.to('game')">X</span>
+            </div>
+            <div class="menu-box">
+                <div class="menu-row"><span>ТЕМА: CLASSIC</span><button class="win-btn" onclick="gui.setT('classic')">SET</button></div>
+                <div class="menu-row"><span>ТЕМА: MATRIX</span><button class="win-btn" onclick="gui.setT('matrix')">SET</button></div>
+                <div class="menu-row"><span>ТЕМА: NEON</span><button class="win-btn" onclick="gui.setT('neon')">SET</button></div>
+                <div class="menu-row"><span>ЗВУК (SFX)</span><input type="checkbox" checked onchange="engine.sfx = this.checked"></div>
+                <div class="menu-row"><span>ВИБРАЦИЯ</span><input type="checkbox" checked onchange="engine.vib = this.checked"></div>
+                <div class="menu-row"><span>ЭКСТРЕМАЛЬНЫЙ РЕЖИМ</span><input type="checkbox" onchange="engine.extreme = this.checked"></div>
+            </div>
+            <button class="btn" style="width:100%; margin-top:10px" onclick="gui.to('game')">ПРИМЕНИТЬ</button>
+        </div>
     </div>
-</div>
 
-<script>
-/**
- * CORE MODULE: AUDIO SYNTHESIZER
- * Профессиональная генерация звука на лету
- */
-const audio = {
-    ctx: new (window.AudioContext || window.webkitAudioContext)(),
-    play(freq, dur, type = 'square', vol = 0.1) {
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-        gain.gain.setValueAtTime(vol, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + dur);
-        osc.connect(gain); gain.connect(this.ctx.destination);
-        osc.start(); osc.stop(this.ctx.currentTime + dur);
-    }
-};
+    <script>
+        const tg = window.Telegram.WebApp;
+        const canvas = document.getElementById('main-canvas');
+        const ctx = canvas.getContext('2d');
 
-/**
- * CORE MODULE: PARTICLE ENGINE
- * Физика осколков при клике
- */
-class Particle {
-    constructor(x, y, color) {
-        this.x = x; this.y = y;
-        this.vx = (Math.random() - 0.5) * 12;
-        this.vy = (Math.random() - 0.5) * 12;
-        this.life = 1.0;
-        this.color = color;
-        this.size = Math.random() * 5 + 2;
-    }
-    update() {
-        this.x += this.vx; this.y += this.vy;
-        this.vy += 0.25; // Гравитация
-        this.life -= 0.02;
-    }
-    draw(ctx) {
-        ctx.globalAlpha = this.life;
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.size, this.size);
-        ctx.globalAlpha = 1.0;
-    }
-}
-
-/**
- * CORE MODULE: GAME ENGINE
- * Вся математика и логика GigaChat
- */
-const game = {
-    canvas: document.getElementById('game-canvas'),
-    ctx: null,
-    gridSize: 10,
-    cellSize: 42,
-    score: 0,
-    traps: [],
-    revealed: [],
-    particles: [],
-    isGameOver: false,
-    startTime: 0,
-
-    init() {
-        this.ctx = this.canvas.getContext('2d');
-        window.Telegram.WebApp.expand();
-        this.resize();
-        this.reset();
-        this.animate();
-    },
-
-    resize() {
-        const w = Math.min(window.innerWidth - 60, 420);
-        this.cellSize = w / this.gridSize;
-        this.canvas.width = this.canvas.height = this.gridSize * this.cellSize;
-    },
-
-    reset() {
-        this.score = 0; this.traps = []; this.revealed = []; this.particles = [];
-        this.isGameOver = false; this.startTime = Date.now();
-        document.getElementById('score-val').innerText = '0000';
-        document.getElementById('smiley-btn').innerText = '😎';
-        
-        // GigaChat Trap Seeding
-        const total = this.gridSize * this.gridSize;
-        for (let i = 0; i < total; i++) {
-            if (Math.random() < 0.16) this.traps.push(i);
-            this.revealed[i] = false;
-        }
-        this.logAI("СЕТКА СИНХРОНИЗИРОВАНА. ПОПРОБУЙ ВЫЖИТЬ.");
-        audio.play(440, 0.2, 'sine');
-    },
-
-    animate() {
-        this.draw();
-        this.particles = this.particles.filter(p => p.life > 0);
-        this.particles.forEach(p => { p.update(); p.draw(this.ctx); });
-        this.updateTimer();
-        requestAnimationFrame(() => this.animate());
-    },
-
-    draw() {
-        this.ctx.fillStyle = '#808080';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-        for (let x = 0; x < this.gridSize; x++) {
-            for (let y = 0; y < this.gridSize; y++) {
-                const idx = y * this.gridSize + x;
-                const px = x * this.cellSize, py = y * this.cellSize;
-                
-                if (!this.revealed[idx]) {
-                    this.drawBevel(px, py, this.cellSize, '#bdbdbd', true);
-                } else {
-                    this.ctx.fillStyle = this.traps.includes(idx) ? '#ff0000' : '#d1d1d1';
-                    this.ctx.fillRect(px, py, this.cellSize, this.cellSize);
-                    this.ctx.strokeStyle = '#666'; this.ctx.lineWidth = 1;
-                    this.ctx.strokeRect(px, py, this.cellSize, this.cellSize);
-                    if (this.traps.includes(idx)) {
-                        this.ctx.font = `${this.cellSize/2}px Arial`;
-                        this.ctx.fillText('💣', px + this.cellSize/4, py + this.cellSize/1.5);
-                    } else {
-                        this.ctx.fillStyle = '#000080';
-                        this.ctx.font = `bold ${this.cellSize/2.5}px Arial`;
-                        this.ctx.fillText('•', px + this.cellSize/2.5, py + this.cellSize/1.6);
-                    }
+        const sound = {
+            ctx: null,
+            play(f, d, t = 'square', v = 0.1) {
+                if(!engine.sfx) return;
+                if(!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const o = this.ctx.createOscillator(), g = this.ctx.createGain();
+                o.type = t; 
+                o.frequency.setValueAtTime(f, this.ctx.currentTime);
+                if(t === 'sawtooth') {
+                    o.frequency.exponentialRampToValueAtTime(f * 0.5, this.ctx.currentTime + d);
+                }
+                g.gain.setValueAtTime(v, this.ctx.currentTime);
+                g.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + d);
+                o.connect(g); g.connect(this.ctx.destination);
+                o.start(); o.stop(this.ctx.currentTime + d);
+            },
+            combo(n) {
+                const base = 440;
+                for(let i = 0; i < n; i++) {
+                    setTimeout(() => this.play(base * (1 + i * 0.2), 0.1, 'sine', 0.15), i * 50);
                 }
             }
+        };
+
+        const gui = {
+            to(id) {
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.getElementById('scr-' + id).classList.add('active');
+                if(engine.vib && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+            },
+            setT(t) { 
+                document.body.className = 'theme-' + t; 
+                engine.logAI(`ТЕМА ИЗМЕНЕНА: ${t.toUpperCase()}`);
+                this.to('game'); 
+            },
+            notify(title, text) {
+                const n = document.getElementById('notification');
+                n.querySelector('div').textContent = title;
+                document.getElementById('notif-text').textContent = text;
+                n.classList.add('show');
+                setTimeout(() => n.classList.remove('show'), 3000);
+            }
+        };
+
+        class Particle {
+            constructor(x, y, c, type = 'normal') {
+                this.x = x; this.y = y;
+                this.type = type;
+                this.vx = (Math.random() - 0.5) * (type === 'explosion' ? 20 : 12);
+                this.vy = (Math.random() - 0.5) * (type === 'explosion' ? 20 : 12);
+                this.life = 1.0; this.c = c;
+                this.size = type === 'explosion' ? 6 : 4;
+            }
+            update() { 
+                this.x += this.vx; this.y += this.vy; 
+                this.vy += 0.3; this.life -= 0.02; 
+                this.size *= 0.98;
+            }
+            draw(ctx) {
+                ctx.globalAlpha = Math.max(0, this.life); 
+                ctx.fillStyle = this.c;
+                ctx.shadowBlur = 10; ctx.shadowColor = this.c;
+                ctx.fillRect(this.x, this.y, this.size, this.size); 
+                ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+            }
         }
-    },
 
-    drawBevel(x, y, s, color, up) {
-        this.ctx.fillStyle = color;
-        this.ctx.fillRect(x, y, s, s);
-        this.ctx.strokeStyle = up ? '#fff' : '#808080';
-        this.ctx.lineWidth = 2;
-        this.ctx.beginPath();
-        this.ctx.moveTo(x, y+s); this.ctx.lineTo(x, y); this.ctx.lineTo(x+s, y);
-        this.ctx.stroke();
-        this.ctx.strokeStyle = up ? '#808080' : '#fff';
-        this.ctx.beginPath();
-        this.ctx.moveTo(x, y+s); this.ctx.lineTo(x+s, y+s); this.ctx.lineTo(x+s, y);
-        this.ctx.stroke();
-    },
+        const engine = {
+            grid: 10, cell: 38, xp: 0, traps: [], open: [], dead: false, parts: [],
+            sfx: true, vib: true, extreme: false, startT: 0, combo: 0, lastClick: 0,
+            shield: false, frozen: false, frozenTime: 0,
+            quest: { name: '', target: 0, current: 0, reward: 0, type: '' },
+            trade: { partner: null, myItem: null, partnerItem: null },
+            inventory: { shield: 0, freeze: 0 },
 
-    handleInput(clientX, clientY) {
-        if (this.isGameOver) return;
-        const rect = this.canvas.getBoundingClientRect();
-        const x = Math.floor((clientX - rect.left) / this.cellSize);
-        const y = Math.floor((clientY - rect.top) / this.cellSize);
-        const idx = y * this.gridSize + x;
+            init() {
+                if(tg.expand) tg.expand();
+                canvas.width = canvas.height = 380;
+                this.cell = 380 / this.grid;
+                this.generateQuest();
+                this.reset();
+                this.loop();
+            },
 
-        if (this.revealed[idx]) return;
-        this.revealed[idx] = true;
+            generateQuest() {
+                const quests = [
+                    { name: 'Открой 20 ячеек', target: 20, reward: 500, type: 'open' },
+                    { name: 'Набери комбо x5', target: 5, reward: 300, type: 'combo' },
+                    { name: 'Проживи 60 секунд', target: 60, reward: 400, type: 'time' },
+                    { name: 'Набери 1000 XP', target: 1000, reward: 600, type: 'xp' }
+                ];
+                const q = quests[Math.floor(Math.random() * quests.length)];
+                this.quest = { ...q, current: 0 };
+                document.getElementById('quest-name').textContent = q.name;
+                document.getElementById('quest-target').textContent = q.target;
+                document.getElementById('quest-reward').textContent = q.reward + ' XP';
+                this.updateQuestBar();
+            },
 
-        // Эффект частиц
-        for (let i = 0; i < 15; i++) {
-            this.particles.push(new Particle(clientX - rect.left, clientY - rect.top, this.traps.includes(idx) ? '#f00' : '#0ff'));
-        }
+            updateQuestBar() {
+                const pct = Math.min(100, (this.quest.current / this.quest.target) * 100);
+                document.getElementById('quest-bar').style.width = pct + '%';
+                document.getElementById('quest-progress').textContent = this.quest.current;
+                
+                if(this.quest.current >= this.quest.target) {
+                    this.xp += this.quest.reward;
+                    document.getElementById('score-lcd').textContent = String(this.xp).padStart(4, '0');
+                    document.getElementById('my-stat').textContent = this.xp;
+                    gui.notify('ЗАДАЧА ВЫПОЛНЕНА!', `+${this.quest.reward} XP`);
+                    sound.play(880, 0.3, 'sine');
+                    setTimeout(() => this.generateQuest(), 2000);
+                }
+            },
 
-        if (this.traps.includes(idx)) {
-            this.boom();
-        } else {
-            const gain = 25 + Math.floor(this.score / 500);
-            this.score += gain;
-            this.showXP(clientX, clientY, gain);
-            audio.play(200 + (this.score % 1000), 0.1, 'triangle');
-            window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-            document.getElementById('score-val').innerText = String(this.score).padStart(4, '0');
-        }
-    },
+            reset() {
+                this.dead = false; this.traps = []; this.open = []; this.parts = []; 
+                this.startT = Date.now(); this.combo = 0; this.shield = false;
+                document.getElementById('score-lcd').innerText = '0000';
+                document.getElementById('face').innerText = '😎';
+                document.getElementById('combo').classList.remove('show');
+                for(let i=0; i<this.grid*this.grid; i++) {
+                    const trapChance = this.extreme ? 0.25 : 0.16;
+                    if(Math.random() < trapChance) this.traps.push(i);
+                    this.open[i] = false;
+                }
+                this.logAI("КВАНТОВАЯ СИНХРОНИЗАЦИЯ... OK.");
+                sound.play(523, 0.2, 'sine');
+            },
 
-    boom() {
-        this.isGameOver = true;
-        document.getElementById('smiley-btn').innerText = '😵';
-        this.traps.forEach(t => this.revealed[t] = true);
-        audio.play(60, 0.6, 'sawtooth', 0.3);
-        window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
-        this.logAI("GIGACHAT: ОБЪЕКТ УСТРАНЕН. ИГРА ОКОНЧЕНА.");
-    },
+            loop() {
+                this.draw();
+                this.parts = this.parts.filter(p => p.life > 0);
+                this.parts.forEach(p => { p.update(); p.draw(ctx); });
+                if(!this.frozen) {
+                    this.updateClock();
+                    this.checkQuestTime();
+                }
+                requestAnimationFrame(() => this.loop());
+            },
 
-    showXP(x, y, v) {
-        const el = document.createElement('div');
-        el.className = 'xp-popup';
-        el.innerText = `+${v}`;
-        el.style.left = `${x}px`; el.style.top = `${y}px`;
-        document.body.appendChild(el);
-        setTimeout(() => el.remove(), 1000);
-    },
+            checkQuestTime() {
+                if(this.quest.type === 'time' && !this.dead) {
+                    const elapsed = Math.floor((Date.now() - this.startT) / 1000);
+                    this.quest.current = elapsed;
+                    this.updateQuestBar();
+                }
+            },
 
-    logAI(msg) {
-        const log = document.getElementById('ai-log');
-        log.innerHTML = `> ${msg}<br>` + log.innerHTML.split('<br>').slice(0, 2).join('<br>');
-    },
+            draw() {
+                ctx.fillStyle = '#808080';
+                ctx.fillRect(0,0, canvas.width, canvas.height);
+                for(let i=0; i<this.grid*this.grid; i++) {
+                    let x = (i % this.grid) * this.cell, y = Math.floor(i / this.grid) * this.cell;
+                    if(!this.open[i]) {
+                        this.drawBtn(x, y, this.cell, true);
+                    } else {
+                        const isTrap = this.traps.includes(i);
+                        ctx.fillStyle = isTrap ? '#300' : '#d1d1d1';
+                        ctx.fillRect(x,y,this.cell,this.cell);
+                        ctx.strokeStyle = isTrap ? '#600' : '#666'; 
+                        ctx.strokeRect(x,y,this.cell,this.cell);
+                        if(isTrap) {
+                            ctx.font = `${this.cell/1.5}px Arial`; 
+                            ctx.fillText('💣', x+this.cell/6, y+this.cell/1.3);
+                            ctx.fillStyle = '#f00';
+                            ctx.fillRect(x+2,y+2,4,4);
+                            ctx.fillRect(x+this.cell-6,y+2,4,4);
+                            ctx.fillRect(x+2,y+this.cell-6,4,4);
+                            ctx.fillRect(x+this.cell-6,y+this.cell-6,4,4);
+                        } else {
+                            ctx.fillStyle = '#444'; 
+                            ctx.font = 'bold 16px Arial'; 
+                            ctx.fillText('•', x+this.cell/2.2, y+this.cell/1.6);
+                        }
+                    }
+                }
+            },
 
-    updateTimer() {
-        if (this.isGameOver) return;
-        const diff = Math.floor((Date.now() - this.startTime) / 1000);
-        const m = String(Math.floor(diff / 60)).padStart(2, '0');
-        const s = String(diff % 60).padStart(2, '0');
-        document.getElementById('timer-val').innerText = `${m}:${s}`;
-    },
+            drawBtn(x, y, s, up) {
+                ctx.fillStyle = '#bdbdbd'; ctx.fillRect(x,y,s,s);
+                ctx.strokeStyle = up ? '#fff' : '#808080';
+                ctx.beginPath(); ctx.moveTo(x, y+s); ctx.lineTo(x, y); ctx.lineTo(x+s, y); ctx.stroke();
+                ctx.strokeStyle = up ? '#808080' : '#fff';
+                ctx.beginPath(); ctx.moveTo(x, y+s); ctx.lineTo(x+s, y+s); ctx.lineTo(x+s, y); ctx.stroke();
+                if(this.extreme && Math.random() > 0.95) {
+                    ctx.fillStyle = 'rgba(255,0,0,0.1)';
+                    ctx.fillRect(x,y,s,s);
+                }
+            },
 
-    watchAd() {
-        this.score += 150;
-        document.getElementById('score-val').innerText = String(this.score).padStart(4, '0');
-        this.logAI("РЕКЛАМА ПРОСМОТРЕНА. +150 XP ПОЛУЧЕНО.");
-        audio.play(880, 0.3, 'sine');
-    },
+            buyGrid(n, cost) {
+                if(this.xp < cost) {
+                    this.logAI("НЕДОСТАТОЧНО КРЕДИТОВ!");
+                    sound.play(150, 0.3, 'sawtooth');
+                    return;
+                }
+                this.xp -= cost;
+                this.grid = n; this.cell = 380 / n; 
+                this.init(); gui.to('game');
+                this.logAI(`СЕТКА ${n}x${n} АКТИВИРОВАНА.`);
+                sound.play(880, 0.3, 'square');
+            },
 
-    gigaHack() {
-        if (this.score < 200) return alert("НЕДОСТАТОЧНО ЭНЕРГИИ (XP)!");
-        this.score -= 200;
-        document.getElementById('score-val').innerText = String(this.score).padStart(4, '0');
-        const hidden = this.traps.filter(t => !this.revealed[t]);
-        if (hidden.length > 0) {
-            const target = hidden[Math.floor(Math.random() * hidden.length)];
-            this.revealed[target] = true;
-            this.logAI("ВЗЛОМ УСПЕШЕН: GIGACHAT ВЫДАЛ МИНУ.");
-        }
-    }
-};
+            buyShield() {
+                if(this.xp < 200) return this.logAI("НЕДОСТАТОЧНО XP!");
+                this.xp -= 200; 
+                this.inventory.shield++;
+                this.logAI("ЩИТ КУПЛЕН. ИСПОЛЬЗУЙ В ИНВЕНТАРЕ.");
+                sound.play(660, 0.2, 'sine');
+            },
 
-/**
- * CORE MODULE: UI & MODALS
- */
-const ui = {
-    open(type) {
-        const ov = document.getElementById('overlay');
-        const title = document.getElementById('modal-title');
-        const body = document.getElementById('modal-body');
-        ov.style.display = 'flex';
-        
-        if (type === 'shop') {
-            title.innerText = "QUANTUM SHOP";
-            body.innerHTML = `
-                <button class="btn" style="width:100%;margin-bottom:10px;" onclick="game.gridSize=20; game.resize(); game.reset(); ui.close();">СЕТКА 20x20 (500 XP)</button>
-                <button class="btn" style="width:100%;" onclick="game.gridSize=40; game.resize(); game.reset(); ui.close();">СЕТКА 40x40 (2000 XP)</button>
-            `;
-        } else if (type === 'themes') {
-            title.innerText = "THEME SELECT";
-            body.innerHTML = `
-                <button class="btn" style="width:100%;margin-bottom:8px;" onclick="document.body.className=''; ui.close();">CLASSIC 95</button>
-                <button class="btn" style="width:100%;margin-bottom:8px;" onclick="document.body.className='matrix'; ui.close();">MATRIX</button>
-                <button class="btn" style="width:100%;" onclick="document.body.className='neon'; ui.close();">CYBER NEON</button>
-            `;
-        } else if (type === 'rank') {
-            title.innerText = "HALL OF FAME";
-            body.innerHTML = "1. GigaForce: 99999<br>2. NetizenAdmin: 25400<br>3. ТЫ: " + game.score;
-        } else {
-            title.innerText = "SETTINGS";
-            body.innerHTML = "Звук: ВКЛ<br>Вибро: ВКЛ<br>Версия: 8.0.1";
-        }
-    },
-    close() { document.getElementById('overlay').style.display = 'none'; }
-};
+            buyTime() {
+                if(this.xp < 300) return this.logAI("НЕДОСТАТОЧНО XP!");
+                this.xp -= 300; 
+                this.inventory.freeze++;
+                this.logAI("ЗАМОРОЗКА КУПЛЕНА.");
+                sound.play(1100, 0.5, 'sine');
+            },
 
-// INITIALIZATION
-game.canvas.addEventListener('click', (e) => game.handleInput(e.clientX, e.clientY));
-window.onload = () => game.init();
-</script>
+            openTrade(partner) {
+                this.trade.partner = partner;
+                document.getElementById('trade-partner').textContent = partner;
+                document.getElementById('trade-panel').classList.add('show');
+                
+                const items = ['🛡️', '⏱️', '🔋', '🍀'];
+                document.getElementById('partner-item').textContent = items[Math.floor(Math.random() * items.length)];
+            },
+
+            selectTradeItem() {
+                const myItems = [];
+                if(this.inventory.shield > 0) myItems.push('🛡️');
+                if(this.inventory.freeze > 0) myItems.push('⏱️');
+                
+                if(myItems.length === 0) {
+                    this.logAI("НЕТ ПРЕДМЕТОВ ДЛЯ ОБМЕНА!");
+                    return;
+                }
+                
+                this.trade.myItem = myItems[0];
+                document.getElementById('my-item').textContent = this.trade.myItem;
+            },
+
+            confirmTrade() {
+                if(!this.trade.myItem) {
+                    this.logAI("ВЫБЕРИТЕ ПРЕДМЕТ!");
+                    return;
+                }
+                
+                if(this.trade.myItem === '🛡️') this.inventory.shield--;
+                if(this.trade.myItem === '⏱️') this.inventory.freeze--;
+                
+                const received = document.getElementById('partner-item').textContent;
+                if(received === '🛡️') this.inventory.shield++;
+                if(received === '⏱️') this.inventory.freeze++;
+                if(received === '🔋') this.xp += 100;
+                if(received === '🍀') this.xp += 200;
+                
+                document.getElementById('score-lcd').textContent = String(this.xp).padStart(4, '0');
+                document.getElementById('my-stat').textContent = this.xp;
+                
+                gui.notify('ОБМЕН УСПЕШЕН!', `Получено: ${received}`);
+                this.closeTrade();
+            },
+
+            closeTrade() {
+                document.getElementById('trade-panel').classList.remove('show');
+                this.trade = { partner: null, myItem: null, partnerItem: null };
+                document.getElementById('my-item').textContent = '?';
+            },
+
+            handleInput(e) {
+                if(this.dead || this.frozen) return;
+                const rect = canvas.getBoundingClientRect();
+                const x = Math.floor((e.clientX - rect.left) / this.cell);
+                const y = Math.floor((e.clientY - rect.top) / this.cell);
+                const idx = y * this.grid + x;
+                if(x < 0 || x >= this.grid || y < 0 || y >= this.grid) return;
+                if(this.open[idx]) return;
+                this.open[idx] = true;
+
+                if(this.quest.type === 'open') {
+                    this.quest.current++;
+                    this.updateQuestBar();
+                }
+
+                const now = Date.now();
+                if(now - this.lastClick < 1000) {
+                    this.combo++;
+                    document.getElementById('combo').innerText = `COMBO x${this.combo}`;
+                    document.getElementById('combo').classList.add('show');
+                    sound.combo(Math.min(this.combo, 5));
+                    
+                    if(this.quest.type === 'combo' && this.combo >= this.quest.target) {
+                        this.quest.current = this.combo;
+                        this.updateQuestBar();
+                    }
+                } else {
+                    this.combo = 0;
+                    document.getElementById('combo').classList.remove('show');
+                }
+                this.lastClick = now;
+
+                const px = x * this.cell + this.cell/2;
+                const py = y * this.cell + this.cell/2;
+
+                if(this.traps.includes(idx)) {
+                    if(this.shield) {
+                        this.shield = false;
+                        this.logAI("ЩИТ ПОГЛОЩЁН! МИНА НЕЙТРАЛИЗОВАНА.");
+                        sound.play(440, 0.4, 'sine');
+                        for(let i=0; i<20; i++) this.parts.push(new Particle(px, py, '#0ff', 'shield'));
+                    } else {
+                        this.boom(px, py);
+                    }
+                } else {
+                    const gain = (25 + Math.floor(this.xp / 1000)) * (1 + this.combo * 0.1);
+                    this.xp += Math.floor(gain);
+                    
+                    if(this.quest.type === 'xp') {
+                        this.quest.current = this.xp;
+                        this.updateQuestBar();
+                    }
+                    
+                    this.popXP(e.clientX, e.clientY, Math.floor(gain));
+                    document.getElementById('score-lcd').innerText = String(this.xp).padStart(4, '0');
+                    document.getElementById('my-stat').innerText = this.xp;
+                    sound.play(400 + (this.xp % 1000), 0.1, 'sine');
+                    if(this.vib && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+                    for(let i=0; i<10; i++) this.parts.push(new Particle(px, py, '#0ff'));
+                }
+            },
+
+            boom(x, y) {
+                this.dead = true;
+                document.getElementById('face').innerText = '😵';
+                this.traps.forEach(t => this.open[t] = true);
+                sound.play(80, 0.8, 'sawtooth', 0.3);
+                sound.play(60, 0.6, 'square', 0.2);
+                if(this.vib && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+                this.logAI("КРИТИЧЕСКАЯ ОШИБКА. ОБЪЕКТ УНИЧТОЖЕН.");
+                for(let i=0; i<50; i++) this.parts.push(new Particle(x, y, '#f00', 'explosion'));
+                if(tg.sendData) tg.sendData(JSON.stringify({action: 'game_over', score: this.xp}));
+            },
+
+            popXP(x, y, v) {
+                const el = document.createElement('div');
+                el.className = 'xp-pop'; el.innerText = `+${v}`;
+                el.style.left = `${x}px`; el.style.top = `${y}px`;
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 1200);
+            },
+
+            logAI(m) {
+                const log = document.getElementById('terminal');
+                const time = new Date().toLocaleTimeString('ru-RU', {hour12: false});
+                log.innerHTML = `> [${time}] ${m}<br>` + log.innerHTML.split('<br>').slice(0,3).join('<br>');
+            },
+
+            updateClock() {
+                if(this.dead) return;
+                const s = Math.floor((Date.now() - this.startT)/1000);
+                document.getElementById('timer-lcd').innerText = `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+            },
+
+            gigaHint() {
+                if(this.xp < 150) {
+                    this.logAI("НЕДОСТАТОЧНО XP ДЛЯ АНАЛИЗА!");
+                    sound.play(200, 0.3, 'sawtooth');
+                    return;
+                }
+                this.xp -= 150;
+                let safe = [];
+                for(let i=0; i<this.grid*this.grid; i++) {
+                    if(!this.open[i] && !this.traps.includes(i)) safe.push(i);
+                }
+                if(safe.length > 0) {
+                    const hint = safe[Math.floor(Math.random() * safe.length)];
+                    this.open[hint] = true;
+                    const x = (hint % this.grid) * this.cell + this.cell/2;
+                    const y = Math.floor(hint / this.grid) * this.cell + this.cell/2;
+                    for(let i=0; i<15; i++) this.parts.push(new Particle(x, y, '#ff0'));
+                    this.logAI("GIGACHAT: БЕЗОПАСНАЯ ЯЧЕЙКА РАСКРЫТА.");
+                    sound.play(660, 0.2, 'sine');
+                }
+            }
+        };
+
+        canvas.addEventListener('click', (e) => engine.handleInput(e));
+        window.onload = () => engine.init();
+    </script>
 </body>
 </html>
