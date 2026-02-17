@@ -74,6 +74,12 @@
             font-weight: 700;
             text-transform: uppercase;
             text-shadow: 0 0 10px var(--neon-dim);
+            animation: neonPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes neonPulse {
+            0%, 100% { text-shadow: 0 0 10px var(--neon-dim), 0 0 20px var(--neon-dim); }
+            50% { text-shadow: 0 0 20px var(--neon), 0 0 30px var(--neon); }
         }
         
         .energy { 
@@ -85,11 +91,23 @@
             font-size: 11px;
             letter-spacing: 0.5px;
             box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+            animation: energyGlow 3s ease-in-out infinite;
+        }
+        
+        @keyframes energyGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(0, 255, 136, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(0, 255, 136, 0.8), 0 0 35px rgba(0, 255, 136, 0.4); }
         }
         
         .energy.creator { 
             background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
             box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            animation: creatorGlow 2s ease-in-out infinite;
+        }
+        
+        @keyframes creatorGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.9), 0 0 45px rgba(255, 215, 0, 0.5); }
         }
 
         #chat { 
@@ -109,20 +127,29 @@
             border-radius: 18px; 
             font-size: 14.5px; 
             line-height: 1.6; 
-            animation: messageAppear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: messageAppear 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             position: relative;
             word-wrap: break-word;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .msg:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
         }
         
         @keyframes messageAppear {
-            from { 
+            0% { 
                 opacity: 0; 
-                transform: translateY(20px) scale(0.95); 
+                transform: translateY(30px) scale(0.8) rotateX(-15deg); 
             }
-            to { 
+            70% {
+                transform: translateY(-5px) scale(1.02) rotateX(5deg);
+            }
+            100% { 
                 opacity: 1; 
-                transform: translateY(0) scale(1); 
+                transform: translateY(0) scale(1) rotateX(0); 
             }
         }
         
@@ -133,6 +160,13 @@
             font-weight: 600;
             border-bottom-right-radius: 4px;
             margin-left: 40px;
+            animation: userSlide 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        @keyframes userSlide {
+            0% { opacity: 0; transform: translateX(50px) scale(0.9); }
+            70% { transform: translateX(-10px) scale(1.02); }
+            100% { opacity: 1; transform: translateX(0) scale(1); }
         }
         
         .ai { 
@@ -143,6 +177,13 @@
             color: #e0f2e9;
             margin-right: 40px;
             backdrop-filter: blur(10px);
+            animation: aiSlide 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        @keyframes aiSlide {
+            0% { opacity: 0; transform: translateX(-50px) scale(0.9); }
+            70% { transform: translateX(10px) scale(1.02); }
+            100% { opacity: 1; transform: translateX(0) scale(1); }
         }
         
         .system { 
@@ -153,6 +194,12 @@
             text-align: center;
             max-width: 90%;
             font-size: 13px;
+            animation: pulseWarning 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulseWarning {
+            0%, 100% { box-shadow: 0 0 0 rgba(255,68,68,0); }
+            50% { box-shadow: 0 0 20px rgba(255,68,68,0.3); }
         }
         
         .preview-img { 
@@ -161,6 +208,12 @@
             margin-top: 8px; 
             border: 1px solid var(--neon-dim);
             box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            animation: imageAppear 0.6s ease-out;
+        }
+        
+        @keyframes imageAppear {
+            0% { opacity: 0; transform: scale(0.8) rotate(-3deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0); }
         }
         
         .msg-actions { 
@@ -182,13 +235,15 @@
             font-size: 11px; 
             border-radius: 6px; 
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s;
             backdrop-filter: blur(4px);
         }
         
         .edit-btn:hover, .delete-btn:hover {
             background: var(--neon);
             color: #000;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px var(--neon);
         }
 
         .photo-preview { 
@@ -198,12 +253,13 @@
             padding: 12px; 
             margin-bottom: 12px; 
             position: relative;
-            animation: slideDown 0.3s;
+            animation: slideDown 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
         
         @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            0% { opacity: 0; transform: translateY(-20px) scale(0.9); }
+            70% { transform: translateY(5px) scale(1.01); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
         }
         
         .photo-preview img { 
@@ -228,11 +284,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.2s;
+            transition: all 0.3s;
             box-shadow: 0 2px 8px rgba(255,68,68,0.4);
         }
         
-        .remove-photo:hover { transform: scale(1.1); }
+        .remove-photo:hover { 
+            transform: scale(1.15) rotate(90deg); 
+            box-shadow: 0 4px 15px rgba(255,68,68,0.6);
+        }
 
         .footer { 
             padding: 12px 16px 25px; 
@@ -265,7 +324,7 @@
         .tool-btn:hover {
             border-color: var(--neon);
             box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
-            transform: translateY(-2px);
+            transform: translateY(-3px) scale(1.05);
         }
         
         .tool-btn:active { 
@@ -293,8 +352,9 @@
         
         textarea:focus {
             border-color: var(--neon);
-            box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
+            box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1), 0 0 20px rgba(0,255,136,0.2);
             background: rgba(255,255,255,0.05);
+            transform: translateY(-2px);
         }
         
         textarea::placeholder {
@@ -317,11 +377,11 @@
         }
         
         .send-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 255, 136, 0.4);
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.5);
         }
         
-        .send-btn:active { transform: scale(0.95); }
+        .send-btn:active { transform: scale(0.9); }
         
         .send-btn svg { 
             width: 20px; 
@@ -335,8 +395,10 @@
             opacity: 0.5; 
             cursor: not-allowed;
             transform: none;
+            animation: none;
         }
 
+        /* ИСПРАВЛЕННЫЕ КНОПКИ НАД КОДОМ */
         pre { 
             background: #0d1117 !important; 
             border-radius: 12px; 
@@ -348,16 +410,23 @@
             font-family: 'JetBrains Mono', monospace;
             font-size: 13px;
             line-height: 1.6;
+            padding-top: 50px; /* Отступ для кнопок */
         }
         
         code {
             font-family: 'JetBrains Mono', monospace !important;
         }
         
+        .code-buttons {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+        
         .copy-btn { 
-            position: absolute; 
-            right: 8px; 
-            top: 8px; 
             background: rgba(0,255,136,0.1);
             border: 1px solid var(--neon-dim);
             color: var(--neon);
@@ -366,7 +435,7 @@
             font-weight: 700;
             border-radius: 6px; 
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -374,12 +443,11 @@
         .copy-btn:hover {
             background: var(--neon);
             color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,255,136,0.4);
         }
 
         .copy-full-btn {
-            position: absolute;
-            left: 8px;
-            top: 8px;
             background: linear-gradient(135deg, var(--neon) 0%, #00cc6a 100%);
             border: none;
             color: #000;
@@ -388,12 +456,14 @@
             font-weight: 700;
             border-radius: 6px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .copy-full-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 10px rgba(0,255,136,0.5);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,255,136,0.5);
         }
 
         .scroll-down-btn { 
@@ -412,15 +482,20 @@
             justify-content: center; 
             box-shadow: 0 4px 20px rgba(0, 255, 136, 0.4);
             z-index: 100; 
-            animation: float 3s ease-in-out infinite;
+            animation: float 3s ease-in-out infinite, pulseGlow 2s ease-in-out infinite;
             transition: all 0.3s;
         }
         
         .scroll-down-btn.visible { display: flex; }
         
         .scroll-down-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 25px rgba(0, 255, 136, 0.5);
+            transform: scale(1.15);
+            box-shadow: 0 8px 30px rgba(0, 255, 136, 0.6);
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 4px 20px rgba(0, 255, 136, 0.4); }
+            50% { box-shadow: 0 6px 30px rgba(0, 255, 136, 0.7), 0 0 40px rgba(0,255,136,0.3); }
         }
         
         .scroll-down-btn svg { 
@@ -429,11 +504,13 @@
             stroke: currentColor; 
             fill: none; 
             stroke-width: 2.5; 
+            animation: bounceArrow 2s infinite;
         }
         
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
+        @keyframes bounceArrow {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-6px); }
+            60% { transform: translateY(-3px); }
         }
 
         .photo-menu-overlay { 
@@ -462,13 +539,14 @@
             width: 100%; 
             padding: 24px 20px 30px; 
             border-radius: 24px 24px 0 0; 
-            animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: slideUp 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
         }
         
         @keyframes slideUp { 
-            from { transform: translateY(100%); opacity: 0; } 
-            to { transform: translateY(0); opacity: 1; } 
+            0% { transform: translateY(100%) scale(0.9); opacity: 0; } 
+            70% { transform: translateY(-10px) scale(1.01); }
+            100% { transform: translateY(0) scale(1); opacity: 1; } 
         }
         
         .photo-menu-title { 
@@ -480,6 +558,12 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             opacity: 0.8;
+            animation: textGlow 2s ease-in-out infinite;
+        }
+        
+        @keyframes textGlow {
+            0%, 100% { text-shadow: 0 0 5px var(--neon-dim); }
+            50% { text-shadow: 0 0 20px var(--neon), 0 0 30px var(--neon); }
         }
         
         .photo-menu-btn { 
@@ -501,9 +585,10 @@
         }
         
         .photo-menu-btn:hover {
-            background: rgba(0,255,136,0.1);
+            background: rgba(0,255,136,0.15);
             border-color: var(--neon);
-            transform: translateX(5px);
+            transform: translateX(10px);
+            box-shadow: 0 0 20px rgba(0,255,136,0.2);
         }
         
         .photo-menu-btn:active { 
@@ -523,15 +608,15 @@
             font-size: 15px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s;
         }
         
         .photo-menu-close:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.15);
             color: #fff;
+            transform: translateY(-2px);
         }
 
-        /* History Panel */
         .history-panel {
             position: fixed;
             top: 0;
@@ -542,7 +627,7 @@
             background: linear-gradient(180deg, #0a0f0a 0%, #050805 100%);
             border-left: 2px solid var(--neon);
             z-index: 2000;
-            transition: right 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             display: flex;
             flex-direction: column;
             box-shadow: -10px 0 40px rgba(0,0,0,0.5);
@@ -566,25 +651,27 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
+            animation: textGlow 2s ease-in-out infinite;
         }
         
         .history-close {
             background: none;
             border: none;
             color: var(--neon);
-            font-size: 24px;
+            font-size: 28px;
             cursor: pointer;
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 8px;
-            transition: all 0.2s;
+            border-radius: 10px;
+            transition: all 0.3s;
         }
         
         .history-close:hover {
             background: rgba(0,255,136,0.1);
+            transform: rotate(90deg);
         }
         
         .history-list {
@@ -597,16 +684,23 @@
             background: rgba(0,255,136,0.05);
             border: 1px solid var(--neon-dim);
             border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 10px;
+            padding: 14px;
+            margin-bottom: 12px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s;
+            animation: itemAppear 0.4s ease-out;
+        }
+        
+        @keyframes itemAppear {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
         }
         
         .history-item:hover {
-            background: rgba(0,255,136,0.1);
+            background: rgba(0,255,136,0.12);
             border-color: var(--neon);
-            transform: translateX(-5px);
+            transform: translateX(-8px) scale(1.02);
+            box-shadow: 0 4px 15px rgba(0,255,136,0.2);
         }
         
         .history-item-text {
@@ -643,19 +737,21 @@
         
         .clear-history-btn {
             margin: 16px;
-            padding: 12px;
+            padding: 14px;
             background: rgba(255,68,68,0.1);
             border: 1px solid rgba(255,68,68,0.3);
             color: #ff8888;
-            border-radius: 10px;
+            border-radius: 12px;
             cursor: pointer;
             font-size: 13px;
             font-weight: 600;
-            transition: all 0.2s;
+            transition: all 0.3s;
         }
         
         .clear-history-btn:hover {
-            background: rgba(255,68,68,0.2);
+            background: rgba(255,68,68,0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255,68,68,0.3);
         }
 
         ::selection {
@@ -745,9 +841,8 @@
     let isCreator = false;
     let currentUserId = null;
     
-    // История сообщений для контекста
     let messageHistory = JSON.parse(localStorage.getItem('vision_history') || '[]');
-    const MAX_HISTORY = 20; // Храним последние 20 сообщений
+    const MAX_HISTORY = 20;
     
     const tg = window.Telegram.WebApp;
     tg.expand();
@@ -829,7 +924,6 @@
             time: Date.now()
         });
         
-        // Ограничиваем историю
         if (messageHistory.length > MAX_HISTORY) {
             messageHistory = messageHistory.slice(-MAX_HISTORY);
         }
@@ -845,7 +939,7 @@
         }
     }
 
-    // ПЫЛЬ (оригинальная)
+    // ПЫЛЬ
     const c = document.getElementById('canvas'), x = c.getContext('2d');
     let ps = [];
     function rs() { c.width = innerWidth; c.height = innerHeight; }
@@ -1050,34 +1144,12 @@
         checkScroll();
     }
 
-    // Проверка является ли ответ кодом
     function isCodeResponse(text) {
         const codeIndicators = [
-            '```',
-            'function',
-            'const ',
-            'let ',
-            'var ',
-            'class ',
-            'import ',
-            'export ',
-            'def ',
-            'print(',
-            '<html',
-            '<div',
-            '<!DOCTYPE',
-            '#include',
-            'using namespace',
-            'public static',
-            'func ',
-            'package ',
-            'module ',
-            'require(',
-            'console.log',
-            'System.out',
-            '<?php',
-            '<%',
-            '#!/bin/'
+            '```', 'function', 'const ', 'let ', 'var ', 'class ', 'import ', 'export ',
+            'def ', 'print(', '<html', '<div', '<!DOCTYPE', '#include', 'using namespace',
+            'public static', 'func ', 'package ', 'module ', 'require(', 'console.log',
+            'System.out', '<?php', '<%', '#!/bin/'
         ];
         return codeIndicators.some(ind => text.includes(ind));
     }
@@ -1121,8 +1193,6 @@
         `;
         
         chat.appendChild(userDiv);
-        
-        // Добавляем в историю
         addToHistory(text || '(изображение)', true);
         
         input.value = '';
@@ -1146,7 +1216,6 @@
         sendBtn.disabled = true;
 
         try {
-            // Формируем контекст из истории
             const historyContext = messageHistory.slice(-6).map(h => ({
                 role: h.isUser ? 'user' : 'assistant',
                 content: h.text
@@ -1178,20 +1247,17 @@
             const resText = await response.text();
             load.remove();
 
-            // Определяем есть ли код в ответе
             const hasCode = isCodeResponse(resText);
-            
-            // Сохраняем полный текст для копирования
             const fullResponseText = resText;
 
+            // ИСПРАВЛЕННЫЕ КНОПКИ - контейнер для кнопок
             const formatted = resText
                 .replace(/```(\w+)?([\s\S]*?)```/g, (m, l, code) => {
                     const lang = l || 'text';
-                    // Если есть код — добавляем кнопку "КОПИРОВАТЬ ВСЁ"
                     if (hasCode) {
-                        return `<pre><button class="copy-full-btn" onclick="copyFullResponse(this)">КОПИРОВАТЬ ВСЁ</button><button class="copy-btn" onclick="copyCode(this)">КОПИРОВАТЬ БЛОК</button><code class="language-${lang}">${escapeHtml(code.trim())}</code></pre>`;
+                        return `<pre><div class="code-buttons"><button class="copy-full-btn" onclick="copyFullResponse(this)">КОПИРОВАТЬ ВСЁ</button><button class="copy-btn" onclick="copyCode(this)">КОПИРОВАТЬ БЛОК</button></div><code class="language-${lang}">${escapeHtml(code.trim())}</code></pre>`;
                     }
-                    return `<pre><button class="copy-btn" onclick="copyCode(this)">КОПИРОВАТЬ</button><code class="language-${lang}">${escapeHtml(code.trim())}</code></pre>`;
+                    return `<pre><div class="code-buttons"><button class="copy-btn" onclick="copyCode(this)">КОПИРОВАТЬ</button></div><code class="language-${lang}">${escapeHtml(code.trim())}</code></pre>`;
                 })
                 .replace(/`([^`]+)`/g, '<code style="background:rgba(0,255,136,0.1);padding:2px 6px;border-radius:4px;color:var(--neon);font-family:\'JetBrains Mono\',monospace;font-size:12px;">$1</code>')
                 .replace(/\*\*(.*?)\*\*/g, '<b style="color:var(--neon);">$1</b>')
@@ -1201,14 +1267,11 @@
             aiDiv.className = 'msg ai';
             aiDiv.innerHTML = formatted;
             
-            // Сохраняем полный текст для копирования
             if (hasCode) {
                 aiDiv.setAttribute('data-full-text', fullResponseText);
             }
             
             chat.appendChild(aiDiv);
-            
-            // Добавляем ответ ИИ в историю
             addToHistory(fullResponseText, false);
             
             if (window.Prism) Prism.highlightAll();
@@ -1228,9 +1291,8 @@
         return div.innerHTML;
     }
 
-    // Копирование блока кода
     function copyCode(btn) {
-        const code = btn.nextElementSibling.innerText;
+        const code = btn.closest('.code-buttons').nextElementSibling.innerText;
         navigator.clipboard.writeText(code).then(() => { 
             btn.innerText = "✓ СКОПИРОВАНО"; 
             btn.style.background = "var(--neon)";
@@ -1243,7 +1305,6 @@
         });
     }
 
-    // Копирование полного ответа (только если это код)
     function copyFullResponse(btn) {
         const msgEl = btn.closest('.msg');
         const fullText = msgEl.getAttribute('data-full-text');
