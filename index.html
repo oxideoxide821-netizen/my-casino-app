@@ -9,93 +9,548 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
-        :root { --neon: #00ff88; --bg: #020502; --glass: rgba(0, 255, 136, 0.1); --danger: #ff4444; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg); color: #e0f2e9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; overflow: hidden; }
-        #canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
-        .app { display: flex; flex-direction: column; width: 100vw; height: 100vh; }
+        :root { 
+            --neon: #00ff88; 
+            --neon-dim: rgba(0, 255, 136, 0.3);
+            --bg: #020502; 
+            --glass: rgba(0, 255, 136, 0.08);
+            --danger: #ff4444;
+            --surface: #0a0f0a;
+        }
         
-        .header { padding: 15px; background: rgba(0,0,0,0.9); border-bottom: 2px solid var(--neon); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 0 15px var(--neon); z-index: 10; }
-        .header b { color: var(--neon); letter-spacing: 1px; font-size: 16px; }
-        .energy { background: var(--neon); color: #000; padding: 4px 10px; border-radius: 20px; font-weight: 900; font-size: 11px; }
-        .energy.creator { background: #ffd700; color: #000; box-shadow: 0 0 10px #ffd700; }
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        body, html { 
+            margin: 0; 
+            padding: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: var(--bg); 
+            color: #e8f5e9; 
+            overflow: hidden; 
+            line-height: 1.6;
+        }
+        
+        #canvas { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            z-index: -1; 
+            pointer-events: none; 
+        }
+        
+        .app { 
+            display: flex; 
+            flex-direction: column; 
+            width: 100vw; 
+            height: 100vh; 
+        }
+        
+        /* Header */
+        .header { 
+            padding: 16px 20px; 
+            background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,20,10,0.9) 100%);
+            border-bottom: 1px solid var(--neon-dim); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.15);
+            z-index: 10; 
+            backdrop-filter: blur(10px);
+        }
+        
+        .header b { 
+            color: var(--neon); 
+            letter-spacing: 2px; 
+            font-size: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px var(--neon-dim);
+        }
+        
+        .energy { 
+            background: linear-gradient(135deg, var(--neon) 0%, #00cc6a 100%);
+            color: #000; 
+            padding: 6px 14px; 
+            border-radius: 20px; 
+            font-weight: 800; 
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+        }
+        
+        .energy.creator { 
+            background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
 
-        #chat { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth; position: relative; }
-        .msg { max-width: 85%; padding: 12px 16px; border-radius: 15px; font-size: 14px; line-height: 1.5; animation: fadeIn 0.3s; position: relative; word-wrap: break-word; }
-        .user { background: var(--neon); color: #000; align-self: flex-end; font-weight: bold; border-bottom-right-radius: 2px; }
-        .ai { background: rgba(255,255,255,0.05); border: 1px solid var(--glass); align-self: flex-start; border-bottom-left-radius: 2px; }
-        .system { background: rgba(255,68,68,0.1); border: 1px solid var(--danger); color: #ff8888; align-self: center; text-align: center; font-size: 13px; max-width: 95%; }
-        .preview-img { max-width: 100%; border-radius: 10px; margin-top: 5px; border: 1px solid var(--neon); display: block; }
+        /* Chat */
+        #chat { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 16px; 
+            scroll-behavior: smooth;
+            background: linear-gradient(180deg, var(--bg) 0%, var(--surface) 100%);
+        }
         
-        .msg-actions { position: absolute; top: -20px; right: 0; display: none; gap: 5px; }
+        .msg { 
+            max-width: 82%; 
+            padding: 14px 18px; 
+            border-radius: 18px; 
+            font-size: 14.5px; 
+            line-height: 1.6; 
+            animation: messageAppear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            word-wrap: break-word;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        
+        @keyframes messageAppear {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px) scale(0.95); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+        
+        .user { 
+            background: linear-gradient(135deg, var(--neon) 0%, #00cc6a 100%);
+            color: #001a0d; 
+            align-self: flex-end; 
+            font-weight: 600;
+            border-bottom-right-radius: 4px;
+            margin-left: 40px;
+        }
+        
+        .ai { 
+            background: var(--surface);
+            border: 1px solid var(--glass);
+            align-self: flex-start; 
+            border-bottom-left-radius: 4px;
+            color: #e0f2e9;
+            margin-right: 40px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .system { 
+            background: rgba(255,68,68,0.08);
+            border: 1px solid rgba(255,68,68,0.3);
+            color: #ff8888; 
+            align-self: center; 
+            text-align: center;
+            max-width: 90%;
+            font-size: 13px;
+        }
+        
+        .preview-img { 
+            max-width: 100%; 
+            border-radius: 12px; 
+            margin-top: 8px; 
+            border: 1px solid var(--neon-dim);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        }
+        
+        /* Message Actions */
+        .msg-actions { 
+            position: absolute; 
+            top: -24px; 
+            right: 0; 
+            display: none; 
+            gap: 6px;
+            animation: fadeIn 0.2s;
+        }
+        
         .msg:hover .msg-actions { display: flex; }
-        .edit-btn, .delete-btn { background: #333; border: 1px solid var(--neon); color: var(--neon); padding: 2px 8px; font-size: 10px; border-radius: 4px; cursor: pointer; }
+        
+        .edit-btn, .delete-btn { 
+            background: rgba(0,0,0,0.8);
+            border: 1px solid var(--neon); 
+            color: var(--neon); 
+            padding: 4px 10px; 
+            font-size: 11px; 
+            border-radius: 6px; 
+            cursor: pointer;
+            transition: all 0.2s;
+            backdrop-filter: blur(4px);
+        }
+        
+        .edit-btn:hover, .delete-btn:hover {
+            background: var(--neon);
+            color: #000;
+        }
 
-        .photo-preview { background: rgba(0,255,136,0.1); border: 1px dashed var(--neon); border-radius: 10px; padding: 10px; margin-bottom: 10px; position: relative; }
-        .photo-preview img { max-width: 100%; border-radius: 8px; display: block; }
-        .remove-photo { position: absolute; top: 5px; right: 5px; background: var(--danger); color: white; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-size: 16px; line-height: 1; }
+        /* Photo Preview */
+        .photo-preview { 
+            background: rgba(0,255,136,0.05); 
+            border: 1px dashed var(--neon-dim); 
+            border-radius: 12px; 
+            padding: 12px; 
+            margin-bottom: 12px; 
+            position: relative;
+            animation: slideDown 0.3s;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .photo-preview img { 
+            max-width: 100%; 
+            border-radius: 10px; 
+            display: block;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        
+        .remove-photo { 
+            position: absolute; 
+            top: 8px; 
+            right: 8px; 
+            background: var(--danger); 
+            color: white; 
+            border: none; 
+            width: 28px; 
+            height: 28px; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+            box-shadow: 0 2px 8px rgba(255,68,68,0.4);
+        }
+        
+        .remove-photo:hover { transform: scale(1.1); }
 
-        .footer { padding: 10px 15px 30px; background: #000; border-top: 1px solid #222; }
-        .input-area { display: flex; gap: 8px; align-items: flex-end; }
+        /* Footer */
+        .footer { 
+            padding: 12px 16px 25px; 
+            background: linear-gradient(0deg, rgba(0,0,0,0.98) 0%, rgba(0,10,5,0.95) 100%);
+            border-top: 1px solid rgba(0,255,136,0.1);
+            backdrop-filter: blur(20px);
+        }
         
-        .tool-btn { background: transparent; border: 1px solid var(--neon); border-radius: 12px; width: 42px; height: 42px; color: var(--neon); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
-        .tool-btn:active { background: var(--neon); color: #000; }
+        .input-area { 
+            display: flex; 
+            gap: 10px; 
+            align-items: flex-end; 
+        }
         
-        textarea { flex: 1; background: #111; border: 1px solid #333; border-radius: 12px; color: #fff; padding: 12px; min-height: 42px; max-height: 120px; outline: none; resize: none; font-size: 14px; border-color: var(--neon); font-family: inherit; }
+        .tool-btn { 
+            background: transparent; 
+            border: 1.5px solid var(--neon-dim); 
+            border-radius: 14px; 
+            width: 44px; 
+            height: 44px; 
+            color: var(--neon); 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            flex-shrink: 0;
+        }
         
-        .send-btn { background: var(--neon); border: none; border-radius: 12px; width: 48px; height: 42px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px var(--neon); flex-shrink: 0; }
-        .send-btn svg { width: 22px; height: 22px; stroke: #000; fill: none; stroke-width: 2.5; }
-        .send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .tool-btn:hover {
+            border-color: var(--neon);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .tool-btn:active { 
+            background: var(--neon); 
+            color: #000;
+            transform: scale(0.95);
+        }
+        
+        textarea { 
+            flex: 1; 
+            background: rgba(255,255,255,0.03);
+            border: 1.5px solid rgba(0,255,136,0.2);
+            border-radius: 14px; 
+            color: #fff; 
+            padding: 12px 16px; 
+            min-height: 44px; 
+            max-height: 120px; 
+            outline: none; 
+            resize: none; 
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.5;
+            transition: all 0.3s;
+        }
+        
+        textarea:focus {
+            border-color: var(--neon);
+            box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
+            background: rgba(255,255,255,0.05);
+        }
+        
+        textarea::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+        
+        .send-btn { 
+            background: linear-gradient(135deg, var(--neon) 0%, #00cc6a 100%);
+            border: none; 
+            border-radius: 14px; 
+            width: 44px; 
+            height: 44px; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+            flex-shrink: 0;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 255, 136, 0.4);
+        }
+        
+        .send-btn:active { transform: scale(0.95); }
+        
+        .send-btn svg { 
+            width: 20px; 
+            height: 20px; 
+            stroke: #000; 
+            fill: none; 
+            stroke-width: 2.5; 
+        }
+        
+        .send-btn:disabled { 
+            opacity: 0.5; 
+            cursor: not-allowed;
+            transform: none;
+        }
 
-        pre { background: #000 !important; border-radius: 10px; padding: 10px; overflow-x: auto; border: 1px solid #333; position: relative; margin: 5px 0; }
-        .copy-btn { position: absolute; right: 5px; top: 5px; background: var(--neon); border: none; padding: 4px 8px; font-size: 10px; font-weight: bold; border-radius: 4px; color: #000; cursor: pointer; }
+        /* Code Blocks */
+        pre { 
+            background: #0d1117 !important; 
+            border-radius: 12px; 
+            padding: 16px; 
+            overflow-x: auto; 
+            border: 1px solid rgba(0,255,136,0.15);
+            position: relative; 
+            margin: 12px 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
         
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } }
-        .editing { background: rgba(0,255,136,0.2) !important; border: 2px solid var(--neon) !important; }
+        code {
+            font-family: 'JetBrains Mono', monospace !important;
+        }
         
-        /* Меню выбора камеры/галереи */
-        .photo-menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: none; align-items: flex-end; justify-content: center; }
-        .photo-menu { background: #111; border-top: 2px solid var(--neon); width: 100%; padding: 20px; border-radius: 20px 20px 0 0; animation: slideUp 0.3s; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .photo-menu-title { color: var(--neon); text-align: center; margin-bottom: 20px; font-size: 16px; font-weight: bold; }
-        .photo-menu-btn { width: 100%; padding: 15px; margin: 10px 0; background: transparent; border: 2px solid var(--neon); color: var(--neon); border-radius: 12px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .photo-menu-btn:active { background: var(--neon); color: #000; }
-        .photo-menu-close { width: 100%; padding: 15px; margin-top: 10px; background: #333; border: none; color: #fff; border-radius: 12px; font-size: 16px; cursor: pointer; }
+        .copy-btn { 
+            position: absolute; 
+            right: 8px; 
+            top: 8px; 
+            background: rgba(0,255,136,0.1);
+            border: 1px solid var(--neon-dim);
+            color: var(--neon);
+            padding: 6px 12px; 
+            font-size: 11px; 
+            font-weight: 700;
+            border-radius: 6px; 
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .copy-btn:hover {
+            background: var(--neon);
+            color: #000;
+        }
 
-        /* Кнопка прокрутки вниз */
-        .scroll-down-btn { position: fixed; bottom: 100px; right: 20px; width: 45px; height: 45px; background: var(--neon); border: none; border-radius: 50%; color: #000; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 0 15px var(--neon); z-index: 100; animation: bounce 2s infinite; }
+        /* Scroll Down Button */
+        .scroll-down-btn { 
+            position: fixed; 
+            bottom: 100px; 
+            right: 20px; 
+            width: 48px; 
+            height: 48px; 
+            background: linear-gradient(135deg, var(--neon) 0%, #00cc6a 100%);
+            border: none; 
+            border-radius: 50%; 
+            color: #000; 
+            cursor: pointer; 
+            display: none; 
+            align-items: center; 
+            justify-content: center; 
+            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.4);
+            z-index: 100; 
+            animation: float 3s ease-in-out infinite;
+            transition: all 0.3s;
+        }
+        
         .scroll-down-btn.visible { display: flex; }
-        .scroll-down-btn svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; }
-        @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-5px); } 60% { transform: translateY(-3px); } }
+        
+        .scroll-down-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(0, 255, 136, 0.5);
+        }
+        
+        .scroll-down-btn svg { 
+            width: 24px; 
+            height: 24px; 
+            stroke: currentColor; 
+            fill: none; 
+            stroke-width: 2.5; 
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* Photo Menu */
+        .photo-menu-overlay { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(5px);
+            z-index: 1000; 
+            display: none; 
+            align-items: flex-end; 
+            justify-content: center;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .photo-menu { 
+            background: linear-gradient(180deg, #0a0f0a 0%, #050805 100%);
+            border-top: 2px solid var(--neon); 
+            width: 100%; 
+            padding: 24px 20px 30px; 
+            border-radius: 24px 24px 0 0; 
+            animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+        }
+        
+        @keyframes slideUp { 
+            from { transform: translateY(100%); opacity: 0; } 
+            to { transform: translateY(0); opacity: 1; } 
+        }
+        
+        .photo-menu-title { 
+            color: var(--neon); 
+            text-align: center; 
+            margin-bottom: 24px; 
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.8;
+        }
+        
+        .photo-menu-btn { 
+            width: 100%; 
+            padding: 16px; 
+            margin: 8px 0; 
+            background: rgba(0,255,136,0.05);
+            border: 1.5px solid var(--neon-dim); 
+            color: var(--neon); 
+            border-radius: 14px; 
+            font-size: 15px; 
+            font-weight: 600;
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 12px;
+            transition: all 0.3s;
+        }
+        
+        .photo-menu-btn:hover {
+            background: rgba(0,255,136,0.1);
+            border-color: var(--neon);
+            transform: translateX(5px);
+        }
+        
+        .photo-menu-btn:active { 
+            background: var(--neon); 
+            color: #000;
+            transform: scale(0.98);
+        }
+        
+        .photo-menu-close { 
+            width: 100%; 
+            padding: 16px; 
+            margin-top: 16px; 
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.6); 
+            border-radius: 14px; 
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .photo-menu-close:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        /* Selection */
+        ::selection {
+            background: rgba(0, 255, 136, 0.3);
+            color: #fff;
+        }
     </style>
 </head>
 <body>
 <canvas id="canvas"></canvas>
 
-<!-- Меню выбора камеры/галереи -->
+<!-- Photo Menu -->
 <div class="photo-menu-overlay" id="photoMenu" onclick="closePhotoMenu(event)">
     <div class="photo-menu">
-        <div class="photo-menu-title">ВЫБРАТЬ ИСТОЧНИК</div>
+        <div class="photo-menu-title">Выберите источник</div>
         <button class="photo-menu-btn" onclick="selectCamera()">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-            КАМЕРА
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+            Камера
         </button>
         <button class="photo-menu-btn" onclick="selectGallery()">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-            ГАЛЕРЕЯ
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            Галерея
         </button>
-        <button class="photo-menu-close" onclick="closePhotoMenu()">ОТМЕНА</button>
+        <button class="photo-menu-close" onclick="closePhotoMenu()">Отмена</button>
     </div>
 </div>
 
-<!-- Кнопка прокрутки вниз -->
+<!-- Scroll Down Button -->
 <button class="scroll-down-btn" id="scrollDownBtn" onclick="scrollToBottom()">
     <svg viewBox="0 0 24 24"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
 </button>
 
-<!-- Скрытые инпуты -->
+<!-- Hidden Inputs -->
 <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handleImage(this)">
 <input type="file" id="galleryInput" accept="image/*" style="display:none" onchange="handleImage(this)">
 
@@ -105,7 +560,7 @@
         <div class="energy" id="energy">ЗАГРУЗКА...</div>
     </div>
     <div id="chat">
-        <div class="msg ai">Система VISION онлайн. 👁️ <br>Я вижу всё: код, примеры, схемы.<br><br>💡 Прикрепляй фото + пиши текст!</div>
+        <div class="msg ai">Система VISION онлайн. 👁️<br><br>Я вижу всё: код, примеры, схемы. Просто пришли фото или напиши задачу!<br><br>💡 <b>Совет:</b> Прикрепи фото и напиши к нему текст — я проанализирую всё вместе.</div>
     </div>
     <div class="footer">
         <div id="photoPreview" class="photo-preview" style="display:none;">
@@ -114,13 +569,17 @@
         </div>
         
         <div class="input-area">
-            <button class="tool-btn" onclick="openPhotoMenu()" type="button">
+            <button class="tool-btn" onclick="openPhotoMenu()" type="button" title="Прикрепить фото">
                 <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" fill="none" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
             </button>
             
-            <button class="tool-btn" onclick="showRef()" type="button">🔗</button>
-            <textarea id="userInput" placeholder="Текст или фото..." rows="1" oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
-            <button class="send-btn" id="sendBtn" onclick="handleSend()" type="button">
+            <button class="tool-btn" onclick="showRef()" type="button" title="Реферальная ссылка">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+            </button>
+            
+            <textarea id="userInput" placeholder="Введите сообщение..." rows="1" oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
+            
+            <button class="send-btn" id="sendBtn" onclick="handleSend()" type="button" title="Отправить">
                 <svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path></svg>
             </button>
         </div>
@@ -141,14 +600,11 @@
 
     function init() {
         currentUserId = tg.initDataUnsafe?.user?.id || tg.initDataUnsafe?.user_id;
-        
         if (!currentUserId) {
             currentUserId = parseInt(localStorage.getItem('test_user_id')) || null;
         }
         
         isCreator = (currentUserId === ADMIN_ID);
-        
-        console.log('User ID:', currentUserId, 'Is Creator:', isCreator);
         
         if (isCreator) { 
             energy = 9999; 
@@ -172,7 +628,43 @@
         localStorage.setItem('energy', energy); 
     }
 
-    // МЕНЮ КАМЕРЫ/ГАЛЕРЕИ
+    // ОРИГИНАЛЬНАЯ ЗЕЛЕНАЯ ПЫЛЬ ИЗ ПЕРВОГО КОДА
+    const c = document.getElementById('canvas'), x = c.getContext('2d');
+    let ps = [];
+    function rs() { c.width = innerWidth; c.height = innerHeight; }
+    window.onresize = rs; rs();
+    
+    class Dust { 
+        constructor() { this.init(); } 
+        init() { 
+            this.x = Math.random() * c.width; 
+            this.y = Math.random() * -c.height; 
+            this.size = Math.random() * 1.5; 
+            this.speed = Math.random() * 1.5 + 0.5; 
+            this.opacity = Math.random() * 0.6; 
+        } 
+        update() { 
+            this.y += this.speed; 
+            if (this.y > c.height) this.init(); 
+        } 
+        draw() { 
+            x.fillStyle = `rgba(0, 255, 136, ${this.opacity})`; 
+            x.beginPath(); 
+            x.arc(this.x, this.y, this.size, 0, 7); 
+            x.fill(); 
+        } 
+    }
+    
+    for(let i=0; i<60; i++) ps.push(new Dust());
+    
+    function loop() { 
+        x.clearRect(0,0,c.width,c.height); 
+        ps.forEach(p=>{p.update();p.draw();}); 
+        requestAnimationFrame(loop); 
+    }
+    loop();
+
+    // Photo Menu
     function openPhotoMenu() {
         document.getElementById('photoMenu').style.display = 'flex';
     }
@@ -193,71 +685,25 @@
         document.getElementById('galleryInput').click();
     }
 
-    // ПАДАЮЩИЕ ЗЕЛЕНЫЕ ИСКРЫ (100 частиц)
-    const c = document.getElementById('canvas'), x = c.getContext('2d');
-    let ps = [];
-    function rs() { c.width = innerWidth; c.height = innerHeight; }
-    window.onresize = rs; rs();
-    
-    class Spark {
-        constructor() { this.init(); }
-        init() {
-            this.x = Math.random() * c.width;
-            this.y = Math.random() * -c.height;
-            this.size = Math.random() * 2 + 0.5;
-            this.speed = Math.random() * 2 + 0.5;
-            this.opacity = Math.random() * 0.8 + 0.2;
-            this.wind = (Math.random() - 0.5) * 0.5;
-        }
-        update() {
-            this.y += this.speed;
-            this.x += this.wind;
-            if (this.y > c.height) this.init();
-            if (this.x < 0 || this.x > c.width) this.init();
-        }
-        draw() {
-            x.fillStyle = `rgba(0, 255, 136, ${this.opacity})`;
-            x.beginPath();
-            x.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            x.fill();
-        }
-    }
-    
-    for(let i = 0; i < 100; i++) ps.push(new Spark());
-    
-    function loop() {
-        x.clearRect(0, 0, c.width, c.height);
-        ps.forEach(p => { p.update(); p.draw(); });
-        requestAnimationFrame(loop);
-    }
-    loop();
-
-    // КНОПКА ПРОКРУТКИ ВНИЗ
+    // Scroll Down
     const chat = document.getElementById('chat');
     const scrollDownBtn = document.getElementById('scrollDownBtn');
     
     chat.addEventListener('scroll', () => {
-        const isNearBottom = chat.scrollHeight - chat.scrollTop - chat.clientHeight < 100;
-        if (isNearBottom) {
-            scrollDownBtn.classList.remove('visible');
-        } else {
-            scrollDownBtn.classList.add('visible');
-        }
+        const isNearBottom = chat.scrollHeight - chat.scrollTop - chat.clientHeight < 150;
+        scrollDownBtn.classList.toggle('visible', !isNearBottom);
     });
 
     function scrollToBottom() {
         chat.scrollTop = chat.scrollHeight;
-        scrollDownBtn.classList.remove('visible');
     }
 
     function checkScroll() {
-        const isNearBottom = chat.scrollHeight - chat.scrollTop - chat.clientHeight < 100;
-        if (!isNearBottom) {
-            scrollDownBtn.classList.add('visible');
-        }
+        const isNearBottom = chat.scrollHeight - chat.scrollTop - chat.clientHeight < 150;
+        if (!isNearBottom) scrollDownBtn.classList.add('visible');
     }
 
-    // ОБРАБОТКА ФОТО
+    // Image Handling
     function handleImage(input) {
         const file = input.files[0];
         if (!file) return;
@@ -297,22 +743,26 @@
         
         const div = document.createElement('div');
         div.className = 'msg ai';
-        div.style.cssText = 'border:1px dashed var(--neon); background:rgba(0,255,136,0.05);';
+        div.style.cssText = 'border:1px dashed var(--neon); background:rgba(0,255,136,0.03);';
         div.innerHTML = `
-            <b>🔗 ТВОЯ РЕФЕРАЛЬНАЯ ССЫЛКА:</b><br>
-            <code style="font-size:11px;word-break:break-all;display:block;margin:8px 0;padding:8px;background:#000;border-radius:6px;">${refLink}</code>
-            <div style="font-size:12px;color:var(--neon);margin-bottom:8px;">1 друг = +3 заряда</div>
-            <button onclick="copyText('${refLink}')" style="background:var(--neon);color:#000;border:none;padding:8px 16px;border-radius:20px;font-weight:bold;cursor:pointer;width:100%;">КОПИРОВАТЬ ССЫЛКУ</button>
+            <div style="font-size:13px;opacity:0.8;margin-bottom:8px;">🔗 РЕФЕРАЛЬНАЯ СИСТЕМА</div>
+            <div style="font-size:15px;font-weight:600;margin-bottom:12px;color:var(--neon);">Приглашай друзей и получай заряды</div>
+            <div style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;margin-bottom:12px;font-family:'JetBrains Mono',monospace;font-size:12px;word-break:break-all;color:#aaa;">${refLink}</div>
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;font-size:13px;">
+                <span style="color:var(--neon);font-weight:700;">1 друг</span>
+                <span style="opacity:0.5;">=</span>
+                <span style="color:var(--neon);font-weight:700;">+3 заряда</span>
+            </div>
+            <button onclick="copyText('${refLink}')" style="width:100%;background:linear-gradient(135deg,var(--neon) 0%,#00cc6a 100%);color:#000;border:none;padding:10px;border-radius:8px;font-weight:700;cursor:pointer;">КОПИРОВАТЬ ССЫЛКУ</button>
         `;
         chat.appendChild(div);
-        chat.scrollTop = chat.scrollHeight;
         checkScroll();
     }
 
     function copyText(text) {
         navigator.clipboard.writeText(text).then(() => {
             if (tg.showPopup) {
-                tg.showPopup({title: '✅ Скопировано!', message: 'Отправь ссылку друзьям и получи +3 заряда за каждого'});
+                tg.showPopup({title: '✅ Готово', message: 'Ссылка скопирована. Отправь её друзьям!'});
             } else {
                 alert('Ссылка скопирована!');
             }
@@ -346,8 +796,11 @@
     function deleteMessage(msgId) {
         const msgEl = document.getElementById(msgId);
         if (msgEl) {
-            msgEl.remove();
-            if (editingMsgId === msgId) cancelEdit();
+            msgEl.style.animation = 'fadeOut 0.3s forwards';
+            setTimeout(() => {
+                msgEl.remove();
+                if (editingMsgId === msgId) cancelEdit();
+            }, 300);
         }
     }
 
@@ -362,21 +815,18 @@
     }
 
     function showRefBanner() {
-        const needed = Math.ceil((3 - energy) / 3);
+        const needed = Math.max(1, Math.ceil((3 - energy) / 3));
         
         const div = document.createElement('div');
         div.className = 'msg system';
         div.innerHTML = `
-            <div style="padding:10px;">
-                <h3 style="margin:0 0 10px 0;color:var(--danger);">⚡️ ЗАКОНЧИЛИСЬ ЗАРЯДЫ!</h3>
-                <div style="margin-bottom:10px;">У тебя <b>${energy}</b> зарядов</div>
-                <div style="font-size:14px;margin-bottom:15px;">
-                    Пригласи <b>${needed} ${needed === 1 ? 'друга' : 'друзей'}</b> и получи +${needed * 3} зарядов!<br>
-                    <small style="opacity:0.7;">1 друг = +3 заряда</small>
+            <div style="padding:4px;">
+                <div style="font-size:18px;margin-bottom:12px;">⚡️ ЗАКОНЧИЛИСЬ ЗАРЯДЫ</div>
+                <div style="opacity:0.9;margin-bottom:16px;line-height:1.6;">
+                    У тебя <b style="color:var(--neon);">${energy}</b> зарядов<br>
+                    Пригласи <b style="color:var(--neon);">${needed} ${needed === 1 ? 'друга' : 'друзей'}</b> и получи <b style="color:var(--neon);">+${needed * 3}</b> зарядов
                 </div>
-                <button onclick="showRef()" style="background:var(--neon);color:#000;border:none;padding:12px 24px;border-radius:25px;font-weight:bold;cursor:pointer;font-size:14px;">
-                    ПОЛУЧИТЬ ЗАРЯДЫ
-                </button>
+                <button onclick="showRef()" style="background:var(--neon);color:#000;border:none;padding:12px 24px;border-radius:20px;font-weight:700;cursor:pointer;width:100%;">ПОЛУЧИТЬ ЗАРЯДЫ</button>
             </div>
         `;
         chat.appendChild(div);
@@ -416,8 +866,8 @@
         
         userDiv.innerHTML = content + `
             <div class="msg-actions">
-                <button class="edit-btn" onclick="editMessage('${msgId}')">✏️</button>
-                <button class="delete-btn" onclick="deleteMessage('${msgId}')">🗑️</button>
+                <button class="edit-btn" onclick="editMessage('${msgId}')">Изменить</button>
+                <button class="delete-btn" onclick="deleteMessage('${msgId}')">Удалить</button>
             </div>
         `;
         
@@ -436,7 +886,7 @@
 
         const load = document.createElement('div');
         load.className = 'msg ai';
-        load.innerHTML = '👁️ Анализирую через VISION...';
+        load.innerHTML = '<span style="display:flex;align-items:center;gap:8px;"><span style="animation:pulse 1.5s infinite;">👁️</span> Анализирую...</span>';
         chat.appendChild(load);
         checkScroll();
         
@@ -446,12 +896,12 @@
             let promptText = text || "Опиши что на изображении";
             
             if (imgToSend) {
-                promptText = `[Пользователь отправил фото] ${promptText}\nПроанализируй изображение и ответь на вопрос.`;
+                promptText = `[ФОТО ОТПРАВЛЕНО] ${promptText}\nПроанализируй изображение детально.`;
             }
 
             const payload = {
                 messages: [
-                    { role: "system", content: "Ты NEON VISION PRO — эксперт по анализу изображений и кода. Если пользователь отправляет фото — детально описывай что видишь. Отвечай на русском." },
+                    { role: "system", content: "Ты NEON VISION PRO — эксперт по анализу изображений и кода. Отвечай на русском. Форматируй код в блоки." },
                     { role: "user", content: promptText }
                 ],
                 model: "openai",
@@ -467,9 +917,14 @@
             const resText = await response.text();
             load.remove();
 
-            const formatted = resText.replace(/```(\w+)?([\s\S]*?)```/g, (m, l, code) => {
-                return `<pre><button class="copy-btn" onclick="copy(this)">COPY</button><code class="language-${l || 'python'}">${escapeHtml(code.trim())}</code></pre>`;
-            }).replace(/\n/g, '<br>');
+            const formatted = resText
+                .replace(/```(\w+)?([\s\S]*?)```/g, (m, l, code) => {
+                    const lang = l || 'text';
+                    return `<pre><button class="copy-btn" onclick="copyCode(this)">КОПИРОВАТЬ</button><code class="language-${lang}">${escapeHtml(code.trim())}</code></pre>`;
+                })
+                .replace(/`([^`]+)`/g, '<code style="background:rgba(0,255,136,0.1);padding:2px 6px;border-radius:4px;color:var(--neon);font-family:\'JetBrains Mono\',monospace;font-size:12px;">$1</code>')
+                .replace(/\*\*(.*?)\*\*/g, '<b style="color:var(--neon);">$1</b>')
+                .replace(/\n/g, '<br>');
 
             const aiDiv = document.createElement('div');
             aiDiv.className = 'msg ai';
@@ -481,7 +936,7 @@
 
         } catch (e) { 
             console.error(e);
-            load.innerHTML = "❌ Ошибка Vision-модуля.<br><small>" + escapeHtml(e.message) + "</small>"; 
+            load.innerHTML = "❌ Ошибка соединения<br><small style='opacity:0.7'>" + escapeHtml(e.message) + "</small>"; 
         } finally {
             sendBtn.disabled = false;
         }
@@ -493,11 +948,17 @@
         return div.innerHTML;
     }
 
-    function copy(btn) {
+    function copyCode(btn) {
         const code = btn.nextElementSibling.innerText;
         navigator.clipboard.writeText(code).then(() => { 
-            btn.innerText = "OK!"; 
-            setTimeout(() => btn.innerText = "COPY", 2000); 
+            btn.innerText = "✓ СКОПИРОВАНО"; 
+            btn.style.background = "var(--neon)";
+            btn.style.color = "#000";
+            setTimeout(() => {
+                btn.innerText = "КОПИРОВАТЬ";
+                btn.style.background = "";
+                btn.style.color = "";
+            }, 2000); 
         });
     }
 </script>
