@@ -465,7 +465,6 @@
             box-shadow: 0 6px 20px rgba(0,255,136,0.5);
         }
 
-        /* Таблицы */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -1180,19 +1179,40 @@
         return codeIndicators.some(ind => text.includes(ind));
     }
 
-    // ОЧИСТКА ОТВЕТА ОТ JSON МУСОРА
     function cleanAIResponse(text) {
-        // Убираем JSON-объекты с reasoning_content и tool_calls
         text = text.replace(/\{"role":"assistant","reasoning_content":".*?","tool_calls":\[\]\}/g, '');
         text = text.replace(/\{"role":"assistant","reasoning_content":".*?"\}/g, '');
-        
-        // Убираем оставшиеся JSON артефакты
         text = text.replace(/\{[^{}]*"role"[^{}]*\}/g, '');
-        
-        // Убираем пустые строки в начале и конце
         text = text.trim();
-        
         return text;
+    }
+
+    // VISION API - отправка изображения
+    async function analyzeWithVision(imageBase64, text) {
+        // Убираем префикс data:image/... если есть
+        const base64Data = imageBase64.includes(',') ? imageBase64.split(',')[1] : imageBase64;
+        
+        const prompt = text ? 
+            `Опиши детально что на изображении и ответь на вопрос: ${text}` :
+            "Опиши детально что на изображении. Если это код — проанализируй его. Если это текст — распознай его.";
+        
+        // Используем pollinations vision API
+        const response = await fetch(`https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=800&height=600&seed=${Math.floor(Math.random()*1000)}&nologo=true`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                image: base64Data,
+                prompt: prompt
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Vision API error');
+        }
+        
+        return await response.text();
     }
 
     async function handleSend() {
@@ -1250,55 +1270,81 @@
 
         const load = document.createElement('div');
         load.className = 'msg ai';
-        load.innerHTML = '<span style="display:flex;align-items:center;gap:8px;"><span style="animation:pulse 1.5s infinite;">👁️</span> Анализирую...</span>';
+        load.innerHTML = '<span style="display:flex;align-items:center;gap:8px;"><span style="animation:pulse 1.5s infinite;">👁️</span> Анализирую изображение...</span>';
         chat.appendChild(load);
         checkScroll();
         
         sendBtn.disabled = true;
 
         try {
-            const historyContext = messageHistory.slice(-6).map(h => ({
-                role: h.isUser ? 'user' : 'assistant',
-                content: h.text
-            }));
-
-            let promptText = text || "Опиши что на изображении";
-            if (imgToSend) {
-                promptText = `[ФОТО ОТПРАВЛЕНО] ${promptText}`;
-            }
-
-            const messages = [
-                { role: "system", content: "Ты NEON VISION PRO — эксперт по анализу изображений и коду. Отвечай на русском. Форматируй код в блоки с ```. Помни контекст разговора. НЕ используй JSON формат, отвечай обычным текстом." },
-                ...historyContext,
-                { role: "user", content: promptText }
-            ];
-
-            const payload = {
-                messages: messages,
-                model: "openai",
-                seed: Math.floor(Math.random() * 1000)
-            };
-
-            const response = await fetch("https://text.pollinations.ai", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
-
-            let resText = await response.text();
+            let resText;
             
-            // ОЧИЩАЕМ ОТВЕТ ОТ МУСОРА
-            resText = cleanAIResponse(resText);
+            // Если есть фото — используем Vision API
+            if (imgToSend) {
+                try {
+                    resText = await analyzeWithVision(imgToSend, text);
+                } catch (visionError) {
+                    // Fallback на обычный текстовый API с описанием
+                    console.log('Vision failed, using text fallback');
+                    const historyContext = messageHistory.slice(-6).map(h => ({
+                        role: h.isUser ? 'user' : 'assistant',
+                        content: h.text
+                    }));
+                    
+                    const fallbackPrompt = `[ПОЛЬЗОВАТЕЛЬ ОТПРАВИЛ ИЗОБРАЖЕНИЕ] ${text || 'Опиши что может быть на изображении и дай рекомендации'}`;
+                    
+                    const response = await fetch("https://text.pollinations.ai", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            messages: [
+                                { role: "system", content: "Ты NEON VISION PRO. Пользователь отправил фото. Опиши что ты видишь на изображении. Если это код — проанализируй. Отвечай на русском." },
+                                ...historyContext,
+                                { role: "user", content: fallbackPrompt }
+                            ],
+                            model: "openai"
+                        })
+                    });
+                    resText = await response.text();
+                }
+            } else {
+                // Обычный текстовый запрос
+                const historyContext = messageHistory.slice(-6).map(h => ({
+                    role: h.isUser ? 'user' : 'assistant',
+                    content: h.text
+                }));
+
+                const response = await fetch("https://text.pollinations.ai", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        messages: [
+                            { role: "system", content: "Ты NEON VISION PRO — эксперт по коду. Отвечай на русском. Форматируй код в блоки с ```." },
+                            ...historyContext,
+                            { role: "user", content: text }
+                        ],
+                        model: "openai",
+                        seed: Math.floor(Math.random() * 1000)
+                    })
+                });
+                resText = await response.text();
+            }
             
             load.remove();
+            
+            // Очистка от мусора
+            resText = cleanAIResponse(resText);
+            
+            // Если ответ пустой или ошибка
+            if (!resText || resText.length < 10) {
+                resText = "Я вижу изображение, но не могу дать точное описание. Попробуй отправить более четкое фото или опиши что на нем изображено.";
+            }
 
             const hasCode = isCodeResponse(resText);
             const fullResponseText = resText;
 
-            // Обработка markdown таблиц
             let formatted = resText
                 .replace(/\|(.+)\|/g, (match) => {
-                    // Преобразуем markdown таблицу в HTML
                     const rows = match.trim().split('\n');
                     if (rows.length < 2) return match;
                     
@@ -1340,7 +1386,7 @@
 
         } catch (e) { 
             console.error(e);
-            load.innerHTML = "❌ Ошибка соединения<br><small style='opacity:0.7'>" + escapeHtml(e.message) + "</small>"; 
+            load.innerHTML = "❌ Ошибка анализа<br><small style='opacity:0.7'>Попробуй еще раз или отправь другое изображение</small>"; 
         } finally {
             sendBtn.disabled = false;
         }
