@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEON CODER PRO | VISION</title>
+    <title>NEON CODER PRO | VISION + GEN</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
@@ -15,10 +15,12 @@
         :root { 
             --neon: #00ff88; 
             --neon-dim: rgba(0, 255, 136, 0.3);
+            --neon-glow: rgba(0, 255, 136, 0.5);
             --bg: #020502; 
             --glass: rgba(0, 255, 136, 0.08);
             --danger: #ff4444;
             --surface: #0a0f0a;
+            --accent: #ff00ff;
         }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; }
@@ -134,11 +136,21 @@
             font-size: 13px;
         }
         
-        .preview-img { 
+        .preview-img, .generated-img { 
             max-width: 100%; 
             border-radius: 12px; 
             margin-top: 8px; 
             border: 1px solid var(--neon-dim);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+        }
+
+        .generated-img {
+            animation: imageGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes imageGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.2); }
+            50% { box-shadow: 0 0 40px rgba(0, 255, 136, 0.5), 0 0 60px rgba(0, 255, 136, 0.2); }
         }
 
         .photo-preview { 
@@ -201,6 +213,12 @@
             box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
             transform: translateY(-2px);
         }
+
+        .tool-btn.active {
+            background: var(--neon);
+            color: #000;
+            box-shadow: 0 0 20px var(--neon-glow);
+        }
         
         .input-wrapper {
             flex: 1;
@@ -241,6 +259,16 @@
             justify-content: center; 
             box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
             flex-shrink: 0;
+        }
+
+        .send-btn.generating {
+            background: linear-gradient(135deg, var(--accent) 0%, #cc00cc 100%);
+            animation: pulseGen 1s ease-in-out infinite;
+        }
+
+        @keyframes pulseGen {
+            0%, 100% { box-shadow: 0 0 15px rgba(255, 0, 255, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(255, 0, 255, 0.8); }
         }
 
         pre { 
@@ -370,6 +398,101 @@
         }
         
         .history-overlay.show { display: block; }
+
+        .mode-indicator {
+            position: absolute;
+            top: -20px;
+            left: 0;
+            font-size: 11px;
+            color: var(--accent);
+            font-weight: 700;
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .mode-indicator.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .gen-options {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(10, 15, 10, 0.98);
+            border: 1px solid var(--accent);
+            border-radius: 16px;
+            padding: 16px;
+            z-index: 500;
+            display: flex;
+            gap: 10px;
+            opacity: 0;
+            transition: all 0.3s;
+            box-shadow: 0 0 40px rgba(255, 0, 255, 0.3);
+        }
+
+        .gen-options.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .gen-opt-btn {
+            background: rgba(255, 0, 255, 0.1);
+            border: 1px solid var(--accent);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .gen-opt-btn:hover, .gen-opt-btn.active {
+            background: var(--accent);
+            color: #000;
+        }
+
+        .loading-gen {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 20px;
+        }
+
+        .loading-gen::before {
+            content: '';
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(0, 255, 136, 0.2);
+            border-top-color: var(--neon);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, var(--neon) 0%, #00cc6a 100%);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
         
         @media (max-width: 480px) {
             .input-area {
@@ -387,6 +510,11 @@
             #userInput::placeholder {
                 font-size: 14px;
             }
+            .gen-options {
+                flex-wrap: wrap;
+                justify-content: center;
+                width: 90%;
+            }
         }
     </style>
 </head>
@@ -402,6 +530,12 @@
     </div>
     <div class="history-list" id="historyList"></div>
     <button class="tool-btn" onclick="clearHistory()" style="margin: 16px; width: calc(100% - 32px);">ОЧИСТИТЬ ИСТОРИЮ</button>
+</div>
+
+<div class="gen-options" id="genOptions">
+    <button class="gen-opt-btn active" onclick="setGenMode('fast')" id="btnFast">⚡ Быстро</button>
+    <button class="gen-opt-btn" onclick="setGenMode('quality')" id="btnQuality">✨ Качество</button>
+    <button class="gen-opt-btn" onclick="setGenMode('turbo')" id="btnTurbo">🚀 Турбо</button>
 </div>
 
 <button class="scroll-down-btn" id="scrollDownBtn" onclick="scrollToBottom()">
@@ -422,7 +556,7 @@
         </div>
     </div>
     <div id="chat">
-        <div class="msg ai">Система VISION онлайн. 👁️<br><br>Я вижу всё: код, примеры, схемы. Просто пришли фото или напиши задачу!</div>
+        <div class="msg ai">Система VISION онлайн. 👁️<br><br>Я вижу всё: код, примеры, схемы. Просто пришли фото или напиши задачу!<br><br>🎨 <b>Новое:</b> Генерация изображений! Нажми кнопку 🎨 и опиши что создать.</div>
     </div>
     <div class="footer">
         <div id="photoPreview" class="photo-preview" style="display:none;">
@@ -439,11 +573,16 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
             </button>
             
+            <button class="tool-btn" onclick="toggleGenMode()" type="button" title="Генерация изображений" id="genBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+            </button>
+            
             <button class="tool-btn" onclick="showRef()" type="button" title="Рефералка">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
             </button>
             
             <div class="input-wrapper">
+                <div class="mode-indicator" id="modeIndicator">🎨 РЕЖИМ ГЕНЕРАЦИИ</div>
                 <input type="text" id="userInput" placeholder="Сообщение..." onkeydown="handleKey(event)">
             </div>
             
@@ -461,6 +600,9 @@
     let editingMsgId = null;
     let isCreator = false;
     let currentUserId = null;
+    let genMode = false;
+    let genQuality = 'fast';
+    let isGenerating = false;
     
     let messageHistory = JSON.parse(localStorage.getItem('vision_history') || '[]');
     const MAX_HISTORY = 20;
@@ -518,6 +660,34 @@
     }
     loop();
 
+    function toggleGenMode() {
+        genMode = !genMode;
+        const btn = document.getElementById('genBtn');
+        const indicator = document.getElementById('modeIndicator');
+        const options = document.getElementById('genOptions');
+        const input = document.getElementById('userInput');
+        
+        if (genMode) {
+            btn.classList.add('active');
+            indicator.classList.add('active');
+            options.classList.add('show');
+            input.placeholder = "Опиши изображение для генерации...";
+            input.style.borderColor = 'var(--accent)';
+        } else {
+            btn.classList.remove('active');
+            indicator.classList.remove('active');
+            options.classList.remove('show');
+            input.placeholder = "Сообщение...";
+            input.style.borderColor = 'rgba(0,255,136,0.2)';
+        }
+    }
+
+    function setGenMode(mode) {
+        genQuality = mode;
+        document.querySelectorAll('.gen-opt-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn' + mode.charAt(0).toUpperCase() + mode.slice(1)).classList.add('active');
+    }
+
     function openHistory() {
         document.getElementById('historyPanel').classList.add('open');
         document.getElementById('historyOverlay').classList.add('show');
@@ -548,8 +718,8 @@
         }
         closeHistory();
     }
-    function addToHistory(text, isUser = true) {
-        messageHistory.push({ text: text, isUser: isUser, time: Date.now() });
+    function addToHistory(text, isUser = true, isImage = false) {
+        messageHistory.push({ text: text, isUser: isUser, isImage: isImage, time: Date.now() });
         if (messageHistory.length > MAX_HISTORY) messageHistory = messageHistory.slice(-MAX_HISTORY);
         localStorage.setItem('vision_history', JSON.stringify(messageHistory));
     }
@@ -676,6 +846,32 @@
         }
         document.getElementById('userInput').value = '';
         removePhoto();
+    }
+
+    async function generateImage(prompt) {
+        const seed = Math.floor(Math.random() * 1000000);
+        let model = 'flux';
+        let width = 1024;
+        let height = 1024;
+        
+        if (genQuality === 'fast') {
+            model = 'flux';
+            width = 512;
+            height = 512;
+        } else if (genQuality === 'quality') {
+            model = 'flux-realism';
+            width = 1024;
+            height = 1024;
+        } else if (genQuality === 'turbo') {
+            model = 'turbo';
+            width = 512;
+            height = 512;
+        }
+
+        const encodedPrompt = encodeURIComponent(prompt);
+        const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true&model=${model}&enhance=true`;
+        
+        return imageUrl;
     }
 
     async function analyzeImageWithAI(imageBase64, userText) {
@@ -883,17 +1079,72 @@ ${userText ? `❓ **Вопрос:** ${userText}\n\n` : ''}⚠️ *Не удал�
 
         const load = document.createElement('div');
         load.className = 'msg ai';
-        load.innerHTML = '👁️ Анализирую...';
+        load.innerHTML = genMode ? '<div class="loading-gen">Генерирую изображение...</div>' : '👁️ Анализирую...';
         chat.appendChild(load);
         checkScroll();
         
         sendBtn.disabled = true;
+        if (genMode) sendBtn.classList.add('generating');
 
         try {
             let resText;
             
-            if (imgToSend) {
+            if (genMode && text) {
+                // Режим генерации изображений
+                const imageUrl = await generateImage(text);
+                
+                load.remove();
+                
+                const aiDiv = document.createElement('div');
+                aiDiv.className = 'msg ai';
+                aiDiv.innerHTML = `
+                    <div style="font-size:13px;opacity:0.8;margin-bottom:8px;">🎨 Сгенерировано по запросу:</div>
+                    <div style="font-style:italic;margin-bottom:12px;color:var(--accent);">"${text}"</div>
+                    <img src="${imageUrl}" class="generated-img" alt="Generated" onload="checkScroll()">
+                    <br>
+                    <button class="download-btn" onclick="downloadImage('${imageUrl}', '${text.replace(/[^a-z0-9]/gi, '_').substring(0, 30)}')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        СКАЧАТЬ
+                    </button>
+                `;
+                chat.appendChild(aiDiv);
+                addToHistory(`[Изображение: ${text}]`, false, true);
+                checkScroll();
+                
+            } else if (imgToSend) {
                 resText = await analyzeImageWithAI(imgToSend, text);
+                
+                load.remove();
+                
+                resText = resText.replace(/\{"role":"assistant","reasoning_content":".*?","tool_calls":\[\]\}/g, '');
+                resText = resText.replace(/\{"role":"assistant","reasoning_content":".*?"\}/g, '');
+                
+                if (!resText || resText.length < 5) {
+                    resText = "Извини, не удалось проанализировать. Попробуй другое фото.";
+                }
+
+                const hasCode = resText.includes('```') || resText.includes('function') || resText.includes('def ');
+
+                const formatted = resText
+                    .replace(/```(\w+)?([\s\S]*?)```/g, (m, l, code) => {
+                        const lang = l || 'text';
+                        if (hasCode) {
+                            return `<pre><div class="code-buttons"><button class="copy-full-btn" onclick="copyFull(this)">ВСЁ</button><button class="copy-btn" onclick="copyBlock(this)">БЛОК</button></div><code class="language-${lang}">${code.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+                        }
+                        return `<pre><div class="code-buttons"><button class="copy-btn" onclick="copyBlock(this)">КОПИРОВАТЬ</button></div><code class="language-${lang}">${code.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+                    })
+                    .replace(/\*\*(.*?)\*\*/g, '<b style="color:var(--neon);">$1</b>')
+                    .replace(/\n/g, '<br>');
+
+                const aiDiv = document.createElement('div');
+                aiDiv.className = 'msg ai';
+                aiDiv.innerHTML = formatted;
+                if (hasCode) aiDiv.setAttribute('data-full', resText);
+                
+                chat.appendChild(aiDiv);
+                addToHistory(resText, false);
+                checkScroll();
+
             } else {
                 const historyContext = messageHistory.slice(-6).map(h => ({
                     role: h.isUser ? 'user' : 'assistant',
@@ -913,45 +1164,56 @@ ${userText ? `❓ **Вопрос:** ${userText}\n\n` : ''}⚠️ *Не удал�
                     })
                 });
                 resText = await response.text();
+                
+                load.remove();
+                
+                resText = resText.replace(/\{"role":"assistant","reasoning_content":".*?","tool_calls":\[\]\}/g, '');
+                resText = resText.replace(/\{"role":"assistant","reasoning_content":".*?"\}/g, '');
+                
+                if (!resText || resText.length < 5) {
+                    resText = "Извини, не удалось получить ответ. Попробуй ещё раз.";
+                }
+
+                const hasCode = resText.includes('```') || resText.includes('function') || resText.includes('def ');
+
+                const formatted = resText
+                    .replace(/```(\w+)?([\s\S]*?)```/g, (m, l, code) => {
+                        const lang = l || 'text';
+                        if (hasCode) {
+                            return `<pre><div class="code-buttons"><button class="copy-full-btn" onclick="copyFull(this)">ВСЁ</button><button class="copy-btn" onclick="copyBlock(this)">БЛОК</button></div><code class="language-${lang}">${code.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+                        }
+                        return `<pre><div class="code-buttons"><button class="copy-btn" onclick="copyBlock(this)">КОПИРОВАТЬ</button></div><code class="language-${lang}">${code.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+                    })
+                    .replace(/\*\*(.*?)\*\*/g, '<b style="color:var(--neon);">$1</b>')
+                    .replace(/\n/g, '<br>');
+
+                const aiDiv = document.createElement('div');
+                aiDiv.className = 'msg ai';
+                aiDiv.innerHTML = formatted;
+                if (hasCode) aiDiv.setAttribute('data-full', resText);
+                
+                chat.appendChild(aiDiv);
+                addToHistory(resText, false);
+                checkScroll();
             }
-            
-            load.remove();
-            
-            resText = resText.replace(/\{"role":"assistant","reasoning_content":".*?","tool_calls":\[\]\}/g, '');
-            resText = resText.replace(/\{"role":"assistant","reasoning_content":".*?"\}/g, '');
-            
-            if (!resText || resText.length < 5) {
-                resText = "Извини, не удалось проанализировать. Попробуй другое фото.";
-            }
-
-            const hasCode = resText.includes('```') || resText.includes('function') || resText.includes('def ');
-
-            const formatted = resText
-                .replace(/```(\w+)?([\s\S]*?)```/g, (m, l, code) => {
-                    const lang = l || 'text';
-                    if (hasCode) {
-                        return `<pre><div class="code-buttons"><button class="copy-full-btn" onclick="copyFull(this)">ВСЁ</button><button class="copy-btn" onclick="copyBlock(this)">БЛОК</button></div><code class="language-${lang}">${code.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
-                    }
-                    return `<pre><div class="code-buttons"><button class="copy-btn" onclick="copyBlock(this)">КОПИРОВАТЬ</button></div><code class="language-${lang}">${code.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
-                })
-                .replace(/\*\*(.*?)\*\*/g, '<b style="color:var(--neon);">$1</b>')
-                .replace(/\n/g, '<br>');
-
-            const aiDiv = document.createElement('div');
-            aiDiv.className = 'msg ai';
-            aiDiv.innerHTML = formatted;
-            if (hasCode) aiDiv.setAttribute('data-full', resText);
-            
-            chat.appendChild(aiDiv);
-            addToHistory(resText, false);
-            checkScroll();
 
         } catch (e) { 
             console.error(e);
-            load.innerHTML = "❌ Ошибка анализа<br><small>Попробуй ещё раз</small>"; 
+            load.innerHTML = "❌ Ошибка<br><small>Попробуй ещё раз</small>"; 
         } finally {
             sendBtn.disabled = false;
+            sendBtn.classList.remove('generating');
         }
+    }
+
+    function downloadImage(url, filename) {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `neon_${filename}_${Date.now()}.png`;
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     }
 
     function copyBlock(btn) {
