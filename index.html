@@ -21,6 +21,7 @@
             --danger: #ff4444;
             --surface: #0a0f0a;
             --accent: #ff00ff;
+            --gold: #ffd700;
         }
         
         * { 
@@ -90,11 +91,12 @@
             text-transform: uppercase;
             animation: neonPulse 2s ease-in-out infinite;
             white-space: nowrap;
+            text-shadow: 0 0 10px var(--neon-dim);
         }
         
         @keyframes neonPulse {
-            0%, 100% { text-shadow: 0 0 10px var(--neon-dim); }
-            50% { text-shadow: 0 0 20px var(--neon), 0 0 30px var(--neon); }
+            0%, 100% { text-shadow: 0 0 10px var(--neon-dim), 0 0 20px var(--neon-dim); }
+            50% { text-shadow: 0 0 20px var(--neon), 0 0 40px var(--neon), 0 0 60px var(--neon); }
         }
         
         .energy { 
@@ -104,23 +106,54 @@
             border-radius: 16px; 
             font-weight: 800; 
             font-size: 11px;
-            animation: energyGlow 3s ease-in-out infinite;
+            animation: energyGlow 3s ease-in-out infinite, borderPulse 2s infinite;
             white-space: nowrap;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .energy::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        @keyframes borderPulse {
+            0%, 100% { border-color: transparent; }
+            50% { border-color: rgba(255,255,255,0.5); }
         }
         
         @keyframes energyGlow {
-            0%, 100% { box-shadow: 0 0 15px rgba(0, 255, 136, 0.4); }
-            50% { box-shadow: 0 0 25px rgba(0, 255, 136, 0.8); }
+            0%, 100% { box-shadow: 0 0 15px rgba(0, 255, 136, 0.4), inset 0 0 10px rgba(255,255,255,0.1); }
+            50% { box-shadow: 0 0 35px rgba(0, 255, 136, 0.9), 0 0 50px rgba(0, 255, 136, 0.5), inset 0 0 20px rgba(255,255,255,0.2); }
         }
         
         .energy.creator { 
-            background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
-            animation: creatorGlow 2s ease-in-out infinite;
+            background: linear-gradient(135deg, var(--gold) 0%, #ffaa00 100%);
+            animation: creatorGlow 2s ease-in-out infinite, borderPulseGold 2s infinite;
+        }
+
+        @keyframes borderPulseGold {
+            0%, 100% { border-color: transparent; }
+            50% { border-color: rgba(255,255,255,0.8); }
         }
         
         @keyframes creatorGlow {
-            0%, 100% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
-            50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.9); }
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.6), inset 0 0 10px rgba(255,255,255,0.2); }
+            50% { box-shadow: 0 0 40px rgba(255, 215, 0, 1), 0 0 60px rgba(255, 215, 0, 0.8), inset 0 0 30px rgba(255,255,255,0.4); }
         }
 
         #chat { 
@@ -142,18 +175,24 @@
             border-radius: 16px; 
             font-size: 14px; 
             line-height: 1.5; 
-            animation: messageAppear 0.4s ease-out;
+            animation: messageAppear 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             position: relative;
             word-wrap: break-word;
             overflow-wrap: break-word;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .msg:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
         }
         
         @keyframes messageAppear {
-            0% { opacity: 0; transform: translateY(20px) scale(0.9); }
-            50% { transform: translateY(-5px) scale(1.02); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
+            0% { opacity: 0; transform: translateY(30px) scale(0.8) rotateX(-15deg); }
+            60% { transform: translateY(-5px) scale(1.02) rotateX(5deg); }
+            100% { opacity: 1; transform: translateY(0) scale(1) rotateX(0); }
         }
         
         .user { 
@@ -163,6 +202,23 @@
             font-weight: 600;
             border-bottom-right-radius: 4px;
             margin-left: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .user:hover::before {
+            left: 100%;
         }
         
         .ai { 
@@ -172,6 +228,26 @@
             border-bottom-left-radius: 4px;
             color: #e0f2e9;
             margin-right: 20px;
+            position: relative;
+        }
+
+        .ai::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 16px;
+            padding: 1px;
+            background: linear-gradient(135deg, var(--neon-dim), transparent, var(--neon-dim));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .ai:hover::after {
+            opacity: 1;
         }
         
         .system { 
@@ -182,6 +258,14 @@
             text-align: center;
             max-width: 90%;
             font-size: 13px;
+            animation: glitch 2s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 90%, 100% { transform: translate(0); filter: none; }
+            92% { transform: translate(-2px, 2px); filter: hue-rotate(90deg); }
+            94% { transform: translate(2px, -2px); filter: hue-rotate(-90deg); }
+            96% { transform: translate(-1px, 1px); }
         }
         
         .preview-img, .generated-img { 
@@ -191,34 +275,52 @@
             margin-top: 8px; 
             border: 1px solid var(--neon-dim);
             display: block;
+            transition: all 0.3s ease;
+        }
+
+        .preview-img:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
         }
 
         .generated-img {
-            animation: imageGlow 3s ease-in-out infinite;
+            animation: imageGlow 3s ease-in-out infinite, floatImage 4s ease-in-out infinite;
             max-height: 400px;
             object-fit: contain;
         }
 
+        @keyframes floatImage {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
         @keyframes imageGlow {
-            0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.2); }
-            50% { box-shadow: 0 0 40px rgba(0, 255, 136, 0.5); }
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.2), 0 0 40px rgba(0, 255, 136, 0.1); }
+            50% { box-shadow: 0 0 40px rgba(0, 255, 136, 0.6), 0 0 80px rgba(0, 255, 136, 0.3); }
         }
 
         .photo-preview { 
             background: rgba(0,255,136,0.05); 
-            border: 1px dashed var(--neon-dim); 
+            border: 2px dashed var(--neon-dim); 
             border-radius: 12px; 
             padding: 12px; 
             margin-bottom: 12px; 
             position: relative;
             max-width: 100%;
+            animation: borderDash 3s linear infinite;
+        }
+
+        @keyframes borderDash {
+            0% { border-style: dashed; border-color: var(--neon-dim); }
+            50% { border-style: solid; border-color: var(--neon); }
+            100% { border-style: dashed; border-color: var(--neon-dim); }
         }
         
         .remove-photo { 
             position: absolute; 
             top: 8px; 
             right: 8px; 
-            background: var(--danger); 
+            background: linear-gradient(135deg, var(--danger) 0%, #ff6666 100%);
             color: white; 
             border: none; 
             width: 32px; 
@@ -232,12 +334,25 @@
             z-index: 5;
             line-height: 1;
             padding-bottom: 2px;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 4px 15px rgba(255, 68, 68, 0.4);
+            animation: dangerPulse 2s infinite;
+        }
+
+        @keyframes dangerPulse {
+            0%, 100% { box-shadow: 0 4px 15px rgba(255, 68, 68, 0.4); }
+            50% { box-shadow: 0 4px 25px rgba(255, 68, 68, 0.8), 0 0 30px rgba(255, 68, 68, 0.6); }
+        }
+
+        .remove-photo:hover {
+            transform: scale(1.2) rotate(180deg);
+            box-shadow: 0 0 30px var(--danger), 0 0 60px rgba(255, 68, 68, 0.8);
+            animation: none;
         }
 
         .remove-photo:active {
-            transform: scale(0.85);
-            box-shadow: 0 0 20px var(--danger);
+            transform: scale(0.8) rotate(180deg);
+            box-shadow: 0 0 50px var(--danger);
         }
 
         .footer { 
@@ -257,7 +372,7 @@
         
         .tool-btn { 
             background: transparent; 
-            border: 1.5px solid var(--neon-dim); 
+            border: 2px solid var(--neon-dim); 
             border-radius: 12px; 
             width: 44px; 
             height: 44px; 
@@ -266,10 +381,11 @@
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            transition: all 0.15s;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             flex-shrink: 0;
             position: relative;
             overflow: hidden;
+            transform-style: preserve-3d;
         }
 
         .tool-btn::before {
@@ -279,33 +395,59 @@
             left: 50%;
             width: 0;
             height: 0;
-            background: radial-gradient(circle, rgba(0,255,136,0.4) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(0,255,136,0.6) 0%, transparent 70%);
             border-radius: 50%;
             transform: translate(-50%, -50%);
-            transition: width 0.3s, height 0.3s;
+            transition: all 0.4s ease;
         }
 
-        .tool-btn:active::before {
-            width: 100px;
-            height: 100px;
+        .tool-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent, rgba(0,255,136,0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tool-btn:hover::after {
+            opacity: 1;
+        }
+
+        .tool-btn:hover::before {
+            width: 120px;
+            height: 120px;
+        }
+        
+        .tool-btn:hover {
+            transform: scale(1.1) translateY(-3px) rotateX(10deg);
+            border-color: var(--neon);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.4), 0 0 0 1px var(--neon);
+            background: rgba(0, 255, 136, 0.05);
         }
         
         .tool-btn:active {
-            transform: scale(0.92);
-            border-color: var(--neon);
-            box-shadow: 0 0 30px rgba(0, 255, 136, 0.6), inset 0 0 20px rgba(0, 255, 136, 0.2);
+            transform: scale(0.9) translateY(0) rotateX(0);
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.8), inset 0 0 20px rgba(0, 255, 136, 0.3);
+            transition: all 0.1s;
         }
         
         .tool-btn.active {
             background: var(--neon);
             color: #000;
-            box-shadow: 0 0 20px var(--neon-glow);
-            animation: pulseActive 2s infinite;
+            box-shadow: 0 0 30px var(--neon-glow), 0 0 60px rgba(0,255,136,0.4);
+            animation: pulseActive 1.5s infinite, rotate3d 3s infinite linear;
+            border-color: var(--neon);
+        }
+
+        @keyframes rotate3d {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
         }
 
         @keyframes pulseActive {
-            0%, 100% { box-shadow: 0 0 20px var(--neon-glow); }
-            50% { box-shadow: 0 0 40px var(--neon), 0 0 60px rgba(0,255,136,0.3); }
+            0%, 100% { box-shadow: 0 0 30px var(--neon-glow), 0 0 60px rgba(0,255,136,0.4); }
+            50% { box-shadow: 0 0 50px var(--neon), 0 0 100px rgba(0,255,136,0.6), 0 0 150px rgba(0,255,136,0.3); }
         }
         
         .input-wrapper {
@@ -318,23 +460,31 @@
             width: 100%;
             height: 44px;
             background: rgba(255,255,255,0.05);
-            border: 1.5px solid rgba(0,255,136,0.2);
+            border: 2px solid rgba(0,255,136,0.2);
             border-radius: 12px; 
             color: #fff; 
             padding: 0 14px;
             outline: none; 
             font-size: 15px;
             -webkit-appearance: none;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
         }
 
-        #userInput:active {
-            transform: scale(0.98);
+        #userInput:hover {
+            border-color: rgba(0,255,136,0.4);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
         }
-        
+
         #userInput:focus {
             border-color: var(--neon);
-            box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.15), 0 0 20px rgba(0,255,136,0.2);
+            box-shadow: 0 0 0 4px rgba(0, 255, 136, 0.2), 0 0 30px rgba(0,255,136,0.3);
+            transform: scale(1.02);
+            background: rgba(255,255,255,0.08);
+        }
+
+        #userInput:focus:hover {
+            transform: scale(1.02) translateY(-2px);
         }
         
         .send-btn { 
@@ -347,44 +497,74 @@
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.4);
             flex-shrink: 0;
             position: relative;
             overflow: hidden;
-            transition: all 0.15s;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transform-style: preserve-3d;
+        }
+
+        .send-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .send-btn:hover::before {
+            left: 100%;
         }
 
         .send-btn::after {
             content: '';
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255,255,255,0.3);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.4s, height 0.4s;
+            inset: -2px;
+            border-radius: 14px;
+            padding: 2px;
+            background: linear-gradient(135deg, var(--neon), #fff, var(--neon));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s;
+            animation: rotateBorder 2s linear infinite;
         }
 
-        .send-btn:active::after {
-            width: 100px;
-            height: 100px;
+        @keyframes rotateBorder {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        .send-btn:hover::after {
+            opacity: 1;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.15) translateY(-3px) rotateX(15deg);
+            box-shadow: 0 15px 40px rgba(0, 255, 136, 0.6), 0 0 0 1px rgba(0,255,136,0.5);
         }
 
         .send-btn:active {
-            transform: scale(0.92);
-            box-shadow: 0 0 30px rgba(0, 255, 136, 0.8), 0 0 60px rgba(0,255,136,0.4);
+            transform: scale(0.9) rotateX(0);
+            box-shadow: 0 0 50px rgba(0, 255, 136, 1), inset 0 0 30px rgba(0,0,0,0.2);
+            transition: all 0.1s;
         }
 
         .send-btn.generating {
             background: linear-gradient(135deg, var(--accent) 0%, #cc00cc 100%);
-            animation: pulseGen 1s ease-in-out infinite;
+            animation: pulseGen 0.8s ease-in-out infinite, rotate3d 2s infinite linear;
+            pointer-events: none;
         }
 
         @keyframes pulseGen {
-            0%, 100% { box-shadow: 0 0 15px rgba(255, 0, 255, 0.4); transform: scale(1); }
-            50% { box-shadow: 0 0 40px rgba(255, 0, 255, 0.8); transform: scale(1.05); }
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 0, 255, 0.6), 0 0 40px rgba(255, 0, 255, 0.3); transform: scale(1) rotateY(0deg); }
+            50% { box-shadow: 0 0 40px rgba(255, 0, 255, 1), 0 0 80px rgba(255, 0, 255, 0.6); transform: scale(1.1) rotateY(180deg); }
         }
 
         pre { 
@@ -399,6 +579,13 @@
             font-size: 13px;
             padding-top: 50px;
             max-width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        pre:hover {
+            border-color: var(--neon-dim);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.1);
+            transform: translateY(-2px);
         }
         
         .code-buttons {
@@ -416,11 +603,37 @@
             border-radius: 6px; 
             cursor: pointer;
             border: none;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .copy-btn::before, .copy-full-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s;
+        }
+
+        .copy-btn:hover::before, .copy-full-btn:hover::before {
+            width: 60px;
+            height: 60px;
+        }
+
+        .copy-btn:hover, .copy-full-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 255, 136, 0.4);
         }
 
         .copy-btn:active, .copy-full-btn:active {
             transform: scale(0.9);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.6);
         }
         
         .copy-btn { 
@@ -428,10 +641,20 @@
             color: var(--neon);
             border: 1px solid var(--neon-dim);
         }
+
+        .copy-btn:hover {
+            background: rgba(0,255,136,0.2);
+            border-color: var(--neon);
+        }
         
         .copy-full-btn {
             background: linear-gradient(135deg, var(--neon) 0%, #00cc6a 100%);
             color: #000;
+        }
+
+        .copy-full-btn:hover {
+            background: linear-gradient(135deg, #00ff99 0%, #00ff88 100%);
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.6);
         }
 
         .scroll-down-btn { 
@@ -448,14 +671,41 @@
             display: none; 
             align-items: center; 
             justify-content: center; 
-            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.4);
+            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.5);
             z-index: 100;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            animation: float 3s ease-in-out infinite, pulseBtn 2s infinite;
+            transform-style: preserve-3d;
+        }
+
+        @keyframes pulseBtn {
+            0%, 100% { box-shadow: 0 4px 20px rgba(0, 255, 136, 0.5); }
+            50% { box-shadow: 0 4px 40px rgba(0, 255, 136, 0.9), 0 0 60px rgba(0, 255, 136, 0.4); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotateZ(0deg); }
+            50% { transform: translateY(-8px) rotateZ(5deg); }
         }
         
+        .scroll-down-btn:hover {
+            transform: scale(1.2) translateY(-5px) rotateZ(0deg);
+            box-shadow: 0 10px 40px rgba(0, 255, 136, 0.8), 0 0 0 3px rgba(0,255,136,0.3);
+            animation: none;
+        }
+
+        .scroll-down-btn:hover svg {
+            animation: bounce 0.5s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(4px); }
+        }
+
         .scroll-down-btn:active {
-            transform: scale(0.85);
-            box-shadow: 0 0 40px rgba(0, 255, 136, 0.8);
+            transform: scale(0.9);
+            box-shadow: 0 0 50px rgba(0, 255, 136, 1);
         }
         
         .scroll-down-btn.visible { display: flex; }
@@ -468,47 +718,86 @@
             max-width: 320px;
             height: 100%;
             background: linear-gradient(180deg, #0a0f0a 0%, #050805 100%);
-            border-left: 2px solid var(--neon);
+            border-left: 3px solid var(--neon);
             z-index: 2000;
-            transition: right 0.3s ease;
+            transition: right 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             display: flex;
             flex-direction: column;
+            box-shadow: -10px 0 50px rgba(0, 255, 136, 0.2);
         }
         
-        .history-panel.open { right: 0; }
+        .history-panel.open { 
+            right: 0; 
+            animation: slideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes slideIn {
+            0% { right: -100%; opacity: 0; }
+            100% { right: 0; opacity: 1; }
+        }
         
         .history-header {
             padding: 16px;
-            border-bottom: 1px solid var(--neon-dim);
+            border-bottom: 2px solid var(--neon-dim);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: linear-gradient(90deg, transparent, rgba(0,255,136,0.05), transparent);
         }
         
         .history-title {
             color: var(--neon);
             font-size: 16px;
             font-weight: 700;
+            animation: neonPulse 2s ease-in-out infinite;
+            text-shadow: 0 0 10px var(--neon-dim);
         }
         
         .history-close {
-            background: none;
-            border: none;
+            background: rgba(0,255,136,0.1);
+            border: 2px solid var(--neon-dim);
             color: var(--neon);
-            font-size: 28px;
+            font-size: 24px;
             cursor: pointer;
             width: 40px;
             height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .history-close::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(0,255,136,0.4) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s;
+        }
+
+        .history-close:hover::before {
+            width: 100px;
+            height: 100px;
+        }
+
+        .history-close:hover {
+            background: rgba(0,255,136,0.2);
+            transform: rotate(180deg) scale(1.1);
+            border-color: var(--neon);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
         }
 
         .history-close:active {
-            background: rgba(0,255,136,0.1);
-            transform: scale(0.9);
+            transform: rotate(180deg) scale(0.9);
+            box-shadow: 0 0 50px rgba(0, 255, 136, 0.8);
         }
         
         .history-list {
@@ -520,19 +809,61 @@
         
         .history-item {
             background: rgba(0,255,136,0.05);
-            border: 1px solid var(--neon-dim);
+            border: 2px solid var(--neon-dim);
             border-radius: 12px;
             padding: 12px;
             margin-bottom: 10px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+
+        .history-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,255,136,0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .history-item::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 14px;
+            padding: 2px;
+            background: linear-gradient(135deg, var(--neon), transparent, var(--neon));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .history-item:hover::before {
+            left: 100%;
+        }
+
+        .history-item:hover::after {
+            opacity: 1;
+        }
+
+        .history-item:hover {
+            background: rgba(0,255,136,0.1);
+            transform: translateX(10px) translateY(-2px) rotateX(5deg);
+            border-color: var(--neon);
+            box-shadow: 0 10px 30px rgba(0,255,136,0.3), 0 0 0 1px var(--neon);
         }
 
         .history-item:active {
-            background: rgba(0,255,136,0.15);
-            transform: scale(0.98);
-            border-color: var(--neon);
-            box-shadow: 0 0 20px rgba(0,255,136,0.2);
+            transform: translateX(5px) scale(0.98);
+            box-shadow: 0 0 40px rgba(0,255,136,0.5);
         }
         
         .history-overlay {
@@ -541,28 +872,36 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0);
+            backdrop-filter: blur(0px);
             z-index: 1999;
             display: none;
-            opacity: 0;
-            transition: opacity 0.3s;
+            transition: all 0.3s ease;
         }
         
         .history-overlay.show { 
             display: block; 
-            opacity: 1;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
         }
 
         .mode-indicator {
             position: absolute;
-            top: -18px;
+            top: -20px;
             left: 0;
-            font-size: 10px;
+            font-size: 11px;
             color: var(--accent);
             font-weight: 700;
             display: none;
             white-space: nowrap;
-            animation: fadeIn 0.3s;
+            animation: fadeIn 0.3s, glitchText 2s infinite;
+            text-shadow: 0 0 10px var(--accent);
+        }
+
+        @keyframes glitchText {
+            0%, 90%, 100% { transform: translate(0); opacity: 1; }
+            92% { transform: translate(-2px, 1px); opacity: 0.8; }
+            94% { transform: translate(2px, -1px); opacity: 1; }
         }
 
         .mode-indicator.active {
@@ -570,7 +909,7 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -578,48 +917,102 @@
             position: fixed;
             bottom: 90px;
             left: 50%;
-            transform: translateX(-50%) translateY(100px);
+            transform: translateX(-50%) translateY(150px) scale(0.8);
             background: rgba(10, 15, 10, 0.98);
-            border: 1px solid var(--accent);
+            border: 2px solid var(--accent);
             border-radius: 16px;
             padding: 12px;
             z-index: 500;
             display: flex;
             gap: 8px;
             opacity: 0;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 40px rgba(255, 0, 255, 0.3);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 0 50px rgba(255, 0, 255, 0.4), 0 10px 40px rgba(0,0,0,0.5);
             backdrop-filter: blur(10px);
         }
 
         .gen-options.show {
-            transform: translateX(-50%) translateY(0);
+            transform: translateX(-50%) translateY(0) scale(1);
             opacity: 1;
+            animation: floatOptions 3s ease-in-out infinite;
+        }
+
+        @keyframes floatOptions {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-5px); }
         }
 
         .gen-opt-btn {
             background: rgba(255, 0, 255, 0.1);
-            border: 1px solid var(--accent);
+            border: 2px solid var(--accent);
             color: #fff;
             padding: 8px 14px;
             border-radius: 10px;
             cursor: pointer;
             font-size: 12px;
             font-weight: 600;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+
+        .gen-opt-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(255,0,255,0.4) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.4s;
+        }
+
+        .gen-opt-btn:hover::before {
+            width: 120px;
+            height: 120px;
+        }
+
+        .gen-opt-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .gen-opt-btn:hover::after {
+            left: 100%;
+        }
+
+        .gen-opt-btn:hover {
+            transform: translateY(-3px) scale(1.05) rotateX(10deg);
+            box-shadow: 0 10px 30px rgba(255, 0, 255, 0.4);
+            background: rgba(255, 0, 255, 0.2);
         }
 
         .gen-opt-btn:active {
-            transform: scale(0.92);
-            background: rgba(255, 0, 255, 0.3);
-            box-shadow: 0 0 20px rgba(255, 0, 255, 0.4);
+            transform: scale(0.9) rotateX(0);
+            box-shadow: 0 0 40px rgba(255, 0, 255, 0.8);
         }
 
         .gen-opt-btn.active {
             background: var(--accent);
             color: #000;
-            box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+            box-shadow: 0 0 40px rgba(255, 0, 255, 0.8), 0 0 80px rgba(255, 0, 255, 0.4);
+            animation: pulseAccent 1.5s infinite, rotate3d 4s infinite linear;
+            border-color: #fff;
+        }
+
+        @keyframes pulseAccent {
+            0%, 100% { box-shadow: 0 0 40px rgba(255, 0, 255, 0.8), 0 0 80px rgba(255, 0, 255, 0.4); }
+            50% { box-shadow: 0 0 60px rgba(255, 0, 255, 1), 0 0 120px rgba(255, 0, 255, 0.6), 0 0 180px rgba(255, 0, 255, 0.3); }
         }
 
         .loading-gen {
@@ -628,6 +1021,12 @@
             gap: 12px;
             padding: 16px;
             font-size: 14px;
+            animation: pulseText 1.5s infinite;
+        }
+
+        @keyframes pulseText {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
         }
 
         .loading-gen::before {
@@ -638,6 +1037,7 @@
             border-top-color: var(--neon);
             border-radius: 50%;
             animation: spin 1s linear infinite;
+            box-shadow: 0 0 10px var(--neon);
         }
 
         @keyframes spin {
@@ -657,25 +1057,114 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.4);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+
+        .download-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .download-btn:hover::before {
+            left: 100%;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px) scale(1.05) rotateX(10deg);
+            box-shadow: 0 10px 35px rgba(0, 255, 136, 0.7), 0 0 0 2px rgba(0,255,136,0.5);
         }
 
         .download-btn:active {
-            transform: scale(0.95);
-            box-shadow: 0 0 30px rgba(0, 255, 136, 0.6);
+            transform: scale(0.95) rotateX(0);
+            box-shadow: 0 0 50px rgba(0, 255, 136, 1);
+        }
+
+        .download-btn svg {
+            transition: transform 0.3s;
+        }
+
+        .download-btn:hover svg {
+            transform: translateY(2px);
+            animation: bounceArrow 0.5s infinite;
+        }
+
+        @keyframes bounceArrow {
+            0%, 100% { transform: translateY(2px); }
+            50% { transform: translateY(5px); }
         }
 
         .msg-actions {
             position: absolute;
-            top: -28px;
+            top: -32px;
             right: 0;
             display: none;
             gap: 6px;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .msg:hover .msg-actions,
         .msg:active .msg-actions {
             display: flex;
+        }
+
+        .msg-action-btn {
+            background: rgba(0,0,0,0.9);
+            border: 2px solid var(--neon);
+            color: var(--neon);
+            padding: 5px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+
+        .msg-action-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(0,255,136,0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s;
+        }
+
+        .msg-action-btn:hover::before {
+            width: 60px;
+            height: 60px;
+        }
+
+        .msg-action-btn:hover {
+            background: var(--neon);
+            color: #000;
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.5), 0 0 0 1px var(--neon);
+        }
+
+        .msg-action-btn:active {
+            transform: scale(0.9);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.8);
         }
 
         .ripple {
@@ -692,6 +1181,30 @@
                 transform: scale(4);
                 opacity: 0;
             }
+        }
+
+        /* Специальные эффекты для кнопки истории */
+        .tool-btn[onclick="openHistory()"] {
+            animation: historyPulse 3s infinite;
+        }
+
+        @keyframes historyPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(0, 255, 136, 0); }
+        }
+
+        /* Эффект для кнопки генерации */
+        .tool-btn[onclick="toggleGenMode()"] {
+            transition: all 0.3s;
+        }
+
+        .tool-btn[onclick="toggleGenMode()"]:hover svg {
+            animation: starSpin 0.5s linear infinite;
+        }
+
+        @keyframes starSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         @media (max-width: 380px) {
@@ -744,7 +1257,7 @@
         <button class="history-close" onclick="closeHistory()" type="button">×</button>
     </div>
     <div class="history-list" id="historyList"></div>
-    <button class="tool-btn" onclick="clearHistory()" style="margin: 12px; width: calc(100% - 24px); height: 48px; border-radius: 12px;" type="button">ОЧИСТИТЬ ИСТОРИЮ</button>
+    <button class="tool-btn" onclick="clearHistory()" style="margin: 12px; width: calc(100% - 24px); height: 48px; border-radius: 12px; font-weight: 700;" type="button">🗑️ ОЧИСТИТЬ ИСТОРИЮ</button>
 </div>
 
 <div class="gen-options" id="genOptions">
@@ -764,7 +1277,7 @@
     <div class="header">
         <b>⚡️ NEON VISION</b>
         <div style="display:flex;gap:8px;align-items:center;">
-            <button class="tool-btn" onclick="openHistory()" style="width:44px;height:44px;" type="button">
+            <button class="tool-btn" onclick="openHistory()" style="width:44px;height:44px;" type="button" title="История">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10H12V2z"></path></svg>
             </button>
             <div class="energy" id="energy">ЗАГРУЗКА...</div>
@@ -916,14 +1429,16 @@
             options.classList.add('show');
             input.placeholder = "Опиши изображение...";
             input.style.borderColor = 'var(--accent)';
+            input.style.boxShadow = '0 0 20px rgba(255, 0, 255, 0.3)';
             // Вибрация если доступна
-            if (navigator.vibrate) navigator.vibrate(50);
+            if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
         } else {
             btn.classList.remove('active');
             indicator.classList.remove('active');
             options.classList.remove('show');
             input.placeholder = "Сообщение...";
             input.style.borderColor = 'rgba(0,255,136,0.2)';
+            input.style.boxShadow = 'none';
         }
         input.focus();
     }
@@ -939,7 +1454,7 @@
         document.getElementById('historyPanel').classList.add('open');
         document.getElementById('historyOverlay').classList.add('show');
         renderHistory();
-        if (navigator.vibrate) navigator.vibrate(40);
+        if (navigator.vibrate) navigator.vibrate([40, 20, 40]);
     }
     
     function closeHistory() {
@@ -950,11 +1465,11 @@
     function renderHistory() {
         const list = document.getElementById('historyList');
         if (messageHistory.length === 0) {
-            list.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.4);font-size:14px;">История пуста</div>';
+            list.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.4);font-size:14px;animation:fadeIn 0.5s;">История пуста</div>';
             return;
         }
         list.innerHTML = messageHistory.slice().reverse().map((item, idx) => `
-            <div class="history-item" onclick="loadFromHistory(${messageHistory.length - 1 - idx})">
+            <div class="history-item" onclick="loadFromHistory(${messageHistory.length - 1 - idx})" style="animation:slideIn 0.3s ${idx * 0.05}s both;">
                 <div style="font-size:13px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;">${item.text || '(изображение)'}</div>
                 <div style="font-size:11px;color:rgba(255,255,255,0.5);">${new Date(item.time).toLocaleString('ru-RU', {hour: '2-digit', minute:'2-digit'})}</div>
             </div>
@@ -982,7 +1497,7 @@
             messageHistory = [];
             localStorage.removeItem('vision_history');
             renderHistory();
-            if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+            if (navigator.vibrate) navigator.vibrate([50, 100, 50, 100, 50]);
         }
     }
 
@@ -996,7 +1511,7 @@
     
     function scrollToBottom() {
         chat.scrollTo({ top: chat.scrollHeight, behavior: 'smooth' });
-        if (navigator.vibrate) navigator.vibrate(30);
+        if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
     }
     
     function checkScroll() {
@@ -1031,7 +1546,7 @@
             document.getElementById('photoPreview').style.display = 'block';
             document.getElementById('userInput').focus();
             setTimeout(() => chat.scrollTop = chat.scrollHeight, 100);
-            if (navigator.vibrate) navigator.vibrate(50);
+            if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
         };
         reader.onerror = () => alert('Ошибка чтения файла');
         reader.readAsDataURL(file);
@@ -1060,13 +1575,25 @@
         div.className = 'msg ai';
         div.innerHTML = `
             <div style="font-size:13px;opacity:0.8;margin-bottom:8px;">🔗 РЕФЕРАЛЬНАЯ СИСТЕМА</div>
-            <div style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;margin:12px 0;font-family:monospace;font-size:12px;word-break:break-all;">${refLink}</div>
+            <div style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;margin:12px 0;font-family:monospace;font-size:12px;word-break:break-all;border:1px solid var(--neon-dim);transition:all 0.3s;" onmouseover="this.style.borderColor='var(--neon)';this.style.boxShadow='0 0 20px rgba(0,255,136,0.2)'" onmouseout="this.style.borderColor='var(--neon-dim)';this.style.boxShadow='none'">${refLink}</div>
             <div style="font-size:13px;margin-bottom:12px;"><span style="color:var(--neon);font-weight:700;">1 друг = +3 заряда</span></div>
-            <button onclick="navigator.clipboard.writeText('${refLink}').then(()=>alert('Скопировано!'))" style="width:100%;background:var(--neon);color:#000;border:none;padding:12px;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;">КОПИРОВАТЬ</button>
+            <button onclick="copyRef(this, '${refLink}')" style="width:100%;background:linear-gradient(135deg,var(--neon) 0%,#00cc6a 100%);color:#000;border:none;padding:12px;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;transition:all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);position:relative;overflow:hidden;transform-style:preserve-3d;" onmouseover="this.style.transform='translateY(-3px) scale(1.02)'" onmouseout="this.style.transform='translateY(0) scale(1)'" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1.02)'" type="button">КОПИРОВАТЬ</button>
         `;
         chat.appendChild(div);
         checkScroll();
         if (navigator.vibrate) navigator.vibrate(40);
+    }
+
+    function copyRef(btn, link) {
+        navigator.clipboard.writeText(link).then(() => {
+            btn.innerHTML = '✓ СКОПИРОВАНО';
+            btn.style.background = 'linear-gradient(135deg, #00cc6a 0%, var(--neon) 100%)';
+            if (navigator.vibrate) navigator.vibrate([50, 100, 50]);
+            setTimeout(() => {
+                btn.innerHTML = 'КОПИРОВАТЬ';
+                btn.style.background = 'linear-gradient(135deg, var(--neon) 0%, #00cc6a 100%)';
+            }, 2000);
+        });
     }
 
     function generateId() {
@@ -1087,6 +1614,7 @@
         }
         editingMsgId = msgId;
         msgEl.style.border = '2px solid var(--neon)';
+        msgEl.style.boxShadow = '0 0 20px rgba(0,255,136,0.5)';
         document.getElementById('userInput').focus();
         if (navigator.vibrate) navigator.vibrate(30);
     }
@@ -1094,22 +1622,27 @@
     function deleteMessage(msgId) {
         const msgEl = document.getElementById(msgId);
         if (msgEl) {
-            msgEl.remove();
-            if (editingMsgId === msgId) cancelEdit();
+            msgEl.style.animation = 'messageAppear 0.3s reverse forwards';
+            setTimeout(() => {
+                msgEl.remove();
+                if (editingMsgId === msgId) cancelEdit();
+            }, 300);
         }
     }
 
     function cancelEdit() {
         if (editingMsgId) {
             const el = document.getElementById(editingMsgId);
-            if (el) el.style.border = '';
+            if (el) {
+                el.style.border = '';
+                el.style.boxShadow = '';
+            }
             editingMsgId = null;
         }
         document.getElementById('userInput').value = '';
         removePhoto();
     }
 
-    // ИСПРАВЛЕННАЯ ГЕНЕРАЦИЯ ИЗОБРАЖЕНИЙ
     async function generateImage(prompt) {
         const seed = Math.floor(Math.random() * 1000000);
         let width = 1024;
@@ -1130,10 +1663,8 @@
             model = 'turbo';
         }
 
-        // Кодируем промпт правильно
         const encodedPrompt = encodeURIComponent(prompt);
         
-        // Формируем URL с правильными параметрами
         const params = new URLSearchParams({
             width: width,
             height: height,
@@ -1145,7 +1676,7 @@
         
         const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?${params.toString()}`;
         
-        console.log('Generated URL:', imageUrl); // Для отладки
+        console.log('Generated URL:', imageUrl);
         
         return imageUrl;
     }
@@ -1203,8 +1734,7 @@
             return; 
         }
 
-        // Вибрация при отправке
-        if (navigator.vibrate) navigator.vibrate(60);
+        if (navigator.vibrate) navigator.vibrate([60, 40, 60]);
 
         if (editingMsgId) {
             const oldMsg = document.getElementById(editingMsgId);
@@ -1227,8 +1757,8 @@
         
         userDiv.innerHTML = content + `
             <div class="msg-actions">
-                <button onclick="event.stopPropagation(); editMessage('${msgId}')" style="background:#333;border:1px solid var(--neon);color:var(--neon);padding:4px 10px;font-size:11px;border-radius:6px;cursor:pointer;">Изм</button>
-                <button onclick="event.stopPropagation(); deleteMessage('${msgId}')" style="background:#333;border:1px solid var(--neon);color:var(--neon);padding:4px 10px;font-size:11px;border-radius:6px;cursor:pointer;">Удл</button>
+                <button class="msg-action-btn" onclick="event.stopPropagation(); editMessage('${msgId}')" type="button">✏️ Изм</button>
+                <button class="msg-action-btn" onclick="event.stopPropagation(); deleteMessage('${msgId}')" type="button">🗑️ Удл</button>
             </div>
         `;
         
@@ -1248,7 +1778,7 @@
 
         const load = document.createElement('div');
         load.className = 'msg ai';
-        load.innerHTML = genMode ? '<div class="loading-gen">Генерирую изображение...</div>' : '👁️ Думаю...';
+        load.innerHTML = genMode ? '<div class="loading-gen">Генерирую изображение...</div>' : '<div class="loading-gen">👁️ Думаю...</div>';
         chat.appendChild(load);
         checkScroll();
         
@@ -1257,18 +1787,15 @@
 
         try {
             if (genMode && text) {
-                // РЕЖИМ ГЕНЕРАЦИИ
                 console.log('Starting image generation...');
                 const imageUrl = await generateImage(text);
                 
-                // Создаём изображение для проверки загрузки
                 const img = new Image();
                 img.crossOrigin = "anonymous";
                 
                 await new Promise((resolve, reject) => {
                     img.onload = resolve;
                     img.onerror = () => {
-                        // Если ошибка, пробуем ещё раз с другим seed
                         console.log('Retrying with new seed...');
                         const retryUrl = imageUrl.replace(/seed=\d+/, 'seed=' + Math.floor(Math.random() * 1000000));
                         img.src = retryUrl;
@@ -1283,7 +1810,7 @@
                 const aiDiv = document.createElement('div');
                 aiDiv.className = 'msg ai';
                 aiDiv.innerHTML = `
-                    <div style="font-size:12px;opacity:0.8;margin-bottom:6px;">🎨 ${text}</div>
+                    <div style="font-size:12px;opacity:0.8;margin-bottom:6px;color:var(--accent);font-weight:700;">🎨 ${text}</div>
                     <img src="${img.src}" class="generated-img" alt="Generated" style="display:block;max-width:100%;">
                     <br>
                     <button class="download-btn" onclick="downloadImage('${img.src}')" type="button">
@@ -1294,8 +1821,7 @@
                 chat.appendChild(aiDiv);
                 addToHistory(`[Изображение: ${text}]`, false, true);
                 
-                // Успешная генерация - вибрация
-                if (navigator.vibrate) navigator.vibrate([50, 100, 50]);
+                if (navigator.vibrate) navigator.vibrate([50, 100, 50, 100, 50]);
                 
             } else if (imgToSend) {
                 const resText = await analyzeImageWithAI(imgToSend, text);
@@ -1352,23 +1878,27 @@
         return text
             .replace(/```(\w+)?([\s\S]*?)```/g, (m, l, code) => {
                 const lang = l || 'text';
-                return `<pre><div class="code-buttons"><button class="copy-btn" onclick="copyCode(this)" type="button">КОПИРОВАТЬ</button></div><code class="language-${lang}">${code.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+                return `<pre><div class="code-buttons"><button class="copy-btn" onclick="copyCode(this)" type="button">📋 КОПИРОВАТЬ</button></div><code class="language-${lang}">${code.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
             })
-            .replace(/\*\*(.*?)\*\*/g, '<b style="color:var(--neon);">$1</b>')
+            .replace(/\*\*(.*?)\*\*/g, '<b style="color:var(--neon);text-shadow:0 0 10px var(--neon-dim);">$1</b>')
             .replace(/\n/g, '<br>');
     }
 
     function downloadImage(url) {
-        // Открываем в новой вкладке для скачивания
         window.open(url, '_blank');
-        if (navigator.vibrate) navigator.vibrate(50);
+        if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
     }
 
     function copyCode(btn) {
         const code = btn.closest('.code-buttons').nextElementSibling.innerText;
         navigator.clipboard.writeText(code).then(() => { 
-            btn.innerText = "✓"; 
-            setTimeout(() => btn.innerText = "КОПИРОВАТЬ", 2000); 
+            btn.innerHTML = "✓ СКОПИРОВАНО"; 
+            btn.style.background = "rgba(0,255,136,0.3)";
+            if (navigator.vibrate) navigator.vibrate(50);
+            setTimeout(() => {
+                btn.innerHTML = "📋 КОПИРОВАТЬ";
+                btn.style.background = "";
+            }, 2000); 
         });
     }
 </script>
