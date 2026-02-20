@@ -1103,6 +1103,52 @@
             50% { transform: translateY(5px); }
         }
 
+        .share-btn {
+            background: linear-gradient(135deg, var(--accent) 0%, #cc00cc 100%);
+            color: #fff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            margin-left: 8px;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 4px 20px rgba(255, 0, 255, 0.4);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+
+        .share-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .share-btn:hover::before {
+            left: 100%;
+        }
+
+        .share-btn:hover {
+            transform: translateY(-3px) scale(1.05) rotateX(10deg);
+            box-shadow: 0 10px 35px rgba(255, 0, 255, 0.7), 0 0 0 2px rgba(255,0,255,0.5);
+        }
+
+        .share-btn:active {
+            transform: scale(0.95) rotateX(0);
+            box-shadow: 0 0 50px rgba(255, 0, 255, 1);
+        }
+
         .msg-actions {
             position: absolute;
             top: -32px;
@@ -1359,7 +1405,6 @@
         }
         renderHistory();
         
-        // Добавляем ripple эффект на все кнопки
         document.querySelectorAll('button').forEach(btn => {
             btn.addEventListener('click', createRipple);
         });
@@ -1430,7 +1475,6 @@
             input.placeholder = "Опиши изображение...";
             input.style.borderColor = 'var(--accent)';
             input.style.boxShadow = '0 0 20px rgba(255, 0, 255, 0.3)';
-            // Вибрация если доступна
             if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
         } else {
             btn.classList.remove('active');
@@ -1681,6 +1725,23 @@
         return imageUrl;
     }
 
+    // Функция для скачивания изображения как blob и конвертации в base64
+    async function fetchImageAsBase64(url) {
+        try {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+        } catch (err) {
+            console.error('Error fetching image:', err);
+            throw err;
+        }
+    }
+
     async function analyzeImageWithAI(imageBase64, userText) {
         try {
             const base64Data = imageBase64.split(',')[1];
@@ -1790,18 +1851,15 @@
                 console.log('Starting image generation...');
                 const imageUrl = await generateImage(text);
                 
+                // Скачиваем изображение как blob
+                const imageBase64 = await fetchImageAsBase64(imageUrl);
+                
                 const img = new Image();
                 img.crossOrigin = "anonymous";
                 
                 await new Promise((resolve, reject) => {
                     img.onload = resolve;
-                    img.onerror = () => {
-                        console.log('Retrying with new seed...');
-                        const retryUrl = imageUrl.replace(/seed=\d+/, 'seed=' + Math.floor(Math.random() * 1000000));
-                        img.src = retryUrl;
-                        img.onload = resolve;
-                        img.onerror = reject;
-                    };
+                    img.onerror = reject;
                     img.src = imageUrl;
                 });
                 
@@ -1816,6 +1874,10 @@
                     <button class="download-btn" onclick="downloadImage('${img.src}')" type="button">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                         СКАЧАТЬ
+                    </button>
+                    <button class="share-btn" onclick="sendPhotoToBot('${imageBase64}')" type="button">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 7 7M5 12l7-7 7 7"/></svg>
+                        ОТПРАВИТЬ В ЧАТ
                     </button>
                 `;
                 chat.appendChild(aiDiv);
@@ -1874,6 +1936,39 @@
         }
     }
 
+    // Отправка фото в чат через Telegram WebApp
+    function sendPhotoToBot(base64Image) {
+        try {
+            // Конвертируем base64 в blob
+            const byteString = atob(base64Image.split(',')[1]);
+            const mimeString = base64Image.split(',')[0].split(':')[1].split(';')[0];
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            
+            const blob = new Blob([ab], { type: mimeString });
+            const file = new File([blob], "generated_image.png", { type: "image/png" });
+            
+            // Отправляем через Telegram WebApp
+            tg.sendData(JSON.stringify({
+                action: 'send_photo',
+                file: file
+            }));
+            
+            // Альтернативный метод - открываем диалог отправки
+            // tg.showPopup({ title: 'Готово!', message: 'Изображение подготовлено к отправке' });
+            
+            if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+            
+        } catch (err) {
+            console.error('Error sending photo:', err);
+            alert('Ошибка отправки. Попробуй скачать и отправить вручную.');
+        }
+    }
+
     function formatText(text) {
         return text
             .replace(/```(\w+)?([\s\S]*?)```/g, (m, l, code) => {
@@ -1885,7 +1980,13 @@
     }
 
     function downloadImage(url) {
-        window.open(url, '_blank');
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'neon_vision_generated.png';
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
         if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
     }
 
@@ -1903,4 +2004,4 @@
     }
 </script>
 </body>
-    </html>
+</html>
