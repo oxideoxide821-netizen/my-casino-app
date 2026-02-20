@@ -151,8 +151,9 @@
         }
         
         @keyframes messageAppear {
-            0% { opacity: 0; transform: translateY(20px); }
-            100% { opacity: 1; transform: translateY(0); }
+            0% { opacity: 0; transform: translateY(20px) scale(0.9); }
+            50% { transform: translateY(-5px) scale(1.02); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
         }
         
         .user { 
@@ -231,6 +232,12 @@
             z-index: 5;
             line-height: 1;
             padding-bottom: 2px;
+            transition: all 0.2s;
+        }
+
+        .remove-photo:active {
+            transform: scale(0.85);
+            box-shadow: 0 0 20px var(--danger);
         }
 
         .footer { 
@@ -259,20 +266,46 @@
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            transition: all 0.2s;
+            transition: all 0.15s;
             flex-shrink: 0;
-            -webkit-tap-highlight-color: rgba(0,255,136,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(0,255,136,0.4) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+
+        .tool-btn:active::before {
+            width: 100px;
+            height: 100px;
         }
         
         .tool-btn:active {
-            transform: scale(0.95);
-            background: rgba(0, 255, 136, 0.1);
+            transform: scale(0.92);
+            border-color: var(--neon);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.6), inset 0 0 20px rgba(0, 255, 136, 0.2);
         }
         
         .tool-btn.active {
             background: var(--neon);
             color: #000;
             box-shadow: 0 0 20px var(--neon-glow);
+            animation: pulseActive 2s infinite;
+        }
+
+        @keyframes pulseActive {
+            0%, 100% { box-shadow: 0 0 20px var(--neon-glow); }
+            50% { box-shadow: 0 0 40px var(--neon), 0 0 60px rgba(0,255,136,0.3); }
         }
         
         .input-wrapper {
@@ -292,11 +325,16 @@
             outline: none; 
             font-size: 15px;
             -webkit-appearance: none;
+            transition: all 0.2s;
+        }
+
+        #userInput:active {
+            transform: scale(0.98);
         }
         
         #userInput:focus {
             border-color: var(--neon);
-            box-shadow: 0 0 0 2px rgba(0, 255, 136, 0.1);
+            box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.15), 0 0 20px rgba(0,255,136,0.2);
         }
         
         .send-btn { 
@@ -311,21 +349,42 @@
             justify-content: center; 
             box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
             flex-shrink: 0;
-            -webkit-tap-highlight-color: rgba(0,255,136,0.3);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.15s;
+        }
+
+        .send-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
+        }
+
+        .send-btn:active::after {
+            width: 100px;
+            height: 100px;
         }
 
         .send-btn:active {
-            transform: scale(0.95);
+            transform: scale(0.92);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.8), 0 0 60px rgba(0,255,136,0.4);
         }
 
         .send-btn.generating {
             background: linear-gradient(135deg, var(--accent) 0%, #cc00cc 100%);
-            animation: pulseGen 1.5s ease-in-out infinite;
+            animation: pulseGen 1s ease-in-out infinite;
         }
 
         @keyframes pulseGen {
-            0%, 100% { box-shadow: 0 0 15px rgba(255, 0, 255, 0.4); }
-            50% { box-shadow: 0 0 30px rgba(255, 0, 255, 0.8); }
+            0%, 100% { box-shadow: 0 0 15px rgba(255, 0, 255, 0.4); transform: scale(1); }
+            50% { box-shadow: 0 0 40px rgba(255, 0, 255, 0.8); transform: scale(1.05); }
         }
 
         pre { 
@@ -357,6 +416,11 @@
             border-radius: 6px; 
             cursor: pointer;
             border: none;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:active, .copy-full-btn:active {
+            transform: scale(0.9);
         }
         
         .copy-btn { 
@@ -386,11 +450,12 @@
             justify-content: center; 
             box-shadow: 0 4px 20px rgba(0, 255, 136, 0.4);
             z-index: 100;
-            -webkit-tap-highlight-color: rgba(0,255,136,0.3);
+            transition: all 0.2s;
         }
         
         .scroll-down-btn:active {
-            transform: scale(0.9);
+            transform: scale(0.85);
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.8);
         }
         
         .scroll-down-btn.visible { display: flex; }
@@ -437,6 +502,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.2s;
+            border-radius: 50%;
+        }
+
+        .history-close:active {
+            background: rgba(0,255,136,0.1);
+            transform: scale(0.9);
         }
         
         .history-list {
@@ -455,10 +527,12 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-        
+
         .history-item:active {
-            background: rgba(0,255,136,0.1);
+            background: rgba(0,255,136,0.15);
             transform: scale(0.98);
+            border-color: var(--neon);
+            box-shadow: 0 0 20px rgba(0,255,136,0.2);
         }
         
         .history-overlay {
@@ -488,10 +562,16 @@
             font-weight: 700;
             display: none;
             white-space: nowrap;
+            animation: fadeIn 0.3s;
         }
 
         .mode-indicator.active {
             display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .gen-options {
@@ -531,12 +611,15 @@
         }
 
         .gen-opt-btn:active {
-            transform: scale(0.95);
+            transform: scale(0.92);
+            background: rgba(255, 0, 255, 0.3);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.4);
         }
 
         .gen-opt-btn.active {
             background: var(--accent);
             color: #000;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
         }
 
         .loading-gen {
@@ -574,11 +657,12 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            -webkit-tap-highlight-color: rgba(0,255,136,0.3);
+            transition: all 0.2s;
         }
 
         .download-btn:active {
             transform: scale(0.95);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.6);
         }
 
         .msg-actions {
@@ -592,6 +676,22 @@
         .msg:hover .msg-actions,
         .msg:active .msg-actions {
             display: flex;
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(0, 255, 136, 0.6);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
         }
 
         @media (max-width: 380px) {
@@ -641,19 +741,19 @@
 <div class="history-panel" id="historyPanel">
     <div class="history-header">
         <div class="history-title">📜 ИСТОРИЯ</div>
-        <button class="history-close" onclick="closeHistory()">×</button>
+        <button class="history-close" onclick="closeHistory()" type="button">×</button>
     </div>
     <div class="history-list" id="historyList"></div>
-    <button class="tool-btn" onclick="clearHistory()" style="margin: 12px; width: calc(100% - 24px); height: 48px; border-radius: 12px;">ОЧИСТИТЬ ИСТОРИЮ</button>
+    <button class="tool-btn" onclick="clearHistory()" style="margin: 12px; width: calc(100% - 24px); height: 48px; border-radius: 12px;" type="button">ОЧИСТИТЬ ИСТОРИЮ</button>
 </div>
 
 <div class="gen-options" id="genOptions">
-    <button class="gen-opt-btn active" onclick="setGenMode('fast')" id="btnFast">⚡ Быстро</button>
-    <button class="gen-opt-btn" onclick="setGenMode('quality')" id="btnQuality">✨ Качество</button>
-    <button class="gen-opt-btn" onclick="setGenMode('turbo')" id="btnTurbo">🚀 Турбо</button>
+    <button class="gen-opt-btn active" onclick="setGenMode('fast')" id="btnFast" type="button">⚡ Быстро</button>
+    <button class="gen-opt-btn" onclick="setGenMode('quality')" id="btnQuality" type="button">✨ Качество</button>
+    <button class="gen-opt-btn" onclick="setGenMode('turbo')" id="btnTurbo" type="button">🚀 Турбо</button>
 </div>
 
-<button class="scroll-down-btn" id="scrollDownBtn" onclick="scrollToBottom()">
+<button class="scroll-down-btn" id="scrollDownBtn" onclick="scrollToBottom()" type="button">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
 </button>
 
@@ -664,7 +764,7 @@
     <div class="header">
         <b>⚡️ NEON VISION</b>
         <div style="display:flex;gap:8px;align-items:center;">
-            <button class="tool-btn" onclick="openHistory()" style="width:40px;height:40px;" type="button">
+            <button class="tool-btn" onclick="openHistory()" style="width:44px;height:44px;" type="button">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10H12V2z"></path></svg>
             </button>
             <div class="energy" id="energy">ЗАГРУЗКА...</div>
@@ -717,7 +817,6 @@
     let currentUserId = null;
     let genMode = false;
     let genQuality = 'fast';
-    let isGenerating = false;
     
     let messageHistory = JSON.parse(localStorage.getItem('vision_history') || '[]');
     const MAX_HISTORY = 20;
@@ -726,7 +825,6 @@
     tg.expand();
     tg.ready();
 
-    // Фикс для viewport на мобильных
     function setViewportHeight() {
         let vh = window.innerHeight * 0.01;
         document.documentElement.style.setProperty('--vh', `${vh}px`);
@@ -748,13 +846,29 @@
         }
         renderHistory();
         
-        // Фикс для iOS
-        document.addEventListener('touchmove', function(e) {
-            if (e.target.closest('#chat')) return;
-            e.preventDefault();
-        }, { passive: false });
+        // Добавляем ripple эффект на все кнопки
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', createRipple);
+        });
     }
     setTimeout(init, 100);
+
+    function createRipple(e) {
+        const button = e.currentTarget;
+        const rect = button.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+        
+        const ripple = document.createElement('span');
+        ripple.classList.add('ripple');
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        
+        button.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 600);
+    }
 
     const c = document.getElementById('canvas'), x = c.getContext('2d');
     let ps = [];
@@ -802,6 +916,8 @@
             options.classList.add('show');
             input.placeholder = "Опиши изображение...";
             input.style.borderColor = 'var(--accent)';
+            // Вибрация если доступна
+            if (navigator.vibrate) navigator.vibrate(50);
         } else {
             btn.classList.remove('active');
             indicator.classList.remove('active');
@@ -816,12 +932,14 @@
         genQuality = mode;
         document.querySelectorAll('.gen-opt-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('btn' + mode.charAt(0).toUpperCase() + mode.slice(1)).classList.add('active');
+        if (navigator.vibrate) navigator.vibrate(30);
     }
 
     function openHistory() {
         document.getElementById('historyPanel').classList.add('open');
         document.getElementById('historyOverlay').classList.add('show');
         renderHistory();
+        if (navigator.vibrate) navigator.vibrate(40);
     }
     
     function closeHistory() {
@@ -850,6 +968,7 @@
             document.getElementById('userInput').focus();
         }
         closeHistory();
+        if (navigator.vibrate) navigator.vibrate(30);
     }
     
     function addToHistory(text, isUser = true, isImage = false) {
@@ -863,6 +982,7 @@
             messageHistory = [];
             localStorage.removeItem('vision_history');
             renderHistory();
+            if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
         }
     }
 
@@ -876,6 +996,7 @@
     
     function scrollToBottom() {
         chat.scrollTo({ top: chat.scrollHeight, behavior: 'smooth' });
+        if (navigator.vibrate) navigator.vibrate(30);
     }
     
     function checkScroll() {
@@ -886,10 +1007,12 @@
 
     function openCamera() {
         document.getElementById('cameraInput').click();
+        if (navigator.vibrate) navigator.vibrate(40);
     }
     
     function openGallery() {
         document.getElementById('galleryInput').click();
+        if (navigator.vibrate) navigator.vibrate(40);
     }
 
     function handleImage(input) {
@@ -908,6 +1031,7 @@
             document.getElementById('photoPreview').style.display = 'block';
             document.getElementById('userInput').focus();
             setTimeout(() => chat.scrollTop = chat.scrollHeight, 100);
+            if (navigator.vibrate) navigator.vibrate(50);
         };
         reader.onerror = () => alert('Ошибка чтения файла');
         reader.readAsDataURL(file);
@@ -918,6 +1042,7 @@
         currentImageData = null;
         document.getElementById('photoPreview').style.display = 'none';
         document.getElementById('previewImg').src = '';
+        if (navigator.vibrate) navigator.vibrate(30);
     }
     
     function handleKey(e) {
@@ -941,6 +1066,7 @@
         `;
         chat.appendChild(div);
         checkScroll();
+        if (navigator.vibrate) navigator.vibrate(40);
     }
 
     function generateId() {
@@ -962,6 +1088,7 @@
         editingMsgId = msgId;
         msgEl.style.border = '2px solid var(--neon)';
         document.getElementById('userInput').focus();
+        if (navigator.vibrate) navigator.vibrate(30);
     }
 
     function deleteMessage(msgId) {
@@ -982,28 +1109,45 @@
         removePhoto();
     }
 
+    // ИСПРАВЛЕННАЯ ГЕНЕРАЦИЯ ИЗОБРАЖЕНИЙ
     async function generateImage(prompt) {
         const seed = Math.floor(Math.random() * 1000000);
-        let model = 'flux';
         let width = 1024;
         let height = 1024;
+        let model = 'flux';
         
         if (genQuality === 'fast') {
-            model = 'flux';
             width = 512;
             height = 512;
+            model = 'flux';
         } else if (genQuality === 'quality') {
-            model = 'flux-realism';
             width = 1024;
             height = 1024;
+            model = 'flux-realism';
         } else if (genQuality === 'turbo') {
-            model = 'turbo';
             width = 512;
             height = 512;
+            model = 'turbo';
         }
 
+        // Кодируем промпт правильно
         const encodedPrompt = encodeURIComponent(prompt);
-        return `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true&model=${model}&enhance=true`;
+        
+        // Формируем URL с правильными параметрами
+        const params = new URLSearchParams({
+            width: width,
+            height: height,
+            seed: seed,
+            nologo: 'true',
+            model: model,
+            enhance: 'true'
+        });
+        
+        const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?${params.toString()}`;
+        
+        console.log('Generated URL:', imageUrl); // Для отладки
+        
+        return imageUrl;
     }
 
     async function analyzeImageWithAI(imageBase64, userText) {
@@ -1059,6 +1203,9 @@
             return; 
         }
 
+        // Вибрация при отправке
+        if (navigator.vibrate) navigator.vibrate(60);
+
         if (editingMsgId) {
             const oldMsg = document.getElementById(editingMsgId);
             if (oldMsg) oldMsg.remove();
@@ -1101,7 +1248,7 @@
 
         const load = document.createElement('div');
         load.className = 'msg ai';
-        load.innerHTML = genMode ? '<div class="loading-gen">Генерирую...</div>' : '👁️ Думаю...';
+        load.innerHTML = genMode ? '<div class="loading-gen">Генерирую изображение...</div>' : '👁️ Думаю...';
         chat.appendChild(load);
         checkScroll();
         
@@ -1109,19 +1256,37 @@
         if (genMode) sendBtn.classList.add('generating');
 
         try {
-            let resText;
-            
             if (genMode && text) {
+                // РЕЖИМ ГЕНЕРАЦИИ
+                console.log('Starting image generation...');
                 const imageUrl = await generateImage(text);
+                
+                // Создаём изображение для проверки загрузки
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                
+                await new Promise((resolve, reject) => {
+                    img.onload = resolve;
+                    img.onerror = () => {
+                        // Если ошибка, пробуем ещё раз с другим seed
+                        console.log('Retrying with new seed...');
+                        const retryUrl = imageUrl.replace(/seed=\d+/, 'seed=' + Math.floor(Math.random() * 1000000));
+                        img.src = retryUrl;
+                        img.onload = resolve;
+                        img.onerror = reject;
+                    };
+                    img.src = imageUrl;
+                });
+                
                 load.remove();
                 
                 const aiDiv = document.createElement('div');
                 aiDiv.className = 'msg ai';
                 aiDiv.innerHTML = `
                     <div style="font-size:12px;opacity:0.8;margin-bottom:6px;">🎨 ${text}</div>
-                    <img src="${imageUrl}" class="generated-img" alt="Generated" onload="checkScroll()" onerror="this.src='${imageUrl}&retry=1'">
+                    <img src="${img.src}" class="generated-img" alt="Generated" style="display:block;max-width:100%;">
                     <br>
-                    <button class="download-btn" onclick="downloadImage('${imageUrl}')">
+                    <button class="download-btn" onclick="downloadImage('${img.src}')" type="button">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                         СКАЧАТЬ
                     </button>
@@ -1129,8 +1294,11 @@
                 chat.appendChild(aiDiv);
                 addToHistory(`[Изображение: ${text}]`, false, true);
                 
+                // Успешная генерация - вибрация
+                if (navigator.vibrate) navigator.vibrate([50, 100, 50]);
+                
             } else if (imgToSend) {
-                resText = await analyzeImageWithAI(imgToSend, text);
+                const resText = await analyzeImageWithAI(imgToSend, text);
                 load.remove();
                 
                 const aiDiv = document.createElement('div');
@@ -1157,7 +1325,7 @@
                         model: "openai"
                     })
                 });
-                resText = await response.text();
+                let resText = await response.text();
                 resText = resText.replace(/\{.*?\}/g, '').trim() || "Нет ответа";
                 
                 load.remove();
@@ -1172,8 +1340,8 @@
             checkScroll();
 
         } catch (e) { 
-            console.error(e);
-            load.innerHTML = "❌ Ошибка. Попробуй ещё раз."; 
+            console.error('Error:', e);
+            load.innerHTML = "❌ Ошибка генерации. Попробуй ещё раз.<br><small>Возможно, сервер перегружен</small>"; 
         } finally {
             sendBtn.disabled = false;
             sendBtn.classList.remove('generating');
@@ -1184,20 +1352,16 @@
         return text
             .replace(/```(\w+)?([\s\S]*?)```/g, (m, l, code) => {
                 const lang = l || 'text';
-                return `<pre><div class="code-buttons"><button class="copy-btn" onclick="copyCode(this)">КОПИРОВАТЬ</button></div><code class="language-${lang}">${code.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+                return `<pre><div class="code-buttons"><button class="copy-btn" onclick="copyCode(this)" type="button">КОПИРОВАТЬ</button></div><code class="language-${lang}">${code.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
             })
             .replace(/\*\*(.*?)\*\*/g, '<b style="color:var(--neon);">$1</b>')
             .replace(/\n/g, '<br>');
     }
 
     function downloadImage(url) {
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `neon_${Date.now()}.png`;
-        a.target = '_blank';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        // Открываем в новой вкладке для скачивания
+        window.open(url, '_blank');
+        if (navigator.vibrate) navigator.vibrate(50);
     }
 
     function copyCode(btn) {
@@ -1209,4 +1373,4 @@
     }
 </script>
 </body>
-</html>
+    </html>
