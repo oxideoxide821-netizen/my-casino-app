@@ -3,153 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEURO-SIGIL SUPREME</title>
+    <title>ZENITH // NEURAL</title>
     <script src="https://cdnjs.cloudflare.com"></script>
     <script src="https://telegram.org"></script>
     <style>
-        :root { --neon: #00f2ff; --gold: #ffcc00; --bg: #050505; }
-        body { margin: 0; padding: 0; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        @import url('https://fonts.googleapis.com');
         
-        #ui {
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 88%; padding: 20px; border-radius: 28px;
-            background: rgba(15, 15, 15, 0.7); backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1); z-index: 100; text-align: center;
+        :root { --accent: #fff; --bg: #000; --panel: rgba(255, 255, 255, 0.05); }
+        body { margin: 0; padding: 0; background: var(--bg); color: #fff; font-family: 'Manrope', sans-serif; overflow: hidden; -webkit-font-smoothing: antialiased; }
+
+        /* Верхняя статус-линия */
+        #header {
+            position: absolute; top: 25px; width: 100%; display: flex; justify-content: center;
+            font-size: 10px; letter-spacing: 4px; font-weight: 200; opacity: 0.5; z-index: 1000;
+        }
+
+        /* Основной блок управления */
+        #control-center {
+            position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%);
+            width: 88%; z-index: 1000; transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .glass-card {
+            background: var(--panel); border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(40px); border-radius: 35px; padding: 25px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
         }
 
         input {
-            width: 90%; background: rgba(0,0,0,0.5); border: 1px solid rgba(0,242,255,0.2);
-            border-radius: 15px; padding: 15px; color: var(--neon); font-size: 16px; 
-            outline: none; margin-bottom: 15px; transition: 0.4s; text-align: center;
+            width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px; padding: 20px; color: #fff; font-size: 16px;
+            box-sizing: border-box; outline: none; margin-bottom: 20px; text-align: center;
+            font-family: 'Manrope'; font-weight: 200; transition: 0.4s;
+        }
+        input:focus { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.2); }
+
+        .btn-prime {
+            width: 100%; padding: 22px; background: #fff; color: #000;
+            border: none; border-radius: 22px; font-weight: 800; font-size: 13px;
+            letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
+            transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .btn-prime:active { transform: scale(0.96); opacity: 0.8; }
+
+        /* Эффект виньетки */
+        .vignette {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 30%, rgba(0,0,0,0.9) 100%);
+            pointer-events: none; z-index: 500;
         }
 
-        .btn-group { display: flex; gap: 10px; }
-        button {
-            flex: 2; background: linear-gradient(135deg, #00f2ff, #0066ff);
-            border: none; color: white; padding: 16px; border-radius: 15px;
-            font-weight: 800; text-transform: uppercase; cursor: pointer; font-size: 12px;
+        /* Индикатор загрузки Creator */
+        #creator-status { 
+            display: none; position: absolute; top: -30px; width: 100%; text-align: center;
+            font-size: 9px; letter-spacing: 3px; color: #fff; opacity: 0.4;
         }
-
-        #gold-btn {
-            flex: 1; background: linear-gradient(135deg, #ff9900, #ffcc00);
-            color: #000; box-shadow: 0 0 20px rgba(255,204,0,0.3);
-        }
-
-        #status { margin-top: 12px; font-size: 9px; color: var(--neon); letter-spacing: 2px; opacity: 0.6; }
-        .creator-tag { color: var(--gold); font-weight: bold; margin-bottom: 5px; display: block; font-size: 10px; }
     </style>
 </head>
 <body>
-    <div id="ui">
-        <span id="admin-badge" class="creator-tag" style="display:none">CREATOR ACCESS GRANTED</span>
-        <input type="text" id="goal" placeholder="ВВЕДИ СВОЙ ЗАПРОС...">
-        <div class="btn-group">
-            <button onclick="activate(false)">ГЕНЕРАЦИЯ</button>
-            <button id="gold-btn" onclick="checkGold()">GOLD UPGRADE</button>
+    <div class="vignette"></div>
+    <div id="header">NEURAL FREQUENCY // STABLE</div>
+
+    <div id="control-center">
+        <div id="creator-status">IDENTITY: RANDOM06 // GOD_MODE</div>
+        <div class="glass-card">
+            <input type="text" id="prompt" placeholder="SAY SOMETHING..." autocomplete="off">
+            <button class="btn-prime" onmousedown="start()" onmouseup="stop()" ontouchstart="start()" ontouchend="stop()">
+                ACTIVATE NEURAL LINK
+            </button>
         </div>
-        <div id="status">NEURAL LINK IDLE</div>
     </div>
 
 <script>
 let tg = window.Telegram.WebApp;
 tg.expand();
-tg.enableClosingConfirmation();
+tg.backgroundColor = '#000000';
+tg.headerColor = '#000000';
 
-const CREATOR_ID = "Random"; // Твой username без @ для проверки в SDK
-let isGold = false;
-let particles = [];
-let sigilPoints = [];
+const USER = "Random06";
+let isCreator = tg.initDataUnsafe?.user?.username === USER;
 let active = false;
-let colorTheme = [0, 242, 255];
+let morph = 0;
+let points = [];
+let blobs = [];
 
-// Проверка на Создателя
-if (tg.initDataUnsafe?.user?.username === "Random") {
-    document.getElementById('admin-badge').style.display = 'block';
-    document.getElementById('gold-btn').innerText = "CREATOR GOLD";
-}
+if(isCreator) document.getElementById('creator-status').style.display = 'block';
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
-    for(let i=0; i<80; i++) particles.push(new Particle());
+    for(let i=0; i<15; i++) blobs.push(new SoftBlob());
 }
 
 function draw() {
-    background(5, 5, 5, 50);
-    particles.forEach(p => { p.update(); p.show(); });
+    background(0, 0, 0, isCreator ? 40 : 80);
+    
+    // Плавные фоновые формы
+    blobs.forEach(b => { b.update(); b.show(); });
 
-    if (active) {
-        translate(width/2, height/2 - 60);
-        let t = frameCount * 0.02;
+    if(active) {
+        morph = lerp(morph, 1, 0.05);
+        translate(width/2, height/2 - 80);
         
         noFill();
-        strokeWeight(isGold ? 3 : 1.5);
-        stroke(colorTheme[0], colorTheme[1], colorTheme[2], 180);
-
+        stroke(255, 255 * morph);
+        strokeWeight(isCreator ? 3 : 1.5);
+        
+        // Рисуем ртутный узор
         beginShape();
-        sigilPoints.forEach((pt, i) => {
-            let n = noise(t + i) * (isGold ? 40 : 10);
-            let x = pt.x + cos(t + i) * n;
-            let y = pt.y + sin(t + i) * n;
+        points.forEach((p, i) => {
+            let d = noise(frameCount * 0.01 + i) * (isCreator ? 60 : 30) * morph;
+            let x = (p.x * 120 + cos(frameCount * 0.02 + i) * d) * morph;
+            let y = (p.y * 120 + sin(frameCount * 0.02 + i) * d) * morph;
             curveVertex(x, y);
-            if(isGold && i % 2 == 0) {
-                push(); stroke(255, 200, 0, 100); ellipse(x, y, n/2); pop();
+            if(isCreator && i % 3 == 0) {
+                push(); fill(255, 100); noStroke(); ellipse(x, y, 4, 4); pop();
             }
         });
         endShape(CLOSE);
-    }
-}
-
-function activate(goldMode) {
-    let val = document.getElementById('goal').value;
-    if(!val) { tg.showAlert("Введите запрос!"); return; }
-
-    isGold = goldMode;
-    colorTheme = isGold ? [255, 204, 0] : [0, 242, 255];
-    
-    let seed = 0;
-    for(let i=0; i<val.length; i++) seed += val.charCodeAt(i);
-    
-    sigilPoints = [];
-    let steps = isGold ? 25 : 12;
-    for(let i=0; i<steps; i++) {
-        let ang = map(i, 0, steps, 0, TWO_PI);
-        let rad = (seed * (i+3) % (isGold ? 150 : 100)) + 50;
-        sigilPoints.push({ x: cos(ang)*rad, y: sin(ang)*rad });
-    }
-
-    active = true;
-    document.getElementById('status').innerText = isGold ? "GOLDEN RESONANCE ACTIVE" : "STANDARD SIGIL SYNCED";
-    tg.HapticFeedback.notificationOccurred(isGold ? 'success' : 'warning');
-}
-
-function checkGold() {
-    // Если ты - Создатель, включаем сразу
-    if (tg.initDataUnsafe?.user?.username === "Random") {
-        activate(true);
+        
+        // Тактильный пульс
+        if(frameCount % 30 === 0) tg.HapticFeedback.impactOccurred('medium');
     } else {
-        // Для остальных - запрос звезд через бота
-        tg.showConfirm("Активировать GOLD-режим за 50 Звёзд?", (ok) => {
-            if(ok) {
-                // Здесь вызывается платеж. В Mini App это делается через bot API
-                tg.showAlert("Счет на оплату отправлен в чат с ботом!");
-                // Логика: бот должен отправить Invoice пользователю
-            }
-        });
+        morph = lerp(morph, 0, 0.1);
     }
 }
 
-class Particle {
-    constructor() { this.pos = createVector(random(width), random(height)); this.vel = createVector(random(-0.7, 0.7), random(-0.7, 0.7)); }
+function start() {
+    let inp = document.getElementById('prompt').value;
+    if(!inp) return;
+    
+    active = true;
+    points = [];
+    let seed = 0;
+    for(let i=0; i<inp.length; i++) seed += inp.charCodeAt(i);
+    
+    for(let i=0; i<24; i++) {
+        let a = map(i, 0, 24, 0, TWO_PI);
+        points.push({x: cos(a), y: sin(a)});
+    }
+    
+    document.getElementById('control-center').style.transform = "translateX(-50%) scale(0.95)";
+    document.getElementById('control-center').style.opacity = "0.4";
+    tg.HapticFeedback.notificationOccurred('success');
+}
+
+function stop() {
+    active = false;
+    document.getElementById('control-center').style.transform = "translateX(-50%) scale(1)";
+    document.getElementById('control-center').style.opacity = "1";
+}
+
+class SoftBlob {
+    constructor() { this.pos = createVector(random(width), random(height)); this.vel = p5.Vector.random2D().mult(0.5); this.r = random(100, 300); }
     update() { 
         this.pos.add(this.vel); 
-        if(this.pos.x<0 || this.pos.x>width) this.vel.x*=-1; 
-        if(this.pos.y<0 || this.pos.y>height) this.vel.y*=-1; 
+        if(this.pos.x < -200 || this.pos.x > width + 200) this.vel.x *= -1;
+        if(this.pos.y < -200 || this.pos.y > height + 200) this.vel.y *= -1;
     }
-    show() { 
-        stroke(isGold ? 255 : 0, isGold ? 200 : 242, isGold ? 0 : 255, 40); 
-        point(this.pos.x, this.pos.y); 
+    show() {
+        noStroke();
+        let grad = drawingContext.createRadialGradient(this.pos.x, this.pos.y, 0, this.pos.x, this.pos.y, this.r);
+        grad.addColorStop(0, isCreator ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)');
+        grad.addColorStop(1, 'rgba(0,0,0,0)');
+        drawingContext.fillStyle = grad;
+        ellipse(this.pos.x, this.pos.y, this.r * 2);
     }
 }
+
+function windowResized() { resizeCanvas(windowWidth, windowHeight); }
 </script>
 </body>
 </html>
