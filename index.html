@@ -3,174 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZENITH // NEURAL</title>
-    <script src="https://cdnjs.cloudflare.com"></script>
+    <title>NEURAL CORE // FINAL</title>
     <script src="https://telegram.org"></script>
     <style>
         @import url('https://fonts.googleapis.com');
         
-        :root { --accent: #fff; --bg: #000; --panel: rgba(255, 255, 255, 0.05); }
-        body { margin: 0; padding: 0; background: var(--bg); color: #fff; font-family: 'Manrope', sans-serif; overflow: hidden; -webkit-font-smoothing: antialiased; }
-
-        /* Верхняя статус-линия */
-        #header {
-            position: absolute; top: 25px; width: 100%; display: flex; justify-content: center;
-            font-size: 10px; letter-spacing: 4px; font-weight: 200; opacity: 0.5; z-index: 1000;
+        :root { --accent: #fff; --gold: #ffcc00; --bg: #000; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            margin: 0; padding: 0; background: #000; color: #fff; 
+            font-family: 'Inter', sans-serif; overflow: hidden;
+            height: 100vh; width: 100vw;
         }
 
-        /* Основной блок управления */
-        #control-center {
-            position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%);
-            width: 88%; z-index: 1000; transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        #canvas { position: fixed; top: 0; left: 0; z-index: 1; }
+
+        /* HUD ИНТЕРФЕЙС */
+        .hud {
+            position: absolute; width: 100%; padding: 25px;
+            display: flex; justify-content: space-between;
+            font-family: 'JetBrains Mono'; font-size: 8px; 
+            letter-spacing: 2px; color: rgba(255,255,255,0.3); z-index: 10;
+        }
+
+        /* ОСНОВНОЙ КОНТЕЙНЕР */
+        .ui-root {
+            position: absolute; bottom: 40px; left: 0; width: 100%;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 0 20px; z-index: 100;
         }
 
         .glass-card {
-            background: var(--panel); border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(40px); border-radius: 35px; padding: 25px;
-            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+            width: 100%; max-width: 400px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 32px; padding: 25px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
         }
+
+        .creator-active { border-color: var(--gold) !important; box-shadow: 0 0 40px rgba(255,204,0,0.1) !important; }
 
         input {
-            width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 20px; padding: 20px; color: #fff; font-size: 16px;
-            box-sizing: border-box; outline: none; margin-bottom: 20px; text-align: center;
-            font-family: 'Manrope'; font-weight: 200; transition: 0.4s;
+            width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 18px; padding: 18px; color: #fff; font-size: 15px;
+            outline: none; margin-bottom: 15px; text-align: center;
+            font-family: 'Inter'; font-weight: 200; transition: 0.3s;
         }
-        input:focus { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.2); }
 
-        .btn-prime {
+        .btn {
             width: 100%; padding: 22px; background: #fff; color: #000;
-            border: none; border-radius: 22px; font-weight: 800; font-size: 13px;
+            border: none; border-radius: 20px; font-weight: 800; font-size: 13px;
             letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
-            transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .btn-prime:active { transform: scale(0.96); opacity: 0.8; }
+        .btn:active { transform: scale(0.97); opacity: 0.9; }
 
-        /* Эффект виньетки */
+        #sync-label { 
+            font-family: 'JetBrains Mono'; font-size: 10px; margin-top: 15px; 
+            color: rgba(255,255,255,0.5); letter-spacing: 3px;
+        }
+
         .vignette {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, transparent 30%, rgba(0,0,0,0.9) 100%);
-            pointer-events: none; z-index: 500;
-        }
-
-        /* Индикатор загрузки Creator */
-        #creator-status { 
-            display: none; position: absolute; top: -30px; width: 100%; text-align: center;
-            font-size: 9px; letter-spacing: 3px; color: #fff; opacity: 0.4;
+            background: radial-gradient(circle, transparent 20%, #000 100%);
+            pointer-events: none; z-index: 5;
         }
     </style>
 </head>
 <body>
+    <canvas id="canvas"></canvas>
     <div class="vignette"></div>
-    <div id="header">NEURAL FREQUENCY // STABLE</div>
 
-    <div id="control-center">
-        <div id="creator-status">IDENTITY: RANDOM06 // GOD_MODE</div>
-        <div class="glass-card">
-            <input type="text" id="prompt" placeholder="SAY SOMETHING..." autocomplete="off">
-            <button class="btn-prime" onmousedown="start()" onmouseup="stop()" ontouchstart="start()" ontouchend="stop()">
-                ACTIVATE NEURAL LINK
-            </button>
+    <div class="hud">
+        <div id="status">CORE: ACTIVE</div>
+        <div id="creator-tag" style="display:none; color:var(--gold)">GOD MODE // Random06</div>
+        <div>432.1 Hz</div>
+    </div>
+
+    <div class="ui-root">
+        <div class="glass-card" id="main-card">
+            <input type="text" id="dna" placeholder="ENTER INTENTION..." autocomplete="off">
+            <button class="btn" id="trigger">ACTIVATE NEURAL LINK</button>
+            <div id="sync-label" style="text-align: center;">IDLE</div>
         </div>
     </div>
 
 <script>
-let tg = window.Telegram.WebApp;
+const tg = window.Telegram.WebApp;
 tg.expand();
-tg.backgroundColor = '#000000';
-tg.headerColor = '#000000';
 
-const USER = "Random06";
-let isCreator = tg.initDataUnsafe?.user?.username === USER;
-let active = false;
-let morph = 0;
-let points = [];
-let blobs = [];
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const trigger = document.getElementById('trigger');
+const input = document.getElementById('dna');
+const label = document.getElementById('sync-label');
 
-if(isCreator) document.getElementById('creator-status').style.display = 'block';
+const CREATOR_ID = "Random06";
+const isCreator = tg.initDataUnsafe?.user?.username === CREATOR_ID;
 
-function setup() {
-    createCanvas(windowWidth, windowHeight);
-    for(let i=0; i<15; i++) blobs.push(new SoftBlob());
+if(isCreator) {
+    document.getElementById('creator-tag').style.display = 'block';
+    document.getElementById('main-card').classList.add('creator-active');
 }
 
-function draw() {
-    background(0, 0, 0, isCreator ? 40 : 80);
-    
-    // Плавные фоновые формы
-    blobs.forEach(b => { b.update(); b.show(); });
+let width, height;
+let particles = [];
+let isSyncing = false;
+let progress = 0;
+let angle = 0;
 
-    if(active) {
-        morph = lerp(morph, 1, 0.05);
-        translate(width/2, height/2 - 80);
+function init() {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+}
+
+window.addEventListener('resize', init);
+init();
+
+// Частицы фона
+class Particle {
+    constructor() {
+        this.reset();
+    }
+    reset() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.vx = (Math.random() - 0.5) * 0.5;
+        this.vy = (Math.random() - 0.5) * 0.5;
+        this.life = Math.random() * 0.5 + 0.2;
+    }
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if(this.x < 0 || this.x > width || this.y < 0 || this.y > height) this.reset();
+    }
+    draw() {
+        ctx.fillStyle = isCreator ? `rgba(255, 204, 0, ${this.life})` : `rgba(255, 255, 255, ${this.life})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 1, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
+for(let i=0; i<80; i++) particles.push(new Particle());
+
+function drawCore() {
+    const cx = width / 2;
+    const cy = height / 2 - 50;
+    const radius = isSyncing ? 80 + Math.sin(Date.now() * 0.01) * 10 : 60;
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(angle);
+
+    // Основное свечение
+    const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, radius * 1.5);
+    grad.addColorStop(0, isCreator ? 'rgba(255, 204, 0, 0.4)' : 'rgba(255, 255, 255, 0.2)');
+    grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(0, 0, radius * 2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Линии ядра
+    ctx.strokeStyle = isCreator ? 'rgba(255, 204, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)';
+    ctx.lineWidth = 1;
+    for(let i=0; i<3; i++) {
+        ctx.rotate(Math.PI / 3 + (isSyncing ? 0.05 : 0.01));
+        ctx.beginPath();
+        ctx.ellipse(0, 0, radius, radius * 0.4, 0, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+    ctx.restore();
+}
+
+function loop() {
+    ctx.clearRect(0, 0, width, height);
+    
+    particles.forEach(p => { p.update(); p.draw(); });
+    
+    if(isSyncing) {
+        progress += 0.4;
+        angle += 0.05;
+        label.innerText = `SYNCING: ${Math.min(100, progress).toFixed(1)}%`;
+        if(Math.floor(progress) % 15 === 0) tg.HapticFeedback.impactOccurred('light');
         
-        noFill();
-        stroke(255, 255 * morph);
-        strokeWeight(isCreator ? 3 : 1.5);
-        
-        // Рисуем ртутный узор
-        beginShape();
-        points.forEach((p, i) => {
-            let d = noise(frameCount * 0.01 + i) * (isCreator ? 60 : 30) * morph;
-            let x = (p.x * 120 + cos(frameCount * 0.02 + i) * d) * morph;
-            let y = (p.y * 120 + sin(frameCount * 0.02 + i) * d) * morph;
-            curveVertex(x, y);
-            if(isCreator && i % 3 == 0) {
-                push(); fill(255, 100); noStroke(); ellipse(x, y, 4, 4); pop();
-            }
-        });
-        endShape(CLOSE);
-        
-        // Тактильный пульс
-        if(frameCount % 30 === 0) tg.HapticFeedback.impactOccurred('medium');
+        if(progress >= 100) {
+            isSyncing = false;
+            progress = 0;
+            label.innerText = "ESTABLISHED";
+            tg.HapticFeedback.notificationOccurred('success');
+            tg.showAlert("НЕЙРО-ЛИНК УСПЕШНО АКТИВИРОВАН.");
+        }
     } else {
-        morph = lerp(morph, 0, 0.1);
+        angle += 0.005;
     }
+
+    drawCore();
+    requestAnimationFrame(loop);
 }
 
-function start() {
-    let inp = document.getElementById('prompt').value;
-    if(!inp) return;
-    
-    active = true;
-    points = [];
-    let seed = 0;
-    for(let i=0; i<inp.length; i++) seed += inp.charCodeAt(i);
-    
-    for(let i=0; i<24; i++) {
-        let a = map(i, 0, 24, 0, TWO_PI);
-        points.push({x: cos(a), y: sin(a)});
-    }
-    
-    document.getElementById('control-center').style.transform = "translateX(-50%) scale(0.95)";
-    document.getElementById('control-center').style.opacity = "0.4";
-    tg.HapticFeedback.notificationOccurred('success');
-}
+trigger.addEventListener('mousedown', () => { if(input.value) isSyncing = true; });
+trigger.addEventListener('touchstart', (e) => { e.preventDefault(); if(input.value) isSyncing = true; });
+window.addEventListener('mouseup', () => { if(progress < 100) { isSyncing = false; progress = 0; label.innerText = "IDLE"; } });
+window.addEventListener('touchend', () => { if(progress < 100) { isSyncing = false; progress = 0; label.innerText = "IDLE"; } });
 
-function stop() {
-    active = false;
-    document.getElementById('control-center').style.transform = "translateX(-50%) scale(1)";
-    document.getElementById('control-center').style.opacity = "1";
-}
-
-class SoftBlob {
-    constructor() { this.pos = createVector(random(width), random(height)); this.vel = p5.Vector.random2D().mult(0.5); this.r = random(100, 300); }
-    update() { 
-        this.pos.add(this.vel); 
-        if(this.pos.x < -200 || this.pos.x > width + 200) this.vel.x *= -1;
-        if(this.pos.y < -200 || this.pos.y > height + 200) this.vel.y *= -1;
-    }
-    show() {
-        noStroke();
-        let grad = drawingContext.createRadialGradient(this.pos.x, this.pos.y, 0, this.pos.x, this.pos.y, this.r);
-        grad.addColorStop(0, isCreator ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)');
-        grad.addColorStop(1, 'rgba(0,0,0,0)');
-        drawingContext.fillStyle = grad;
-        ellipse(this.pos.x, this.pos.y, this.r * 2);
-    }
-}
-
-function windowResized() { resizeCanvas(windowWidth, windowHeight); }
+loop();
 </script>
 </body>
 </html>
