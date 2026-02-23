@@ -14,7 +14,17 @@
             --green: #00ff88; 
             --red: #ff3333; 
             --gold: #f7931a;
-            --text: #e0e0e0; 
+            --text: #e0e0e0;
+            --border: #2a2a2a;
+            --shadow: rgba(0,0,0,0.6);
+        }
+        
+        [data-theme="light"] {
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --text: #1a1a1a;
+            --border: #e0e0e0;
+            --shadow: rgba(0,0,0,0.1);
         }
         
         * { 
@@ -24,10 +34,7 @@
             -webkit-tap-highlight-color: transparent;
         }
         
-        html {
-            overflow-x: hidden;
-            max-width: 100vw;
-        }
+        html { overflow-x: hidden; max-width: 100vw; }
         
         body { 
             font-family: -apple-system, system-ui, sans-serif; 
@@ -39,6 +46,7 @@
             overflow-x: hidden;
             max-width: 100vw;
             min-height: 100vh;
+            transition: all 0.3s ease;
         }
 
         .glow-bg {
@@ -58,13 +66,14 @@
             50% { opacity: 0.8; transform: scale(1.15); }
         }
 
-        /* Биткоин */
+        /* БИТКОИН */
         .bitcoin-wrapper {
-            width: 80px;
-            height: 80px;
+            width: 140px;
+            height: 140px;
             margin: 10px auto 25px;
             position: relative;
             z-index: 1;
+            perspective: 1200px;
         }
         
         .bitcoin-coin {
@@ -72,78 +81,102 @@
             height: 100%;
             position: relative;
             transform-style: preserve-3d;
-            animation: coinFlip 4s infinite ease-in-out;
+            animation: coinRotate 8s infinite linear;
         }
         
-        @keyframes coinFlip {
-            0% { transform: rotateY(0deg) rotateX(5deg); }
-            25% { transform: rotateY(90deg) rotateX(-5deg); }
-            50% { transform: rotateY(180deg) rotateX(5deg); }
-            75% { transform: rotateY(270deg) rotateX(-5deg); }
-            100% { transform: rotateY(360deg) rotateX(5deg); }
+        @keyframes coinRotate {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
         }
         
-        .coin-side {
+        .coin-layer {
             position: absolute;
-            width: 80px;
-            height: 80px;
+            width: 140px;
+            height: 140px;
             border-radius: 50%;
-            backface-visibility: hidden;
+            left: 0;
+            top: 0;
         }
         
         .coin-front {
             background: linear-gradient(135deg, #ff9500 0%, #ffb700 50%, #ff9500 100%);
-            transform: translateZ(4px);
+            transform: translateZ(20px);
+            border: 8px solid #fff;
+            box-shadow: 
+                0 0 80px rgba(255, 149, 0, 0.9),
+                inset 0 0 60px rgba(255,255,255,0.6),
+                0 25px 60px rgba(0,0,0,0.6);
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 4px solid #fff;
-            box-shadow: 
-                0 0 40px rgba(255, 149, 0, 0.6),
-                inset 0 0 30px rgba(255,255,255,0.4),
-                0 10px 30px rgba(0,0,0,0.4);
         }
         
         .coin-back {
             background: linear-gradient(135deg, #e8850a 0%, #ffa500 50%, #e8850a 100%);
-            transform: translateZ(-4px) rotateY(180deg);
+            transform: translateZ(-20px) rotateY(180deg);
+            border: 8px solid #fff;
+            box-shadow: 
+                0 0 80px rgba(232, 133, 10, 0.9),
+                inset 0 0 60px rgba(255,255,255,0.5),
+                0 25px 60px rgba(0,0,0,0.6);
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 4px solid #fff;
-            box-shadow: 
-                0 0 40px rgba(232, 133, 10, 0.6),
-                inset 0 0 30px rgba(255,255,255,0.3),
-                0 10px 30px rgba(0,0,0,0.4);
         }
         
-        .coin-edge {
+        .coin-layer-1 { transform: translateZ(15px); background: linear-gradient(135deg, #ff9500, #ffb700); opacity: 0.9; }
+        .coin-layer-2 { transform: translateZ(10px); background: linear-gradient(135deg, #f09000, #ffb000); opacity: 0.8; }
+        .coin-layer-3 { transform: translateZ(5px); background: linear-gradient(135deg, #e08000, #ffa500); opacity: 0.7; }
+        .coin-layer-4 { transform: translateZ(0px); background: linear-gradient(135deg, #d07000, #ff9500); opacity: 0.6; }
+        .coin-layer-5 { transform: translateZ(-5px); background: linear-gradient(135deg, #c06000, #f09000); opacity: 0.7; }
+        .coin-layer-6 { transform: translateZ(-10px); background: linear-gradient(135deg, #b05000, #e08000); opacity: 0.8; }
+        .coin-layer-7 { transform: translateZ(-15px); background: linear-gradient(135deg, #a04000, #d07000); opacity: 0.9; }
+        
+        .coin-side {
             position: absolute;
-            width: 80px;
-            height: 8px;
-            background: linear-gradient(90deg, #d47600, #ff9500, #d47600);
-            top: 36px;
+            width: 140px;
+            height: 40px;
+            background: repeating-linear-gradient(
+                90deg,
+                #d47600 0px,
+                #ff9500 2px,
+                #d47600 4px
+            );
+            top: 50px;
             left: 0;
             transform: rotateX(90deg);
-            border-radius: 4px;
+            border-radius: 20px;
         }
         
+        .coin-rim {
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 12px solid #ff9500;
+            top: 0;
+            left: 0;
+        }
+        
+        .coin-rim-front { transform: translateZ(18px); border-color: #ffb700; }
+        .coin-rim-back { transform: translateZ(-18px) rotateY(180deg); border-color: #e8850a; }
+        
         .bitcoin-symbol {
-            font-size: 2.5em;
+            font-size: 5em;
             font-weight: 900;
             color: white;
-            text-shadow: 0 3px 6px rgba(0,0,0,0.4);
+            text-shadow: 0 5px 10px rgba(0,0,0,0.6);
         }
         
         .coin-shine {
             position: absolute;
-            top: 10%;
-            left: 10%;
-            width: 30%;
-            height: 20%;
-            background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, transparent 100%);
+            top: 15%;
+            left: 15%;
+            width: 25%;
+            height: 15%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, transparent 100%);
             border-radius: 50%;
-            transform: rotate(-45deg);
+            transform: rotate(-30deg);
         }
 
         /* Шапка */
@@ -164,7 +197,7 @@
             display: flex; 
             align-items: center; 
             gap: 10px;
-            background: linear-gradient(90deg, #fff, var(--gold), #fff);
+            background: linear-gradient(90deg, var(--gold), #ffb700, var(--gold));
             background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -174,37 +207,55 @@
         @keyframes shine { to { background-position: 200% center; } }
         
         .header-btns { display: flex; gap: 10px; }
+
+        /* АНИМАЦИЯ НАЖАТИЯ */
+        .icon-btn, .add-btn, .amount-btn, .bet-btn, .btn-earn, 
+        .btn-share, .back-btn, .nav-item, .earn-btn, .mining-btn,
+        .trade-btn-small, .task-btn, .risk-btn, .collect-btn {
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
         
+        .icon-btn:active, .add-btn:active, .amount-btn:active, 
+        .bet-btn:active, .btn-earn:active, .btn-share:active, 
+        .back-btn:active, .nav-item:active, .earn-btn:active, 
+        .mining-btn:active, .trade-btn-small:active,
+        .task-btn:active, .risk-btn:active, .collect-btn:active {
+            transform: scale(0.92) !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+        }
+
         .icon-btn {
-            width: 42px;
-            height: 42px;
-            border-radius: 12px;
-            background: #1a1a1a;
-            border: 1px solid #333;
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: var(--card);
+            border: 2px solid var(--border);
             color: #888;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 1.1em;
+            font-size: 1.2em;
             flex-shrink: 0;
+            box-shadow: 0 4px 15px var(--shadow);
         }
         
         .icon-btn:hover { 
             color: var(--gold); 
             border-color: var(--gold);
-            background: #222;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(247,147,26,0.3);
         }
-        .icon-btn:active { transform: scale(0.92); }
 
         .card { 
-            background: #161616;
+            background: var(--card);
             border-radius: 24px; 
             padding: 22px; 
             text-align: center; 
-            border: 1px solid #2a2a2a; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            border: 2px solid var(--border); 
+            box-shadow: 0 15px 35px var(--shadow);
             margin-bottom: 18px; 
             position: relative;
             z-index: 1;
@@ -213,7 +264,7 @@
 
         .balance-box { 
             font-size: 0.85em; 
-            color: #666; 
+            color: #888; 
             margin-bottom: 10px; 
             display: flex; 
             justify-content: center; 
@@ -223,39 +274,41 @@
         }
         
         .balance-amount {
-            font-size: 2.4em;
+            font-size: 2.6em;
             font-weight: 900;
             color: var(--gold);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
-            text-shadow: 0 0 25px rgba(247,147,26,0.3);
+            text-shadow: 0 0 30px rgba(247,147,26,0.4);
         }
 
         .add-btn {
-            background: #1a1a1a;
-            border: 1px solid #444;
-            color: #999;
-            padding: 6px 12px;
+            background: var(--card);
+            border: 2px solid var(--border);
+            color: #888;
+            padding: 8px 14px;
             border-radius: 20px;
-            font-size: 0.75em;
+            font-size: 0.8em;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 5px;
-            transition: all 0.2s;
+            gap: 6px;
+            font-weight: 700;
+            box-shadow: 0 4px 10px var(--shadow);
         }
         
         .add-btn:hover { 
-            background: rgba(247,147,26,0.2);
+            background: rgba(247,147,26,0.15);
             color: var(--gold); 
             border-color: var(--gold);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(247,147,26,0.3);
         }
-        .add-btn:active { transform: scale(0.95); }
 
         .price { 
-            font-size: 3em; 
+            font-size: 3.2em; 
             font-weight: 900; 
             margin: 15px 0; 
             font-variant-numeric: tabular-nums; 
@@ -264,11 +317,11 @@
         
         .price.up { 
             color: var(--green); 
-            text-shadow: 0 0 25px rgba(0,255,136,0.5);
+            text-shadow: 0 0 30px rgba(0,255,136,0.6);
         } 
         .price.down { 
             color: var(--red); 
-            text-shadow: 0 0 25px rgba(255,51,51,0.5);
+            text-shadow: 0 0 30px rgba(255,51,51,0.6);
         }
 
         .timer-box {
@@ -278,29 +331,29 @@
             gap: 15px;
             margin-top: 15px;
             padding-top: 15px;
-            border-top: 1px solid #2a2a2a;
+            border-top: 2px solid var(--border);
         }
         
         .timer-display {
             font-family: 'Courier New', monospace;
-            font-size: 1.5em;
+            font-size: 1.6em;
             font-weight: 900;
             color: var(--primary);
-            text-shadow: 0 0 15px rgba(0,136,204,0.4);
+            text-shadow: 0 0 20px rgba(0,136,204,0.5);
         }
         
         .timer-bar {
-            width: 100px;
-            height: 4px;
-            background: #222;
-            border-radius: 2px;
+            width: 120px;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
             overflow: hidden;
         }
         
         .timer-progress {
             height: 100%;
             background: linear-gradient(90deg, var(--primary), var(--green));
-            border-radius: 2px;
+            border-radius: 3px;
             transition: width 1s linear;
         }
 
@@ -317,33 +370,35 @@
         .amount-selector::-webkit-scrollbar { display: none; }
         
         .amount-btn {
-            padding: 10px 16px;
-            border: 2px solid #2a2a2a;
-            background: #1a1a1a;
-            color: #777;
-            border-radius: 12px;
+            padding: 12px 18px;
+            border: 2px solid var(--border);
+            background: var(--card);
+            color: #888;
+            border-radius: 14px;
             cursor: pointer;
             font-weight: 800;
-            font-size: 0.85em;
-            transition: all 0.2s ease;
+            font-size: 0.9em;
             white-space: nowrap;
             display: flex;
             align-items: center;
             gap: 6px;
             flex-shrink: 0;
+            box-shadow: 0 4px 10px var(--shadow);
         }
         
         .amount-btn:hover { 
-            border-color: #444; 
+            border-color: #666; 
             color: #aaa;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
         }
-        .amount-btn:active { transform: scale(0.96); }
         
         .amount-btn.active { 
             background: rgba(247,147,26,0.2);
             border-color: var(--gold); 
             color: var(--gold);
-            box-shadow: 0 0 20px rgba(247,147,26,0.3);
+            box-shadow: 0 0 25px rgba(247,147,26,0.4);
+            transform: translateY(-2px);
         }
 
         .btn-group { 
@@ -356,39 +411,35 @@
         
         .bet-btn { 
             border: none; 
-            border-radius: 18px; 
-            padding: 20px 16px; 
-            font-size: 1.1em; 
+            border-radius: 20px; 
+            padding: 22px 18px; 
+            font-size: 1.2em; 
             font-weight: 900; 
             cursor: pointer; 
             color: white; 
-            transition: transform 0.15s ease, box-shadow 0.2s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             position: relative;
             overflow: hidden;
             min-width: 0;
+            box-shadow: 0 10px 30px var(--shadow);
         }
 
         .btn-up { 
             background: linear-gradient(145deg, #00c853, #00ff88);
             color: #000; 
-            box-shadow: 0 8px 25px rgba(0,200,83,0.35);
+            box-shadow: 0 10px 30px rgba(0,200,83,0.4);
         }
         
         .btn-up:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(0,255,136,0.45);
-        }
-        
-        .btn-up:active { 
-            transform: translateY(-1px) scale(0.98);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,255,136,0.5);
         }
         
         .btn-up:disabled { 
-            opacity: 0.35; 
+            opacity: 0.4; 
             cursor: not-allowed;
             transform: none !important;
             box-shadow: none;
@@ -396,107 +447,159 @@
 
         .btn-down { 
             background: linear-gradient(145deg, #d50000, #ff5252);
-            box-shadow: 0 8px 25px rgba(213,0,0,0.35);
+            box-shadow: 0 10px 30px rgba(213,0,0,0.4);
         }
         
         .btn-down:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(255,82,82,0.45);
-        }
-        
-        .btn-down:active { 
-            transform: translateY(-1px) scale(0.98);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(255,82,82,0.5);
         }
         
         .btn-down:disabled { 
-            opacity: 0.35; 
+            opacity: 0.4; 
             cursor: not-allowed;
             transform: none !important;
             box-shadow: none;
         }
         
-        .btn-icon { font-size: 1.4em; }
-        .btn-sub { font-size: 0.7em; opacity: 0.9; font-weight: 700; }
+        .btn-icon { font-size: 1.6em; }
+        .btn-sub { font-size: 0.75em; opacity: 0.9; font-weight: 700; }
+
+        .earn-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 15px;
+        }
+        
+        .btn-earn {
+            background: linear-gradient(145deg, var(--card), var(--bg));
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            padding: 18px;
+            border-radius: 18px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            font-weight: 800;
+            box-shadow: 0 8px 25px var(--shadow);
+        }
+        
+        .btn-earn:hover {
+            background: rgba(247,147,26,0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(247,147,26,0.4);
+        }
 
         .btn-share { 
-            background: #1a1a1a;
+            background: linear-gradient(145deg, var(--card), var(--bg));
             width: 100%; 
             margin-top: 15px; 
-            border: 2px solid #333; 
+            border: 2px solid var(--border); 
             color: #888;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            font-size: 0.95em;
-            font-weight: 700;
-            padding: 16px;
-            border-radius: 16px;
+            gap: 12px;
+            font-size: 1em;
+            font-weight: 800;
+            padding: 18px;
+            border-radius: 18px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            max-width: 100%;
+            box-shadow: 0 8px 25px var(--shadow);
         }
         
         .btn-share:hover { 
             border-color: var(--primary);
             color: var(--primary);
-            background: #222;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0,136,204,0.3);
         }
-        .btn-share:active { transform: scale(0.98); }
 
         .section-title { 
-            font-size: 0.75em; 
-            color: #555; 
+            font-size: 0.8em; 
+            color: #888; 
             text-transform: uppercase; 
             letter-spacing: 2px; 
-            margin: 20px 0 10px 5px; 
+            margin: 25px 0 12px 5px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center;
-            font-weight: 700;
+            font-weight: 800;
             max-width: 100%;
         }
         
+        .chat-container {
+            background: var(--card);
+            border-radius: 24px;
+            padding: 20px;
+            border: 2px solid var(--border);
+            box-shadow: 0 15px 35px var(--shadow);
+        }
+        
         .chat-box { 
-            background: #0a0a0a; 
+            background: var(--bg); 
             border-radius: 20px; 
-            padding: 18px; 
-            height: 150px; 
+            padding: 15px; 
+            height: 200px; 
             overflow-y: auto; 
-            border: 1px solid #2a2a2a; 
+            border: 2px solid var(--border); 
             display: flex; 
-            flex-direction: column-reverse;
+            flex-direction: column;
+            gap: 8px;
             max-width: 100%;
         }
         
         .msg { 
             font-size: 0.9em; 
-            margin-bottom: 8px; 
             line-height: 1.4; 
-            border-bottom: 1px solid #1a1a1a; 
-            padding-bottom: 6px; 
             display: flex;
             align-items: flex-start;
-            gap: 8px;
+            gap: 10px;
             animation: fadeIn 0.3s ease;
             max-width: 100%;
             word-break: break-word;
+            padding: 8px 12px;
+            background: rgba(0,136,204,0.1);
+            border-radius: 14px;
+            border: 1px solid rgba(0,136,204,0.2);
         }
         
-        @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        .msg.own {
+            background: rgba(247,147,26,0.1);
+            border-color: rgba(247,147,26,0.3);
+            flex-direction: row-reverse;
+            text-align: right;
+        }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         .msg-avatar {
-            width: 26px;
-            height: 26px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--primary), var(--green));
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.75em;
+            font-size: 0.8em;
             font-weight: 900;
             flex-shrink: 0;
+            border: 2px solid var(--border);
         }
+        
+        .msg-content { flex: 1; }
+        
+        .msg-name {
+            font-weight: 800;
+            color: var(--primary);
+            font-size: 0.85em;
+            margin-bottom: 2px;
+        }
+        
+        .msg.own .msg-name { color: var(--gold); }
         
         .input-area { 
             display: flex; 
@@ -507,45 +610,48 @@
         
         input { 
             flex: 1; 
-            background: #1a1a1a;
-            border: 2px solid #2a2a2a; 
-            color: #fff; 
-            padding: 14px; 
-            border-radius: 14px; 
+            background: var(--bg);
+            border: 2px solid var(--border); 
+            color: var(--text); 
+            padding: 16px; 
+            border-radius: 16px; 
             outline: none;
-            font-size: 0.95em;
-            transition: border-color 0.2s;
+            font-size: 1em;
+            transition: all 0.2s;
             min-width: 0;
         }
         
-        input:focus { border-color: var(--primary); }
+        input:focus { 
+            border-color: var(--primary); 
+            box-shadow: 0 0 20px rgba(0,136,204,0.2);
+        }
 
         .feed { 
             display: flex; 
             flex-direction: column; 
-            gap: 8px; 
+            gap: 10px; 
             padding-bottom: 10px;
             max-width: 100%;
         }
         
         .bet-item { 
-            background: #161616;
-            padding: 14px 18px; 
-            border-radius: 16px; 
+            background: var(--card);
+            padding: 16px 20px; 
+            border-radius: 18px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center;
-            font-size: 0.9em; 
-            border-left: 4px solid #333; 
+            font-size: 0.95em; 
+            border-left: 5px solid #333; 
             animation: slideIn 0.4s ease;
-            border: 1px solid #222;
-            border-left-width: 4px;
+            border: 2px solid var(--border);
+            border-left-width: 5px;
             max-width: 100%;
+            box-shadow: 0 5px 15px var(--shadow);
         }
         
         @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
 
-        /* Нижняя навигация */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -553,37 +659,38 @@
             right: 0;
             background: rgba(18,18,18,0.98);
             backdrop-filter: blur(20px);
-            border-top: 1px solid #2a2a2a;
-            padding: 10px 20px 20px;
+            border-top: 2px solid var(--border);
+            padding: 12px 20px 25px;
             display: flex;
             justify-content: space-around;
             z-index: 1000;
             max-width: 100vw;
         }
         
+        [data-theme="light"] .bottom-nav {
+            background: rgba(255,255,255,0.98);
+        }
+        
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
-            color: #555;
-            font-size: 0.65em;
-            font-weight: 700;
-            transition: all 0.2s ease;
-            padding: 8px 16px;
-            border-radius: 16px;
+            gap: 5px;
+            color: #888;
+            font-size: 0.7em;
+            font-weight: 800;
+            padding: 10px 20px;
+            border-radius: 18px;
             cursor: pointer;
         }
         
-        .nav-item i { font-size: 1.4em; margin-bottom: 3px; }
-        .nav-item:hover { color: #888; }
+        .nav-item i { font-size: 1.6em; margin-bottom: 3px; }
+        .nav-item:hover { color: #aaa; }
         .nav-item.active { 
             color: var(--gold); 
             background: rgba(247,147,26,0.15);
         }
-        .nav-item:active { transform: scale(0.9); }
 
-        /* Экраны */
         .screen { 
             display: none;
             max-width: 100%;
@@ -595,24 +702,28 @@
         @keyframes fadeScreen { from { opacity: 0; } to { opacity: 1; } }
 
         .back-btn {
-            background: #1a1a1a;
-            border: 2px solid #333;
+            background: var(--card);
+            border: 2px solid var(--border);
             color: #888;
-            padding: 12px 20px;
-            border-radius: 14px;
+            padding: 14px 24px;
+            border-radius: 16px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 20px;
             margin-top: 10px;
-            font-weight: 700;
-            transition: all 0.2s;
+            font-weight: 800;
             max-width: 100%;
+            box-shadow: 0 5px 15px var(--shadow);
         }
         
-        .back-btn:hover { border-color: var(--gold); color: var(--gold); }
-        .back-btn:active { transform: scale(0.97); }
+        .back-btn:hover { 
+            border-color: var(--gold); 
+            color: var(--gold); 
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(247,147,26,0.3);
+        }
 
         .profile-header {
             text-align: center;
@@ -621,15 +732,14 @@
         }
         
         .profile-avatar {
-            width: 100px;
-            height: 100px;
+            width: 110px;
+            height: 110px;
             border-radius: 50%;
             margin: 0 auto 15px;
-            border: 3px solid var(--gold);
-            box-shadow: 0 0 30px rgba(247,147,26,0.3);
+            border: 4px solid var(--gold);
+            box-shadow: 0 0 40px rgba(247,147,26,0.4);
         }
 
-        /* Модальные окна */
         .modal {
             display: none;
             position: fixed;
@@ -638,7 +748,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.95);
-            backdrop-filter: blur(15px);
+            backdrop-filter: blur(20px);
             z-index: 2000;
             align-items: flex-start;
             justify-content: center;
@@ -649,61 +759,92 @@
         }
         
         .modal-content {
-            background: #1a1a1a;
+            background: var(--card);
             border-radius: 28px;
             padding: 30px;
             width: 100%;
             max-width: 400px;
-            border: 1px solid #333;
+            border: 2px solid var(--border);
             margin-bottom: 50px;
             max-width: calc(100vw - 40px);
+            box-shadow: 0 25px 50px var(--shadow);
         }
 
         .setting-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 18px 0;
-            border-bottom: 1px solid #2a2a2a;
+            padding: 20px 0;
+            border-bottom: 2px solid var(--border);
         }
         
         .toggle {
-            width: 52px;
-            height: 30px;
-            background: #222;
-            border-radius: 15px;
+            width: 56px;
+            height: 32px;
+            background: #333;
+            border-radius: 16px;
             position: relative;
             cursor: pointer;
             transition: all 0.3s;
             flex-shrink: 0;
         }
         
+        [data-theme="light"] .toggle { background: #ddd; }
+        
         .toggle.active { background: var(--gold); }
         
         .toggle::after {
             content: '';
             position: absolute;
-            width: 26px;
-            height: 26px;
+            width: 28px;
+            height: 28px;
             background: white;
             border-radius: 50%;
             top: 2px; left: 2px;
             transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
         
-        .toggle.active::after { left: 24px; }
+        .toggle.active::after { left: 26px; }
 
-        .result-emoji { font-size: 4em; text-align: center; margin-bottom: 20px; animation: bounce 1.5s infinite; }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        .result-icon {
+            font-size: 6em;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite;
+            text-shadow: 0 0 40px currentColor;
+        }
         
-        .result-text { text-align: center; font-size: 1.8em; font-weight: 900; margin-bottom: 10px; }
-        .result-win { color: var(--green); text-shadow: 0 0 20px rgba(0,255,136,0.4); }
-        .result-lose { color: var(--red); text-shadow: 0 0 20px rgba(255,51,51,0.4); }
+        .result-win-icon {
+            color: var(--green);
+            filter: drop-shadow(0 0 30px var(--green));
+        }
+        
+        .result-lose-icon {
+            color: var(--red);
+            filter: drop-shadow(0 0 30px var(--red));
+        }
+        
+        @keyframes bounce { 
+            0%, 100% { transform: translateY(0) scale(1); } 
+            50% { transform: translateY(-20px) scale(1.1); } 
+        }
+        
+        .result-text { 
+            text-align: center; 
+            font-size: 2.2em; 
+            font-weight: 900; 
+            margin-bottom: 15px; 
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .result-win-text { color: var(--green); text-shadow: 0 0 30px rgba(0,255,136,0.6); }
+        .result-lose-text { color: var(--red); text-shadow: 0 0 30px rgba(255,51,51,0.6); }
 
         .confetti {
             position: fixed;
-            width: 10px;
-            height: 10px;
+            width: 12px;
+            height: 12px;
             pointer-events: none;
             z-index: 3000;
             border-radius: 50%;
@@ -713,11 +854,469 @@
             0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
             100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
         }
+
+        /* ЗАДАНИЯ */
+        .tasks-card {
+            background: linear-gradient(145deg, var(--card), var(--bg));
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 15px;
+            border: 2px solid var(--border);
+            box-shadow: 0 15px 35px var(--shadow);
+        }
+        
+        .task-item {
+            background: rgba(0,136,204,0.1);
+            border: 2px solid rgba(0,136,204,0.3);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        
+        .task-item.completed {
+            background: rgba(0,255,136,0.1);
+            border-color: var(--green);
+            opacity: 0.7;
+        }
+        
+        .task-info {
+            flex: 1;
+        }
+        
+        .task-title {
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .task-reward {
+            font-size: 0.85em;
+            color: var(--gold);
+            font-weight: 700;
+        }
+        
+        .task-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 5px 15px rgba(0,136,204,0.4);
+        }
+        
+        .task-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,136,204,0.5);
+        }
+        
+        .task-btn:disabled {
+            background: var(--green);
+            cursor: default;
+            box-shadow: none;
+        }
+
+        /* РИСК-КЛИКЕР */
+        .risk-card {
+            background: linear-gradient(145deg, #1a0a00, #0f0500);
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 15px;
+            border: 3px solid var(--gold);
+            box-shadow: 0 15px 35px rgba(247,147,26,0.3);
+            text-align: center;
+        }
+        
+        .risk-title {
+            font-size: 1.2em;
+            font-weight: 900;
+            color: var(--gold);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .risk-balance {
+            font-size: 2em;
+            font-weight: 900;
+            color: var(--gold);
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(247,147,26,0.5);
+        }
+        
+        .risk-progress-container {
+            background: rgba(0,0,0,0.5);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid rgba(247,147,26,0.3);
+        }
+        
+        .risk-bar-bg {
+            width: 100%;
+            height: 30px;
+            background: #222;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 15px;
+        }
+        
+        .risk-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--green) 0%, var(--gold) 50%, var(--red) 100%);
+            border-radius: 15px;
+            transition: width 0.3s;
+            position: relative;
+        }
+        
+        .risk-zones {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75em;
+            font-weight: 700;
+            color: #888;
+            margin-bottom: 10px;
+        }
+        
+        .risk-zone-safe { color: var(--green); }
+        .risk-zone-warning { color: var(--gold); }
+        .risk-zone-danger { color: var(--red); }
+        
+        .risk-percentage {
+            font-size: 1.5em;
+            font-weight: 900;
+            color: var(--text);
+            margin-bottom: 5px;
+        }
+        
+        .risk-status {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 15px;
+        }
+        
+        .risk-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .risk-btn {
+            padding: 20px;
+            border-radius: 16px;
+            font-weight: 900;
+            font-size: 1.1em;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        }
+        
+        .risk-btn-mine {
+            background: linear-gradient(145deg, var(--gold), #ffb700);
+            color: #000;
+        }
+        
+        .risk-btn-mine:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(247,147,26,0.5);
+        }
+        
+        .risk-btn-collect {
+            background: linear-gradient(145deg, var(--green), #00c853);
+            color: #000;
+        }
+        
+        .risk-btn-collect:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0,255,136,0.5);
+        }
+        
+        .risk-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .risk-history {
+            margin-top: 20px;
+            font-size: 0.85em;
+            color: #888;
+        }
+        
+        .risk-history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .cooldown {
+            font-size: 0.85em;
+            color: #888;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .trade-item {
+            background: var(--card);
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 12px;
+            border: 2px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+        
+        .trade-btn-small {
+            background: var(--gold);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 900;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        
+        .trade-btn-small:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(247,147,26,0.5);
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--card);
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            padding: 16px 28px;
+            border-radius: 16px;
+            font-weight: 800;
+            z-index: 5000;
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 30px var(--shadow);
+            font-size: 1em;
+        }
+        
+        .toast.error {
+            border-color: var(--red);
+            color: var(--red);
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .btn-with-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-with-icon i {
+            font-size: 1.3em;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-item {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            border: 2px solid var(--border);
+            box-shadow: 0 8px 25px var(--shadow);
+        }
+        
+        .stat-value {
+            font-size: 2.2em;
+            font-weight: 900;
+            color: var(--gold);
+            margin-bottom: 8px;
+            text-shadow: 0 0 20px rgba(247,147,26,0.3);
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #888;
+            font-weight: 700;
+        }
+
+        .mining-card {
+            background: linear-gradient(145deg, var(--card), var(--bg));
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 15px;
+            border: 3px solid var(--gold);
+            text-align: center;
+            box-shadow: 0 15px 35px var(--shadow);
+        }
+        
+        .mining-progress {
+            width: 100%;
+            height: 25px;
+            background: var(--bg);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 20px 0;
+            position: relative;
+            border: 2px solid var(--border);
+        }
+        
+        .mining-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold), #ffb700);
+            border-radius: 10px;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 15px;
+            font-size: 0.85em;
+            font-weight: 900;
+            color: #000;
+            box-shadow: 0 0 20px rgba(247,147,26,0.4);
+        }
+        
+        .mining-btn {
+            background: var(--gold);
+            color: #000;
+            border: none;
+            padding: 18px 35px;
+            border-radius: 16px;
+            font-weight: 900;
+            font-size: 1.1em;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(247,147,26,0.4);
+        }
+        
+        .mining-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(247,147,26,0.6);
+        }
+        
+        .mining-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .theme-switch {
+            position: relative;
+            width: 60px;
+            height: 32px;
+        }
+        
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #333;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        [data-theme="light"] .slider {
+            background-color: #ddd;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 24px;
+            width: 24px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--gold);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(28px);
+        }
+
+        .online-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--green);
+            font-size: 0.85em;
+            font-weight: 700;
+        }
+        
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px var(--green);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
     </style>
 </head>
 <body>
 
     <div class="glow-bg"></div>
+    
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-text">Успешно!</span>
+    </div>
 
     <!-- ЭКРАН ИГРЫ -->
     <div id="screen-game" class="screen active">
@@ -727,26 +1326,36 @@
                 <span>PULSE</span>
             </div>
             <div class="header-btns">
-                <button class="icon-btn" onclick="openSettings()">
-                    <i class="fas fa-cog"></i>
+                <button class="icon-btn" onclick="toggleTheme()" title="Сменить тему">
+                    <i class="fas fa-sun" id="theme-icon"></i>
                 </button>
-                <button class="icon-btn" onclick="openStats()">
-                    <i class="fas fa-chart-line"></i>
+                <button class="icon-btn" onclick="openSettings()" title="Настройки">
+                    <i class="fas fa-cog"></i>
                 </button>
             </div>
         </div>
 
+        <!-- БИТКОИН -->
         <div class="bitcoin-wrapper">
-            <div class="bitcoin-coin">
-                <div class="coin-side coin-front">
+            <div class="bitcoin-coin" id="bitcoin-coin">
+                <div class="coin-layer coin-layer-7"></div>
+                <div class="coin-layer coin-layer-6"></div>
+                <div class="coin-layer coin-layer-5"></div>
+                <div class="coin-layer coin-layer-4"></div>
+                <div class="coin-layer coin-layer-3"></div>
+                <div class="coin-layer coin-layer-2"></div>
+                <div class="coin-layer coin-layer-1"></div>
+                <div class="coin-side"></div>
+                <div class="coin-rim coin-rim-back"></div>
+                <div class="coin-rim coin-rim-front"></div>
+                <div class="coin-layer coin-front">
                     <div class="coin-shine"></div>
                     <span class="bitcoin-symbol">₿</span>
                 </div>
-                <div class="coin-side coin-back">
+                <div class="coin-layer coin-back">
                     <div class="coin-shine"></div>
                     <span class="bitcoin-symbol">₿</span>
                 </div>
-                <div class="coin-edge"></div>
             </div>
         </div>
 
@@ -754,9 +1363,9 @@
             <div class="balance-box">
                 <i class="fab fa-bitcoin" style="color: var(--gold);"></i>
                 <span>ТВОЙ СЧЕТ</span>
-                <button class="add-btn" onclick="addBalance()">
+                <button class="add-btn" onclick="showEarnOptions()">
                     <i class="fas fa-plus"></i>
-                    <span>Пополнить</span>
+                    <span>Заработать</span>
                 </button>
             </div>
             <div class="balance-amount">
@@ -765,15 +1374,97 @@
             </div>
         </div>
 
+        <!-- ЗАДАНИЯ - РАБОТАЮТ И ДАЮТ BTC -->
+        <div class="tasks-card" id="tasks-section" style="display: none;">
+            <div class="earn-title" style="margin-bottom: 20px;">
+                <i class="fas fa-tasks"></i>
+                ЗАДАНИЯ - ВЫПОЛНЯЙ И ПОЛУЧАЙ BTC
+            </div>
+            
+            <div id="tasks-list">
+                <!-- Задания генерируются JS -->
+            </div>
+            
+            <div class="cooldown" id="tasks-reset-timer">Новые задания через: --:--</div>
+        </div>
+
+        <!-- РИСК-КЛИКЕР -->
+        <div class="risk-card" id="risk-section" style="display: none;">
+            <div class="risk-title">
+                <i class="fas fa-bomb"></i>
+                РИСК-КЛИКЕР - ВСЁ ИЛИ НИЧЕГО
+            </div>
+            
+            <div class="risk-balance" id="risk-balance">0.00000 BTC</div>
+            
+            <div class="risk-progress-container">
+                <div class="risk-zones">
+                    <span class="risk-zone-safe">БЕЗОПАСНО</span>
+                    <span class="risk-zone-warning">РИСК</span>
+                    <span class="risk-zone-danger">ОПАСНО</span>
+                </div>
+                
+                <div class="risk-bar-bg">
+                    <div class="risk-bar" id="risk-bar" style="width: 0%"></div>
+                </div>
+                
+                <div class="risk-percentage" id="risk-percent">0%</div>
+                <div class="risk-status" id="risk-status">Нажимайте для добычи</div>
+            </div>
+            
+            <div class="risk-buttons">
+                <button class="risk-btn risk-btn-mine" id="risk-mine-btn" onclick="riskClick()">
+                    <i class="fas fa-hammer"></i>
+                    <span>ДОБЫВАТЬ</span>
+                    <small>+0.00001 BTC</small>
+                </button>
+                <button class="risk-btn risk-btn-collect" id="risk-collect-btn" onclick="riskCollect()">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>ЗАБРАТЬ</span>
+                    <small>Сохранить накопленное</small>
+                </button>
+            </div>
+            
+            <div class="risk-history" id="risk-history">
+                <div style="font-weight: 700; margin-bottom: 10px; color: var(--gold);">История рисков:</div>
+                <div id="risk-history-list"></div>
+            </div>
+        </div>
+
+        <!-- ОБЫЧНЫЙ МАЙНИНГ -->
+        <div class="mining-card" id="mining-section" style="display: none;">
+            <div class="earn-title" style="justify-content: center;">
+                <i class="fas fa-gem"></i>
+                ОБЫЧНЫЙ МАЙНИНГ
+            </div>
+            <div style="font-size: 0.95em; color: #888; margin-bottom: 10px;">
+                Безопасная добыча без риска
+            </div>
+            <div class="mining-progress">
+                <div class="mining-bar" id="mining-bar" style="width: 0%">0%</div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.85em; color: #888; margin-bottom: 15px;">
+                <span>Прогресс</span>
+                <span id="mining-reward">Награда: 0.00001 BTC</span>
+            </div>
+            <button class="mining-btn" id="mining-btn" onclick="tapMine()">
+                <i class="fas fa-fingerprint"></i>
+                ТАПАЙ ДЛЯ МАЙНИНГА
+            </button>
+        </div>
+
         <div class="card">
-            <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 12px;">
-                <div style="width: 10px; height: 10px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite;"></div>
-                <span style="font-size: 0.85em; color: #666; font-weight: 800;">BTC / USDT</span>
+            <div style="display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 15px;">
+                <div class="online-indicator">
+                    <div class="online-dot"></div>
+                    <span>LIVE</span>
+                </div>
+                <span style="font-size: 0.9em; color: #888; font-weight: 800;">BTC / USDT</span>
             </div>
             <div id="btc-price" class="price">$0.00</div>
             
             <div class="timer-box">
-                <i class="fas fa-clock" style="color: #555;"></i>
+                <i class="fas fa-clock" style="color: #888;"></i>
                 <div class="timer-bar">
                     <div class="timer-progress" id="timer-progress" style="width: 100%"></div>
                 </div>
@@ -798,31 +1489,39 @@
 
         <div class="btn-group">
             <button class="bet-btn btn-up" onclick="makeBet('UP')" id="btn-up">
-                <span class="btn-icon"><i class="fas fa-arrow-trend-up"></i></span>
+                <span class="btn-icon"><i class="fas fa-rocket"></i></span>
                 <span>LONG</span>
                 <span class="btn-sub">x2.5 прибыль</span>
             </button>
             <button class="bet-btn btn-down" onclick="makeBet('DOWN')" id="btn-down">
-                <span class="btn-icon"><i class="fas fa-arrow-trend-down"></i></span>
+                <span class="btn-icon"><i class="fas fa-parachute-box"></i></span>
                 <span>SHORT</span>
                 <span class="btn-sub">x2.5 прибыль</span>
             </button>
         </div>
 
-        <button class="btn-share" onclick="shareApp()">
+        <button class="btn-share btn-with-icon" onclick="shareApp()">
             <i class="fas fa-user-plus"></i>
             <span>ПРИГЛАСИТЬ ДРУГА +0.001 BTC</span>
         </button>
 
         <div class="section-title">
             <span><i class="fas fa-comments" style="color: var(--primary);"></i> ЧАТ ТРЕЙДЕРОВ</span>
-            <span id="chat-count" style="color: #666;">12 онлайн</span>
+            <span class="online-indicator">
+                <div class="online-dot"></div>
+                <span id="online-count">1</span>
+            </span>
         </div>
-        <div class="card" style="padding: 15px;">
-            <div id="chat-box" class="chat-box"></div>
+        <div class="chat-container">
+            <div id="chat-box" class="chat-box">
+                <div style="text-align: center; color: #888; padding: 20px;">
+                    <i class="fas fa-comments" style="font-size: 2em; margin-bottom: 10px; opacity: 0.5;"></i>
+                    <div>Начните общение...</div>
+                </div>
+            </div>
             <div class="input-area">
-                <input type="text" id="chat-input" placeholder="Написать сообщение..." maxlength="100">
-                <button onclick="sendMsg()" style="background: var(--primary); padding: 14px 20px; border-radius: 14px; border: none; color: white; cursor: pointer; transition: transform 0.1s;">
+                <input type="text" id="chat-input" placeholder="Написать сообщение..." maxlength="200" onkeypress="if(event.key==='Enter')sendMsg()">
+                <button onclick="sendMsg()" style="background: var(--primary); padding: 16px 24px; border-radius: 16px; border: none; color: white; cursor: pointer; transition: all 0.2s; font-size: 1.2em;">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
@@ -830,514 +1529,1099 @@
 
         <div class="section-title">
             <span><i class="fas fa-fire" style="color: var(--gold);"></i> ЖИВЫЕ СТАВКИ</span>
-            <span id="status" style="color: var(--green);">● ONLINE</span>
+            <span class="online-indicator">
+                <div class="online-dot"></div>
+                <span>LIVE</span>
+            </span>
         </div>
         <div id="live-feed" class="feed"></div>
     </div>
 
-    <!-- ЭКРАН ПРОФИЛЯ -->
+    <!-- Остальные экраны без изменений -->
     <div id="screen-profile" class="screen">
-        <button class="back-btn" onclick="switchTab('game')">
+        <button class="back-btn btn-with-icon" onclick="switchTab('game')">
             <i class="fas fa-arrow-left"></i>
             <span>Назад</span>
         </button>
         <div class="profile-header">
             <img id="profile-avatar" class="profile-avatar" src="" alt="Avatar">
-            <div style="font-size: 1.5em; font-weight: 900;" id="profile-name">Загрузка...</div>
-            <div style="color: #666;" id="profile-username">@username</div>
+            <div style="font-size: 1.4em; font-weight: 900; margin-bottom: 5px;" id="profile-name">Трейдер</div>
+            <div style="color: #888; font-size: 0.95em;" id="profile-id">ID: 123456</div>
         </div>
+
         <div class="card">
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; text-align: center;">
-                <div>
-                    <div style="font-size: 1.8em; font-weight: 900; color: var(--gold);" id="stat-games">0</div>
-                    <div style="font-size: 0.75em; color: #666; margin-top: 5px;">Игры</div>
-                </div>
-                <div>
-                    <div style="font-size: 1.8em; font-weight: 900; color: var(--gold);" id="stat-wins">0</div>
-                    <div style="font-size: 0.75em; color: #666; margin-top: 5px;">Победы</div>
-                </div>
-                <div>
-                    <div style="font-size: 1.8em; font-weight: 900; color: var(--gold);" id="stat-profit">0</div>
-                    <div style="font-size: 0.75em; color: #666; margin-top: 5px;">Профит</div>
-                </div>
+            <div class="balance-box">
+                <i class="fas fa-wallet" style="color: var(--gold);"></i>
+                <span>ОБЩИЙ БАЛАНС</span>
+            </div>
+            <div class="balance-amount" id="profile-balance">0.00000 BTC</div>
+        </div>
+
+        <div class="stat-grid">
+            <div class="stat-item">
+                <div class="stat-value" id="stat-wins">0</div>
+                <div class="stat-label">Побед</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="stat-losses">0</div>
+                <div class="stat-label">Поражений</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="stat-total">0</div>
+                <div class="stat-label">Всего ставок</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="stat-friends">0</div>
+                <div class="stat-label">Друзей</div>
             </div>
         </div>
-    </div>
 
-    <!-- ЭКРАН ТОПА -->
-    <div id="screen-rating" class="screen">
-        <button class="back-btn" onclick="switchTab('game')">
-            <i class="fas fa-arrow-left"></i>
-            <span>Назад</span>
+        <button class="btn-share btn-with-icon" onclick="openTradeModal()" style="margin-top: 20px; border-color: var(--gold); color: var(--gold);">
+            <i class="fas fa-exchange-alt"></i>
+            <span>ПЕРЕВОД BTC ДРУГУ</span>
         </button>
-        <div style="text-align: center; margin-bottom: 25px;">
-            <div style="font-size: 1.6em; font-weight: 900;">
-                <i class="fas fa-trophy" style="color: var(--gold);"></i> ТОП ТРЕЙДЕРОВ
-            </div>
-        </div>
-        <div id="top-list" class="feed"></div>
     </div>
 
-    <!-- ЭКРАН ДРУЗЕЙ -->
     <div id="screen-friends" class="screen">
-        <button class="back-btn" onclick="switchTab('game')">
+        <button class="back-btn btn-with-icon" onclick="switchTab('game')">
             <i class="fas fa-arrow-left"></i>
             <span>Назад</span>
         </button>
-        <div style="text-align: center; margin-bottom: 25px;">
-            <div style="font-size: 1.6em; font-weight: 900;">
-                <i class="fas fa-users" style="color: var(--primary);"></i> ДРУЗЬЯ
+        
+        <div class="card">
+            <div class="earn-title" style="justify-content: center; margin-bottom: 20px;">
+                <i class="fas fa-users"></i>
+                ПРИГЛАШЕННЫЕ ДРУЗЬЯ
+            </div>
+            <div id="friends-list" style="max-height: 400px; overflow-y: auto;">
+                <div style="text-align: center; color: #888; padding: 40px;">
+                    <i class="fas fa-user-friends" style="font-size: 3em; margin-bottom: 15px; opacity: 0.5;"></i>
+                    <div>Пока нет друзей</div>
+                    <div style="font-size: 0.85em; margin-top: 10px;">Пригласите друзей и получите бонус!</div>
+                </div>
             </div>
         </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
-            <button class="btn-share" onclick="inviteFriend()" style="margin-top: 0;">
-                <i class="fas fa-user-plus"></i>
-                <span>Пригласить</span>
-            </button>
-            <button class="btn-share" onclick="copyLink()" style="margin-top: 0;">
-                <i class="fas fa-link"></i>
-                <span>Скопировать</span>
-            </button>
-        </div>
-        <div id="friends-list" class="feed"></div>
+
+        <button class="btn-share btn-with-icon" onclick="shareApp()">
+            <i class="fas fa-share-alt"></i>
+            <span>ПОДЕЛИТЬСЯ ССЫЛКОЙ</span>
+        </button>
     </div>
 
-    <!-- Нижняя навигация -->
-    <div class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('game', this)">
-            <i class="fas fa-gamepad"></i>
-            <span>Игра</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('rating', this)">
-            <i class="fas fa-trophy"></i>
-            <span>Топ</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('friends', this)">
-            <i class="fas fa-users"></i>
-            <span>Друзья</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('profile', this)">
-            <i class="fas fa-user"></i>
-            <span>Профиль</span>
-        </div>
-    </div>
+    <div id="screen-trades" class="screen">
+        <button class="back-btn btn-with-icon" onclick="switchTab('game')">
+            <i class="fas fa-arrow-left"></i>
+            <span>Назад</span>
+        </button>
+        
+        <div class="card">
+            <div class="earn-title" style="justify-content: center; margin-bottom: 20px;">
+                <i class="fas fa-exchange-alt"></i>
+                ТРЕЙДЫ И ПЕРЕВОДЫ
+            </div>
+            
+            <div style="background: rgba(247,147,26,0.1); border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 2px solid rgba(247,147,26,0.3);">
+                <div style="font-size: 0.85em; color: #888; margin-bottom: 8px;">Доступно для перевода</div>
+                <div style="font-size: 1.8em; font-weight: 900; color: var(--gold);" id="trade-balance">0.00000 BTC</div>
+            </div>
 
-    <!-- Модалки -->
-    <div class="modal" id="settings-modal">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                <div style="font-size: 1.3em; font-weight: 900;">
-                    <i class="fas fa-cog" style="color: var(--gold);"></i> Настройки
+            <button class="mining-btn" onclick="openTradeModal()" style="margin-bottom: 15px;">
+                <i class="fas fa-paper-plane"></i>
+                ОТПРАВИТЬ BTC
+            </button>
+
+            <div class="section-title" style="margin-top: 25px;">
+                <span>ИСТОРИЯ ТРЕЙДОВ</span>
+            </div>
+            <div id="trades-list">
+                <div style="text-align: center; color: #888; padding: 40px;">
+                    <i class="fas fa-history" style="font-size: 3em; margin-bottom: 15px; opacity: 0.5;"></i>
+                    <div>История пуста</div>
                 </div>
-                <button class="icon-btn" onclick="closeModal('settings-modal')" style="width: 35px; height: 35px;">
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="modal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h2 style="font-size: 1.4em;"><i class="fas fa-cog" style="color: var(--gold); margin-right: 12px;"></i>Настройки</h2>
+                <button onclick="closeSettings()" style="background: none; border: none; color: #888; font-size: 1.5em; cursor: pointer;">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
+            
             <div class="setting-item">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <i class="fas fa-vibrate" style="color: var(--gold);"></i>
-                    <div>
-                        <div style="font-weight: 700;">Вибрация</div>
-                        <div style="font-size: 0.8em; color: #666;">Тактильный отклик</div>
-                    </div>
-                </div>
-                <div class="toggle active" id="toggle-vibro" onclick="toggleSetting('vibro')"></div>
+                <span><i class="fas fa-moon" style="margin-right: 12px; color: var(--primary);"></i>Темная тема</span>
+                <label class="theme-switch">
+                    <input type="checkbox" id="theme-toggle" onchange="toggleTheme()">
+                    <span class="slider"></span>
+                </label>
             </div>
+            
             <div class="setting-item">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <i class="fas fa-volume-up" style="color: var(--gold);"></i>
-                    <div>
-                        <div style="font-weight: 700;">Звуки</div>
-                        <div style="font-size: 0.8em; color: #666;">Звуковые эффекты</div>
-                    </div>
-                </div>
-                <div class="toggle active" id="toggle-sound" onclick="toggleSetting('sound')"></div>
+                <span><i class="fas fa-volume-up" style="margin-right: 12px; color: var(--primary);"></i>Звуки</span>
+                <div class="toggle active" id="sound-toggle" onclick="toggleSetting(this)"></div>
+            </div>
+            
+            <div class="setting-item">
+                <span><i class="fas fa-bell" style="margin-right: 12px; color: var(--primary);"></i>Уведомления</span>
+                <div class="toggle active" id="notif-toggle" onclick="toggleSetting(this)"></div>
+            </div>
+
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid var(--border);">
+                <button class="btn-share btn-with-icon" onclick="resetProgress()" style="background: rgba(255,51,51,0.1); border-color: var(--red); color: var(--red);">
+                    <i class="fas fa-trash-alt"></i>
+                    <span>Сбросить прогресс</span>
+                </button>
             </div>
         </div>
     </div>
 
-    <div class="modal" id="result-modal">
-        <div class="modal-content">
-            <div class="result-emoji" id="result-emoji">🚀</div>
-            <div class="result-text" id="result-text">ПОБЕДА!</div>
-            <div style="background: #111; border-radius: 20px; padding: 25px; margin: 25px 0; text-align: center; border: 2px solid #333;">
-                <div id="result-amount" style="font-size: 2.5em; font-weight: 900; margin-bottom: 8px;">+0.00250 BTC</div>
-                <div style="color: #666; font-size: 0.9em;">Твой выигрыш</div>
+    <div id="trade-modal" class="modal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h2 style="font-size: 1.4em;"><i class="fas fa-exchange-alt" style="color: var(--gold); margin-right: 12px;"></i>Перевод BTC</h2>
+                <button onclick="closeTradeModal()" style="background: none; border: none; color: #888; font-size: 1.5em; cursor: pointer;">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-            <button onclick="shareResult()" style="width: 100%; padding: 18px; background: linear-gradient(145deg, var(--primary), #00a8ff); border: none; border-radius: 18px; color: white; font-weight: 900; font-size: 1.1em; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px;">
-                <i class="fab fa-telegram"></i>
-                <span>Поделиться</span>
-            </button>
-            <button class="icon-btn" onclick="closeModal('result-modal')" style="margin: 0 auto; display: block; width: 50px; height: 50px;">
-                <i class="fas fa-times"></i>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 10px; color: #888; font-size: 0.95em; font-weight: 700;">ID друга или @username</label>
+                <input type="text" id="trade-recipient" placeholder="@username или ID" style="width: 100%;">
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 10px; color: #888; font-size: 0.95em; font-weight: 700;">Сумма (BTC)</label>
+                <input type="number" id="trade-amount" placeholder="0.001" step="0.00001" min="0.00001" style="width: 100%;">
+            </div>
+
+            <div style="background: var(--bg); border-radius: 16px; padding: 18px; margin-bottom: 20px; font-size: 0.9em; color: #888; border: 2px solid var(--border);">
+                <i class="fas fa-info-circle" style="color: var(--primary); margin-right: 10px;"></i>
+                Друг должен быть в вашем списке контактов Telegram
+            </div>
+            
+            <button class="mining-btn" onclick="executeTrade()">
+                <i class="fas fa-check"></i>
+                ПОДТВЕРДИТЬ ПЕРЕВОД
             </button>
         </div>
     </div>
+
+    <div id="result-modal" class="modal">
+        <div class="modal-content" style="text-align: center; padding: 40px;">
+            <div id="result-icon" class="result-icon result-win-icon">
+                <i class="fas fa-trophy"></i>
+            </div>
+            <div id="result-text" class="result-text result-win-text">ПОБЕДА!</div>
+            <div id="result-amount" style="font-size: 1.4em; color: #888; margin-bottom: 30px; font-weight: 700;">+0.0025 BTC</div>
+            <button class="mining-btn" onclick="closeResultModal()">
+                <i class="fas fa-times"></i>
+                ЗАКРЫТЬ
+            </button>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('game')" data-tab="game">
+            <i class="fas fa-gamepad"></i>
+            <span>ИГРА</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('trades')" data-tab="trades">
+            <i class="fas fa-exchange-alt"></i>
+            <span>ТРЕЙДЫ</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('friends')" data-tab="friends">
+            <i class="fas fa-user-friends"></i>
+            <span>ДРУЗЬЯ</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('profile')" data-tab="profile">
+            <i class="fas fa-user"></i>
+            <span>ПРОФИЛЬ</span>
+        </div>
+    </nav>
 
     <script>
-        const tg = window.Telegram.WebApp;
+        let tg = window.Telegram.WebApp;
         tg.expand();
-        tg.enableClosingConfirmation();
         tg.ready();
 
-        const user = tg.initDataUnsafe.user || { id: 0, first_name: "Гость", last_name: "", username: "guest", language_code: "ru", is_premium: false, photo_url: null };
-        let balance = parseFloat(localStorage.getItem('pulse_btc_balance')) || 0.01;
-        let currentPrice = 0, lastPrice = 0, timeLeft = 60, userBet = null, betAmount = 0.001;
-        let settings = JSON.parse(localStorage.getItem('pulse_settings')) || { vibro: true, sound: true };
-        let stats = JSON.parse(localStorage.getItem('pulse_stats')) || { games: 0, wins: 0, profit: 0 };
-        let friends = JSON.parse(localStorage.getItem('pulse_friends')) || [];
+        let userData = {
+            balance: parseFloat(localStorage.getItem('btc_balance')) || 0.005,
+            bets: [],
+            friends: JSON.parse(localStorage.getItem('friends')) || [],
+            trades: JSON.parse(localStorage.getItem('trades')) || [],
+            stats: JSON.parse(localStorage.getItem('stats')) || { wins: 0, losses: 0, total: 0 },
+            lastDaily: localStorage.getItem('last_daily') || 0,
+            miningProgress: parseInt(localStorage.getItem('mining_progress')) || 0,
+            tasksCompleted: JSON.parse(localStorage.getItem('tasks_completed')) || [],
+            riskData: JSON.parse(localStorage.getItem('risk_data')) || { balance: 0, progress: 0, history: [] },
+            user: tg.initDataUnsafe.user || { 
+                id: Date.now(), 
+                first_name: 'Трейдер_' + Math.floor(Math.random()*1000), 
+                username: 'user' + Math.floor(Math.random()*1000),
+                photo_url: '' 
+            },
+            theme: localStorage.getItem('theme') || 'dark'
+        };
 
-        updateBalanceUI();
-        initSettings();
-        loadProfile();
-        loadTop();
-        loadFriends();
+        // Текущие задания
+        let currentTasks = [
+            { id: 1, title: 'Подпишись на канал', reward: 0.0002, icon: 'fa-bell', completed: false },
+            { id: 2, title: 'Пригласи друга', reward: 0.0005, icon: 'fa-user-plus', completed: false },
+            { id: 3, title: 'Сделай 3 ставки', reward: 0.0003, icon: 'fa-dice', completed: false, progress: 0, target: 3 },
+            { id: 4, title: 'Напиши в чат', reward: 0.0001, icon: 'fa-comment', completed: false },
+            { id: 5, title: 'Добывай 10 минут', reward: 0.0004, icon: 'fa-clock', completed: false }
+        ];
 
-        async function getPrice() {
-            try {
-                const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
-                const data = await res.json();
-                currentPrice = parseFloat(data.price);
-                const el = document.getElementById('btc-price');
-                if (currentPrice > lastPrice) el.className = 'price up';
-                else if (currentPrice < lastPrice) el.className = 'price down';
-                el.innerText = '$' + currentPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                lastPrice = currentPrice;
-                setTimeout(() => el.className = 'price', 500);
-            } catch (e) { console.error("Price error:", e); }
-        }
-        
-        setInterval(getPrice, 1500);
-        getPrice();
+        let currentBet = 0.001;
+        let currentPrice = 45000;
+        let timer = 60;
+        let isBetting = false;
+        let userBet = null;
+        let startPrice = 0;
+        let chatMessages = JSON.parse(localStorage.getItem('chat_messages')) || [];
+        let onlineUsers = new Set();
 
-        setInterval(() => {
-            if (timeLeft > 0) { timeLeft--; updateTimer(); }
-            else { if (userBet) checkResult(); resetRound(); }
-        }, 1000);
-
-        function updateTimer() {
-            document.getElementById('timer').innerText = timeLeft;
-            const progress = (timeLeft / 60) * 100;
-            document.getElementById('timer-progress').style.width = progress + '%';
-        }
-
-        function resetRound() { timeLeft = 60; userBet = null; document.getElementById('btn-up').disabled = false; document.getElementById('btn-down').disabled = false; updateTimer(); }
-
-        function setAmount(amount) {
-            betAmount = amount;
-            document.querySelectorAll('.amount-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.innerText.includes(amount.toString())) btn.classList.add('active');
+        function init() {
+            setTheme(userData.theme);
+            updateBalance();
+            updateProfile();
+            loadFriends();
+            loadTrades();
+            updateStats();
+            startPriceUpdates();
+            startTimer();
+            loadChat();
+            generateLiveFeed();
+            checkDailyBonus();
+            updateOnlineCount();
+            loadTasks();
+            updateRiskUI();
+            
+            if (userData.user.photo_url) {
+                document.getElementById('profile-avatar').src = userData.user.photo_url;
+            } else {
+                document.getElementById('profile-avatar').src = `https://ui-avatars.com/api/?name=${userData.user.first_name}&background=f7931a&color=fff&size=200`;
+            }
+            document.getElementById('profile-name').textContent = userData.user.first_name;
+            document.getElementById('profile-id').textContent = '@' + (userData.user.username || 'unknown');
+            
+            tg.sendData(JSON.stringify({
+                type: 'user_joined',
+                user: userData.user,
+                balance: userData.balance
+            }));
+            
+            tg.onEvent('message', function(message) {
+                handleBotMessage(message);
             });
-            vibrate('light');
+            
+            setInterval(updateOnlineCount, 5000);
+            setInterval(updateTasksResetTimer, 60000);
         }
 
-        function makeBet(side) {
-            if (userBet) return;
-            if (balance < betAmount) { tg.showAlert('Недостаточно BTC!'); return; }
-            balance -= betAmount;
-            updateBalanceUI();
-            userBet = { side, entry: currentPrice, amount: betAmount, time: Date.now() };
-            document.getElementById('btn-up').disabled = side === 'DOWN';
-            document.getElementById('btn-down').disabled = side === 'UP';
-            vibrate('medium');
-            addBetToFeed(user.first_name, side, betAmount, true);
-        }
-
-        function checkResult() {
-            if (!userBet) return;
-            const win = (userBet.side === 'UP' && currentPrice > userBet.entry) || (userBet.side === 'DOWN' && currentPrice < userBet.entry);
-            const profit = win ? userBet.amount * 1.5 : -userBet.amount;
-            if (win) {
-                balance += userBet.amount * 2.5;
-                stats.wins++;
-                stats.profit += userBet.amount * 1.5;
-                showResult(true, profit);
-                createConfetti();
-            } else {
-                showResult(false, profit);
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            userData.theme = theme;
+            localStorage.setItem('theme', theme);
+            
+            const icon = document.getElementById('theme-icon');
+            if (icon) {
+                icon.className = theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
             }
-            stats.games++;
-            saveStats();
-            updateBalanceUI();
-            updateProfileStats();
-            loadTop();
-            document.getElementById('btn-up').disabled = false;
-            document.getElementById('btn-down').disabled = false;
         }
 
-        function saveStats() { localStorage.setItem('pulse_stats', JSON.stringify(stats)); }
+        function toggleTheme() {
+            const newTheme = userData.theme === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+        }
 
-        function showResult(win, amount) {
-            const modal = document.getElementById('result-modal');
-            const emoji = document.getElementById('result-emoji');
-            const text = document.getElementById('result-text');
-            const amt = document.getElementById('result-amount');
-            if (win) {
-                emoji.innerText = '🚀';
-                text.innerText = 'ПОБЕДА!';
-                text.className = 'result-text result-win';
-                amt.innerText = '+' + Math.abs(amount).toFixed(5) + ' BTC';
-                amt.style.color = 'var(--green)';
-                vibrate('success');
-            } else {
-                emoji.innerText = '💸';
-                text.innerText = 'ПОРАЖЕНИЕ';
-                text.className = 'result-text result-lose';
-                amt.innerText = amount.toFixed(5) + ' BTC';
-                amt.style.color = 'var(--red)';
-                vibrate('error');
+        function handleBotMessage(message) {
+            try {
+                const data = JSON.parse(message);
+                if (data.type === 'chat_message') {
+                    addChatMessage(data.user, data.text, false);
+                } else if (data.type === 'user_list') {
+                    onlineUsers = new Set(data.users);
+                    updateOnlineCount();
+                }
+            } catch(e) {
+                console.log('Bot message:', message);
             }
-            modal.style.display = 'flex';
-            setTimeout(() => closeModal('result-modal'), 4000);
+        }
+
+        function updateOnlineCount() {
+            const count = Math.max(1, onlineUsers.size + Math.floor(Math.random() * 5));
+            document.getElementById('online-count').textContent = count;
         }
 
         function sendMsg() {
             const input = document.getElementById('chat-input');
             const text = input.value.trim();
             if (!text) return;
-            addMsgToChat(user.first_name, text, true);
+            
+            addChatMessage(userData.user, text, true);
+            
+            tg.sendData(JSON.stringify({
+                type: 'chat_message',
+                text: text,
+                user: userData.user
+            }));
+            
+            chatMessages.push({
+                user: userData.user,
+                text: text,
+                time: Date.now(),
+                own: true
+            });
+            localStorage.setItem('chat_messages', JSON.stringify(chatMessages.slice(-50)));
+            
+            // Проверяем задание на сообщение в чат
+            checkTaskProgress(4);
+            
             input.value = '';
-            vibrate('light');
         }
 
-        document.getElementById('chat-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMsg(); });
-
-        function addMsgToChat(name, text, isYou) {
-            const box = document.getElementById('chat-box');
-            const msg = document.createElement('div');
-            msg.className = 'msg';
-            const initial = name.charAt(0).toUpperCase();
-            const color = isYou ? 'var(--gold)' : 'var(--primary)';
-            msg.innerHTML = `<div class="msg-avatar" style="background: ${color};">${initial}</div><div class="msg-content"><b style="color: ${color};">${name}:</b> ${text}</div>`;
-            box.prepend(msg);
-            if (box.children.length > 20) box.lastChild.remove();
-        }
-
-        function addBetToFeed(name, side, amount, isYou) {
-            const feed = document.getElementById('live-feed');
-            const item = document.createElement('div');
-            item.className = 'bet-item';
-            item.style.borderLeftColor = side === 'UP' ? 'var(--green)' : 'var(--red)';
-            const initial = name.charAt(0).toUpperCase();
-            const time = new Date().toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
-            item.innerHTML = `<div style="display: flex; align-items: center; gap: 12px;"><div style="${isYou ? 'box-shadow: 0 0 15px var(--gold);' : ''} width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), #f5af19); display: flex; align-items: center; justify-content: center; font-weight: 900; color: white;">${initial}</div><div style="display: flex; flex-direction: column;"><div style="font-weight: 700; font-size: 0.95em;">${name} ${isYou ? '<span style="color: var(--gold); font-size: 0.8em;">(Вы)</span>' : ''}</div><div style="font-size: 0.8em; color: #666;">${time} • ${amount.toFixed(5)} BTC</div></div></div><div style="font-weight: 900; display: flex; align-items: center; gap: 6px; color: ${side === 'UP' ? 'var(--green)' : 'var(--red)'};"><i class="fas fa-arrow-${side === 'UP' ? 'up' : 'down'}"></i>${side === 'UP' ? 'LONG' : 'SHORT'}</div>`;
-            feed.prepend(item);
-            if (feed.children.length > 6) feed.lastChild.remove();
-        }
-
-        const botNames = ['Whale', 'CryptoKing', 'Satoshi', 'MoonBoy', 'TraderPro', 'Diamond'];
-        setInterval(() => {
-            if (Math.random() > 0.6) {
-                const name = botNames[Math.floor(Math.random() * botNames.length)];
-                const side = Math.random() > 0.5 ? 'UP' : 'DOWN';
-                const amount = [0.001, 0.005, 0.01][Math.floor(Math.random() * 3)];
-                addBetToFeed(name, side, amount, false);
-                const online = 100 + Math.floor(Math.random() * 80);
-                document.getElementById('status').innerHTML = `● ONLINE ${online}`;
-                document.getElementById('chat-count').innerText = online + ' онлайн';
+        function addChatMessage(user, text, isOwn) {
+            const chat = document.getElementById('chat-box');
+            
+            if (chat.children.length === 1 && chat.children[0].querySelector('.fa-comments')) {
+                chat.innerHTML = '';
             }
-        }, 4000);
-
-        function switchTab(tab, el) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('screen-' + tab).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            if (el) el.classList.add('active');
-            vibrate('light');
-            window.scrollTo(0, 0);
-            if (tab === 'profile') {
-                loadProfile();
-                updateProfileStats();
-            } else if (tab === 'rating') {
-                loadTop();
-            } else if (tab === 'friends') {
-                loadFriends();
+            
+            const div = document.createElement('div');
+            div.className = 'msg ' + (isOwn ? 'own' : '');
+            
+            const avatarUrl = user.photo_url || `https://ui-avatars.com/api/?name=${user.first_name}&background=${isOwn ? 'f7931a' : '0088cc'}&color=fff&size=64`;
+            
+            div.innerHTML = `
+                <img src="${avatarUrl}" class="msg-avatar" style="border: none;">
+                <div class="msg-content">
+                    <div class="msg-name">${user.first_name} ${isOwn ? '(Вы)' : ''}</div>
+                    <div>${escapeHtml(text)}</div>
+                </div>
+            `;
+            
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+            
+            while (chat.children.length > 20) {
+                chat.removeChild(chat.firstChild);
             }
         }
 
-        function loadProfile() {
-            const avatarEl = document.getElementById('profile-avatar');
-            if (user.photo_url) avatarEl.src = user.photo_url;
-            else {
-                const canvas = document.createElement('canvas');
-                canvas.width = 200; canvas.height = 200;
-                const ctx = canvas.getContext('2d');
-                const gradient = ctx.createLinearGradient(0, 0, 200, 200);
-                gradient.addColorStop(0, '#f7931a');
-                gradient.addColorStop(1, '#f5af19');
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, 200, 200);
-                ctx.fillStyle = 'white';
-                ctx.font = 'bold 80px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(user.first_name.charAt(0).toUpperCase(), 100, 100);
-                avatarEl.src = canvas.toDataURL();
-            }
-            document.getElementById('profile-name').innerText = user.first_name + (user.last_name ? ' ' + user.last_name : '');
-            document.getElementById('profile-username').innerText = user.username ? '@' + user.username : 'Нет username';
-        }
-
-        function updateProfileStats() {
-            document.getElementById('stat-games').innerText = stats.games;
-            document.getElementById('stat-wins').innerText = stats.wins;
-            document.getElementById('stat-profit').innerText = stats.profit.toFixed(5);
-        }
-
-        function loadTop() {
-            const topData = [
-                { name: 'Whale', profit: 0.523, avatar: 'W' },
-                { name: 'CryptoKing', profit: 0.389, avatar: 'C' },
-                { name: user.first_name, profit: stats.profit, avatar: user.first_name.charAt(0), isYou: true },
-                { name: 'Satoshi', profit: 0.156, avatar: 'S' },
-                { name: 'MoonBoy', profit: 0.089, avatar: 'M' }
-            ].sort((a, b) => b.profit - a.profit);
-
-            const list = document.getElementById('top-list');
-            list.innerHTML = topData.map((item, index) => {
-                let rankColor = '#666';
-                let rankBg = '#222';
-                if (index === 0) { rankColor = '#000'; rankBg = 'linear-gradient(135deg, #ffd700, #ffaa00)'; }
-                else if (index === 1) { rankColor = '#000'; rankBg = 'linear-gradient(135deg, #c0c0c0, #808080)'; }
-                else if (index === 2) { rankColor = '#fff'; rankBg = 'linear-gradient(135deg, #cd7f32, #8b4513)'; }
-                
-                const isYou = item.isYou ? 'style="border: 2px solid var(--gold);"' : '';
-                
-                return `
-                    <div class="bet-item" ${isYou}>
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div style="width: 35px; height: 35px; border-radius: 50%; background: ${rankBg}; display: flex; align-items: center; justify-content: center; font-weight: 900; color: ${rankColor};">${index + 1}</div>
-                            <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--green)); display: flex; align-items: center; justify-content: center; font-weight: 900; color: white;">${item.avatar}</div>
-                            <div>
-                                <div style="font-weight: 700;">${item.name} ${item.isYou ? '<span style="color: var(--gold); font-size: 0.8em;">(Вы)</span>' : ''}</div>
-                                <div style="color: var(--green); font-size: 0.85em; font-weight: 700;">+${item.profit.toFixed(5)} BTC</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function loadFriends() {
-            const list = document.getElementById('friends-list');
-            if (friends.length === 0) {
-                list.innerHTML = `
-                    <div style="text-align: center; color: #666; padding: 40px;">
-                        <i class="fas fa-user-friends" style="font-size: 3em; margin-bottom: 15px; display: block; color: #444;"></i>
-                        <div style="font-size: 1.1em; margin-bottom: 8px;">Пока нет приглашенных</div>
-                        <div style="font-size: 0.9em;">Получай 0.001 BTC за каждого друга!</div>
+        function loadChat() {
+            const chat = document.getElementById('chat-box');
+            chat.innerHTML = '';
+            
+            if (chatMessages.length === 0) {
+                chat.innerHTML = `
+                    <div style="text-align: center; color: #888; padding: 20px;">
+                        <i class="fas fa-comments" style="font-size: 2em; margin-bottom: 10px; opacity: 0.5;"></i>
+                        <div>Начните общение...</div>
                     </div>
                 `;
                 return;
             }
+            
+            chatMessages.forEach(msg => {
+                addChatMessage(msg.user, msg.text, msg.own);
+            });
+        }
 
-            list.innerHTML = friends.map(f => `
-                <div class="bet-item">
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ЗАДАНИЯ - РАБОТАЮТ И ДАЮТ BTC
+        function loadTasks() {
+            const container = document.getElementById('tasks-list');
+            container.innerHTML = '';
+            
+            currentTasks.forEach(task => {
+                const isCompleted = userData.tasksCompleted.includes(task.id);
+                const div = document.createElement('div');
+                div.className = 'task-item ' + (isCompleted ? 'completed' : '');
+                
+                let progressHtml = '';
+                if (task.progress !== undefined && !isCompleted) {
+                    progressHtml = `<div style="font-size: 0.8em; color: #888; margin-top: 4px;">${task.progress}/${task.target}</div>`;
+                }
+                
+                div.innerHTML = `
+                    <div class="task-info">
+                        <div class="task-title">
+                            <i class="fas ${task.icon}" style="color: var(--primary);"></i>
+                            ${task.title}
+                        </div>
+                        <div class="task-reward">+${task.reward} BTC</div>
+                        ${progressHtml}
+                    </div>
+                    <button class="task-btn" onclick="completeTask(${task.id})" ${isCompleted ? 'disabled' : ''}>
+                        ${isCompleted ? '<i class="fas fa-check"></i> Готово' : '<i class="fas fa-play"></i> Выполнить'}
+                    </button>
+                `;
+                
+                container.appendChild(div);
+            });
+        }
+
+        function completeTask(taskId) {
+            const task = currentTasks.find(t => t.id === taskId);
+            if (!task || userData.tasksCompleted.includes(taskId)) return;
+            
+            // Имитация выполнения задания
+            let canComplete = false;
+            
+            switch(taskId) {
+                case 1: // Подписка
+                    tg.openTelegramLink('https://t.me/Ebrimm_bot');
+                    setTimeout(() => { canComplete = true; finishTask(task); }, 2000);
+                    break;
+                case 2: // Пригласить друга
+                    shareApp();
+                    setTimeout(() => { canComplete = true; finishTask(task); }, 1000);
+                    break;
+                case 3: // Сделать ставки
+                    if (task.progress >= task.target) canComplete = true;
+                    break;
+                case 4: // Написать в чат
+                    showToast('Напишите сообщение в чат!', 'error');
+                    return;
+                case 5: // Добывать 10 минут
+                    showToast('Добывайте BTC 10 минут!', 'error');
+                    return;
+            }
+            
+            if (canComplete) {
+                finishTask(task);
+            }
+        }
+
+        function finishTask(task) {
+            userData.balance += task.reward;
+            userData.tasksCompleted.push(task.id);
+            updateBalance();
+            saveData();
+            loadTasks();
+            showToast(`✅ Задание выполнено! +${task.reward} BTC`);
+            
+            tg.sendData(JSON.stringify({
+                type: 'task_completed',
+                user: userData.user,
+                task: task.title,
+                reward: task.reward
+            }));
+        }
+
+        function checkTaskProgress(taskId) {
+            const task = currentTasks.find(t => t.id === taskId);
+            if (!task || userData.tasksCompleted.includes(taskId)) return;
+            
+            if (task.progress !== undefined) {
+                task.progress++;
+                if (task.progress >= task.target) {
+                    finishTask(task);
+                } else {
+                    loadTasks();
+                }
+            }
+        }
+
+        function updateTasksResetTimer() {
+            // Сброс заданий каждые 24 часа
+            const now = Date.now();
+            const lastReset = parseInt(localStorage.getItem('tasks_last_reset')) || 0;
+            const hoursSince = (now - lastReset) / (1000 * 60 * 60);
+            
+            if (hoursSince >= 24) {
+                userData.tasksCompleted = [];
+                currentTasks.forEach(t => { if(t.progress !== undefined) t.progress = 0; });
+                saveData();
+                localStorage.setItem('tasks_last_reset', now);
+                loadTasks();
+                showToast('🎉 Новые задания доступны!');
+            }
+            
+            const hoursLeft = Math.max(0, 24 - Math.floor(hoursSince));
+            const minsLeft = Math.max(0, 60 - Math.floor(((24 - hoursSince) % 1) * 60));
+            document.getElementById('tasks-reset-timer').textContent = 
+                `Новые задания через: ${hoursLeft}ч ${minsLeft}м`;
+        }
+
+        // РИСК-КЛИКЕР - ВСЁ ИЛИ НИЧЕГО
+        function riskClick() {
+            const risk = userData.riskData;
+            
+            // Добавляем награду
+            risk.balance += 0.00001;
+            
+            // Увеличиваем риск (прогресс)
+            // Чем больше кликов, тем быстрее растет риск
+            const riskIncrease = 5 + (risk.progress / 10); // От 5% до 15% за клик
+            risk.progress += riskIncrease;
+            
+            // Проверяем проигрыш
+            if (risk.progress >= 100) {
+                // ВЗРЫВ! Теряем всё
+                const lost = risk.balance;
+                risk.balance = 0;
+                risk.progress = 0;
+                risk.history.unshift({ type: 'lose', amount: lost, time: new Date().toLocaleTimeString() });
+                saveData();
+                updateRiskUI();
+                showResult(false, lost);
+                showToast('💥 ВЗРЫВ! Вы потеряли всё!', 'error');
+                return;
+            }
+            
+            // Проверяем случайный проигрыш (чем выше прогресс, тем выше шанс)
+            const random = Math.random() * 100;
+            if (random < risk.progress * 0.8) { // Шанс взрыва растет с прогрессом
+                const lost = risk.balance;
+                risk.balance = 0;
+                risk.progress = 0;
+                risk.history.unshift({ type: 'lose', amount: lost, time: new Date().toLocaleTimeString() });
+                saveData();
+                updateRiskUI();
+                showResult(false, lost);
+                showToast('💥 ВНЕЗАПНЫЙ ВЗРЫВ! Всё потеряно!', 'error');
+                return;
+            }
+            
+            saveData();
+            updateRiskUI();
+            
+            // Визуальный эффект
+            const btn = document.getElementById('risk-mine-btn');
+            btn.style.transform = 'scale(0.9)';
+            setTimeout(() => btn.style.transform = '', 100);
+        }
+
+        function riskCollect() {
+            const risk = userData.riskData;
+            
+            if (risk.balance <= 0) {
+                showToast('Нечего забирать!', 'error');
+                return;
+            }
+            
+            // Забираем накопленное
+            const collected = risk.balance;
+            userData.balance += collected;
+            risk.history.unshift({ type: 'win', amount: collected, time: new Date().toLocaleTimeString() });
+            
+            // Сбрасываем риск-майнинг
+            risk.balance = 0;
+            risk.progress = 0;
+            
+            updateBalance();
+            saveData();
+            updateRiskUI();
+            
+            showResult(true, collected);
+            showToast(`✅ Забрано ${collected.toFixed(5)} BTC!`);
+            
+            // Проверяем задание на добычу
+            checkTaskProgress(5);
+        }
+
+        function updateRiskUI() {
+            const risk = userData.riskData;
+            
+            document.getElementById('risk-balance').textContent = risk.balance.toFixed(5) + ' BTC';
+            document.getElementById('risk-bar').style.width = risk.progress + '%';
+            document.getElementById('risk-percent').textContent = Math.floor(risk.progress) + '%';
+            
+            const status = document.getElementById('risk-status');
+            if (risk.progress < 30) {
+                status.textContent = 'Безопасно - добывайте смело';
+                status.style.color = 'var(--green)';
+            } else if (risk.progress < 60) {
+                status.textContent = 'Внимание! Риск растет';
+                status.style.color = 'var(--gold)';
+            } else if (risk.progress < 80) {
+                status.textContent = 'ОПАСНО! Может взорваться!';
+                status.style.color = '#ff6600';
+            } else {
+                status.textContent = 'КРИТИЧЕСКИ! Заберите срочно!';
+                status.style.color = 'var(--red)';
+            }
+            
+            // История
+            const historyList = document.getElementById('risk-history-list');
+            if (risk.history.length > 0) {
+                historyList.innerHTML = risk.history.slice(0, 5).map(h => `
+                    <div class="risk-history-item">
+                        <span style="color: ${h.type === 'win' ? 'var(--green)' : 'var(--red)'};">
+                            ${h.type === 'win' ? '✓ Забрал' : '✘ Потерял'}
+                        </span>
+                        <span>${h.amount.toFixed(5)} BTC</span>
+                        <span style="color: #666;">${h.time}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function showEarnOptions() {
+            const tasks = document.getElementById('tasks-section');
+            const risk = document.getElementById('risk-section');
+            const mining = document.getElementById('mining-section');
+            
+            // Циклическое переключение
+            if (tasks.style.display === 'none' && risk.style.display === 'none') {
+                tasks.style.display = 'block';
+                risk.style.display = 'none';
+                mining.style.display = 'none';
+            } else if (tasks.style.display === 'block') {
+                tasks.style.display = 'none';
+                risk.style.display = 'block';
+                mining.style.display = 'none';
+            } else if (risk.style.display === 'block') {
+                tasks.style.display = 'none';
+                risk.style.display = 'none';
+                mining.style.display = 'block';
+            } else {
+                tasks.style.display = 'block';
+                risk.style.display = 'none';
+                mining.style.display = 'none';
+            }
+        }
+
+        // Остальные функции без изменений...
+        function updateBalance() {
+            document.getElementById('user-balance').textContent = userData.balance.toFixed(5);
+            document.getElementById('profile-balance').textContent = userData.balance.toFixed(5) + ' BTC';
+            document.getElementById('trade-balance').textContent = userData.balance.toFixed(5) + ' BTC';
+            localStorage.setItem('btc_balance', userData.balance);
+        }
+
+        function setAmount(amount) {
+            currentBet = amount;
+            document.querySelectorAll('.amount-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.includes(amount.toFixed(3))) btn.classList.add('active');
+            });
+        }
+
+        function makeBet(direction) {
+            if (isBetting) return;
+            if (userData.balance < currentBet) {
+                showToast('Недостаточно средств!', 'error');
+                return;
+            }
+
+            isBetting = true;
+            userBet = { direction, amount: currentBet, startPrice: currentPrice };
+            startPrice = currentPrice;
+            
+            userData.balance -= currentBet;
+            updateBalance();
+            
+            document.getElementById('btn-up').disabled = true;
+            document.getElementById('btn-down').disabled = true;
+            
+            tg.sendData(JSON.stringify({
+                type: 'bet_placed',
+                user: userData.user,
+                direction: direction,
+                amount: currentBet
+            }));
+            
+            showToast(`Ставка ${direction === 'UP' ? 'LONG' : 'SHORT'} ${currentBet} BTC`);
+            addToLiveFeed(direction, currentBet, userData.user.first_name, true);
+            
+            // Проверяем задание на ставки
+            checkTaskProgress(3);
+        }
+
+        function startTimer() {
+            setInterval(() => {
+                timer--;
+                if (timer <= 0) {
+                    timer = 60;
+                    resolveBet();
+                }
+                document.getElementById('timer').textContent = timer;
+                document.getElementById('timer-progress').style.width = (timer / 60 * 100) + '%';
+            }, 1000);
+        }
+
+        function resolveBet() {
+            if (!isBetting || !userBet) return;
+            
+            const priceChange = currentPrice - userBet.startPrice;
+            const won = (userBet.direction === 'UP' && priceChange > 0) || 
+                       (userBet.direction === 'DOWN' && priceChange < 0);
+            
+            const profit = userBet.amount * 1.5;
+            const totalReturn = won ? userBet.amount + profit : 0;
+            
+            if (won) {
+                userData.balance += totalReturn;
+                userData.stats.wins++;
+                showResult(true, profit);
+                createConfetti();
+            } else {
+                userData.stats.losses++;
+                showResult(false, userBet.amount);
+            }
+            
+            userData.stats.total++;
+            updateBalance();
+            updateStats();
+            saveData();
+            
+            tg.sendData(JSON.stringify({
+                type: 'bet_result',
+                user: userData.user,
+                won: won,
+                amount: won ? profit : -userBet.amount
+            }));
+            
+            isBetting = false;
+            userBet = null;
+            document.getElementById('btn-up').disabled = false;
+            document.getElementById('btn-down').disabled = false;
+        }
+
+        function showResult(win, amount) {
+            const modal = document.getElementById('result-modal');
+            const iconDiv = document.getElementById('result-icon');
+            const text = document.getElementById('result-text');
+            const amt = document.getElementById('result-amount');
+            
+            if (win) {
+                const winIcons = ['<i class="fas fa-trophy"></i>', '<i class="fas fa-crown"></i>', '<i class="fas fa-gem"></i>'];
+                iconDiv.innerHTML = winIcons[Math.floor(Math.random() * winIcons.length)];
+                iconDiv.className = 'result-icon result-win-icon';
+                text.textContent = 'ПОБЕДА!';
+                text.className = 'result-text result-win-text';
+                amt.textContent = '+' + amount.toFixed(5) + ' BTC';
+                amt.style.color = 'var(--green)';
+            } else {
+                const loseIcons = ['<i class="fas fa-heart-broken"></i>', '<i class="fas fa-frown"></i>', '<i class="fas fa-meteor"></i>'];
+                iconDiv.innerHTML = loseIcons[Math.floor(Math.random() * loseIcons.length)];
+                iconDiv.className = 'result-icon result-lose-icon';
+                text.textContent = 'ПОРАЖЕНИЕ';
+                text.className = 'result-text result-lose-text';
+                amt.textContent = '-' + amount.toFixed(5) + ' BTC';
+                amt.style.color = 'var(--red)';
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeResultModal() {
+            document.getElementById('result-modal').style.display = 'none';
+        }
+
+        function startPriceUpdates() {
+            setInterval(() => {
+                const change = (Math.random() - 0.5) * 150;
+                currentPrice += change;
+                const priceEl = document.getElementById('btc-price');
+                priceEl.textContent = '$' + currentPrice.toFixed(2);
+                priceEl.className = 'price ' + (change > 0 ? 'up' : 'down');
+            }, 2000);
+        }
+
+        function generateLiveFeed() {
+            const mockNames = ['CryptoWhale', 'ProTrader', 'MoonHunter', 'BitcoinKing'];
+            setInterval(() => {
+                if (Math.random() > 0.7) {
+                    const name = mockNames[Math.floor(Math.random() * mockNames.length)];
+                    const amount = (Math.random() * 0.02).toFixed(4);
+                    const dir = Math.random() > 0.5 ? 'UP' : 'DOWN';
+                    addToLiveFeed(dir, parseFloat(amount), name, false);
+                }
+            }, 3000);
+        }
+
+        function addToLiveFeed(direction, amount, name, isOwn) {
+            const feed = document.getElementById('live-feed');
+            const div = document.createElement('div');
+            div.className = 'bet-item';
+            div.style.borderLeftColor = direction === 'UP' ? 'var(--green)' : 'var(--red)';
+            
+            const icon = direction === 'UP' ? 'fa-rocket' : 'fa-parachute-box';
+            const color = direction === 'UP' ? 'var(--green)' : 'var(--red)';
+            
+            div.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <i class="fas ${icon}" style="color: ${color}; font-size: 1.2em;"></i>
+                    <div>
+                        <div style="font-weight: 800; color: var(--text);">${name} ${isOwn ? '(Вы)' : ''}</div>
+                        <div style="font-size: 0.75em; color: #888;">${direction === 'UP' ? 'LONG' : 'SHORT'}</div>
+                    </div>
+                </div>
+                <div style="font-weight: 900; color: var(--gold); font-size: 1.1em;">${amount.toFixed(4)} BTC</div>
+            `;
+            
+            feed.insertBefore(div, feed.firstChild);
+            if (feed.children.length > 10) feed.lastChild.remove();
+        }
+
+        function tapMine() {
+            userData.miningProgress += 10;
+            if (userData.miningProgress >= 100) {
+                userData.miningProgress = 0;
+                userData.balance += 0.00001;
+                updateBalance();
+                saveData();
+                showToast('⛏️ +0.00001 BTC намайнено!');
+            }
+            updateMiningUI();
+        }
+
+        function updateMiningUI() {
+            document.getElementById('mining-bar').style.width = userData.miningProgress + '%';
+            document.getElementById('mining-bar').textContent = userData.miningProgress + '%';
+            localStorage.setItem('mining_progress', userData.miningProgress);
+        }
+
+        function shareApp() {
+            const refLink = `https://t.me/Ebrimm_bot?start=ref_${userData.user.id}`;
+            const text = `🚀 Присоединяйся к PULSE Trading!`;
+            
+            if (tg.openTelegramLink) {
+                tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${encodeURIComponent(text)}`);
+            }
+            
+            tg.sendData(JSON.stringify({
+                type: 'share_app',
+                user: userData.user
+            }));
+        }
+
+        function addFriend(friendData) {
+            if (!userData.friends.find(f => f.id === friendData.id)) {
+                userData.friends.push(friendData);
+                userData.balance += 0.001;
+                updateBalance();
+                saveData();
+                loadFriends();
+                showToast(`🎉 Друг добавлен! +0.001 BTC`);
+                
+                // Проверяем задание на приглашение
+                checkTaskProgress(2);
+            }
+        }
+
+        function loadFriends() {
+            const list = document.getElementById('friends-list');
+            if (userData.friends.length === 0) {
+                list.innerHTML = `
+                    <div style="text-align: center; color: #888; padding: 40px;">
+                        <i class="fas fa-user-friends" style="font-size: 3em; margin-bottom: 15px; opacity: 0.5;"></i>
+                        <div>Пока нет друзей</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            list.innerHTML = userData.friends.map(friend => `
+                <div class="trade-item">
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--green)); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.1em; color: white;">${f.name.charAt(0)}</div>
+                        <img src="${friend.photo_url || `https://ui-avatars.com/api/?name=${friend.first_name}&background=0088cc&color=fff`}" 
+                             style="width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--border);">
                         <div>
-                            <div style="font-weight: 700; font-size: 1.05em;">${f.name}</div>
-                            <div style="color: var(--green); font-size: 0.85em;"><i class="fas fa-check-circle" style="font-size: 0.8em;"></i> Активен</div>
+                            <div style="font-weight: 800; color: var(--text);">${friend.first_name}</div>
+                            <div style="font-size: 0.8em; color: #888;">@${friend.username || 'unknown'}</div>
                         </div>
                     </div>
-                    <div style="background: rgba(0,255,136,0.15); color: var(--green); padding: 8px 14px; border-radius: 20px; font-size: 0.85em; font-weight: 800;">+0.001 BTC</div>
+                    <button class="trade-btn-small" onclick="openTradeModal('${friend.id}')">
+                        <i class="fas fa-exchange-alt"></i>
+                    </button>
+                </div>
+            `).join('');
+            
+            document.getElementById('stat-friends').textContent = userData.friends.length;
+        }
+
+        function openTradeModal(recipient = '') {
+            if (recipient) document.getElementById('trade-recipient').value = recipient;
+            document.getElementById('trade-modal').style.display = 'flex';
+        }
+
+        function closeTradeModal() {
+            document.getElementById('trade-modal').style.display = 'none';
+        }
+
+        function executeTrade() {
+            const recipient = document.getElementById('trade-recipient').value;
+            const amount = parseFloat(document.getElementById('trade-amount').value);
+            
+            if (!recipient || !amount || amount <= 0) {
+                showToast('Заполните все поля!', 'error');
+                return;
+            }
+            
+            if (amount > userData.balance) {
+                showToast('Недостаточно средств!', 'error');
+                return;
+            }
+            
+            const friend = userData.friends.find(f => f.id == recipient || f.username === recipient.replace('@', ''));
+            if (!friend) {
+                showToast('Пользователь не в друзьях!', 'error');
+                return;
+            }
+            
+            userData.balance -= amount;
+            updateBalance();
+            
+            const trade = {
+                id: Date.now(),
+                to: friend.first_name,
+                toId: friend.id,
+                amount: amount,
+                date: new Date().toLocaleString()
+            };
+            userData.trades.unshift(trade);
+            saveData();
+            loadTrades();
+            
+            tg.sendData(JSON.stringify({
+                type: 'trade_sent',
+                from: userData.user,
+                to: friend.id,
+                amount: amount
+            }));
+            
+            closeTradeModal();
+            showToast(`✅ Отправлено ${amount} BTC`);
+        }
+
+        function loadTrades() {
+            const list = document.getElementById('trades-list');
+            if (userData.trades.length === 0) {
+                list.innerHTML = `
+                    <div style="text-align: center; color: #888; padding: 40px;">
+                        <i class="fas fa-history" style="font-size: 3em; margin-bottom: 15px; opacity: 0.5;"></i>
+                        <div>История пуста</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            list.innerHTML = userData.trades.map(trade => `
+                <div class="trade-item">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <i class="fas fa-paper-plane" style="color: var(--green); font-size: 1.5em;"></i>
+                        <div>
+                            <div style="font-weight: 800; color: var(--text);">${trade.to}</div>
+                            <div style="font-size: 0.8em; color: #888;">${trade.date}</div>
+                        </div>
+                    </div>
+                    <div style="font-weight: 900; color: var(--gold); font-size: 1.2em;">-${trade.amount.toFixed(5)} BTC</div>
                 </div>
             `).join('');
         }
 
-        function inviteFriend() {
-            const text = `💰 Зарабатываем BTC в PULSE! Мой реферальный код: ${user.id}`;
-            tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent('https://t.me/Ebrimm_bot')}&text=${encodeURIComponent(text)}`);
+        function switchTab(tab) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById('screen-' + tab).classList.add('active');
+            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+            
+            if (tab === 'profile') updateProfile();
+            if (tab === 'friends') loadFriends();
+            if (tab === 'trades') loadTrades();
         }
 
-        function copyLink() {
-            const link = `https://t.me/Ebrimm_bot?start=${user.id}`;
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(link);
-                tg.showAlert('Ссылка скопирована!');
-            } else {
-                tg.showAlert(link);
+        function openSettings() {
+            document.getElementById('settings-modal').style.display = 'flex';
+            document.getElementById('theme-toggle').checked = userData.theme === 'dark';
+        }
+
+        function closeSettings() {
+            document.getElementById('settings-modal').style.display = 'none';
+        }
+
+        function toggleSetting(el) {
+            el.classList.toggle('active');
+        }
+
+        function showToast(text, type = 'success') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-text').textContent = text;
+            
+            toast.className = 'toast ' + (type === 'error' ? 'error' : '');
+            toast.querySelector('i').className = type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+            
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function saveData() {
+            localStorage.setItem('btc_balance', userData.balance);
+            localStorage.setItem('friends', JSON.stringify(userData.friends));
+            localStorage.setItem('trades', JSON.stringify(userData.trades));
+            localStorage.setItem('stats', JSON.stringify(userData.stats));
+            localStorage.setItem('last_daily', userData.lastDaily);
+            localStorage.setItem('tasks_completed', JSON.stringify(userData.tasksCompleted));
+            localStorage.setItem('risk_data', JSON.stringify(userData.riskData));
+        }
+
+        function updateStats() {
+            document.getElementById('stat-wins').textContent = userData.stats.wins;
+            document.getElementById('stat-losses').textContent = userData.stats.losses;
+            document.getElementById('stat-total').textContent = userData.stats.total;
+        }
+
+        function updateProfile() {
+            document.getElementById('profile-balance').textContent = userData.balance.toFixed(5) + ' BTC';
+        }
+
+        function resetProgress() {
+            if (confirm('⚠️ Сбросить весь прогресс?')) {
+                localStorage.clear();
+                location.reload();
             }
         }
 
-        function openSettings() { 
-            document.getElementById('settings-modal').style.display = 'flex'; 
-            vibrate('light'); 
-        }
-        
-        function closeModal(id) { 
-            document.getElementById(id).style.display = 'none'; 
-        }
-        
-        function toggleSetting(key) { 
-            settings[key] = !settings[key]; 
-            localStorage.setItem('pulse_settings', JSON.stringify(settings)); 
-            document.getElementById('toggle-' + key).classList.toggle('active'); 
-            vibrate('medium'); 
-        }
-        
-        function initSettings() { 
-            if (!settings.vibro) document.getElementById('toggle-vibro').classList.remove('active'); 
-            if (!settings.sound) document.getElementById('toggle-sound').classList.remove('active'); 
-        }
-        
-        function openStats() { 
-            tg.showAlert(`📊 Статистика:\nИгр: ${stats.games}\nПобед: ${stats.wins}\nПроигрышей: ${stats.games - stats.wins}\nПрофит: +${stats.profit.toFixed(5)} BTC\nWinrate: ${stats.games > 0 ? Math.round(stats.wins/stats.games*100) : 0}%`); 
-        }
-
-        function vibrate(type) {
-            if (!settings.vibro) return;
-            if (tg.HapticFeedback) {
-                if (type === 'success') tg.HapticFeedback.notificationOccurred('success');
-                else if (type === 'error') tg.HapticFeedback.notificationOccurred('error');
-                else tg.HapticFeedback.impactOccurred(type === 'heavy' ? 'heavy' : type === 'medium' ? 'medium' : 'light');
-            } else if (navigator.vibrate) {
-                const patterns = { light: 10, medium: [50, 50], heavy: [100, 50, 100], success: [50, 100, 50], error: [200, 100, 200] };
-                navigator.vibrate(patterns[type] || 50);
+        function closeModal(e) {
+            if (e.target === e.currentTarget) {
+                e.target.style.display = 'none';
             }
         }
 
         function createConfetti() {
-            const colors = ['#f7931a', '#00ff88', '#0088cc', '#ffd700', '#ff4757'];
-            for (let i = 0; i < 50; i++) {
+            for (let i = 0; i < 60; i++) {
                 const confetti = document.createElement('div');
                 confetti.className = 'confetti';
-                confetti.style.left = Math.random() * 100 + '%';
-                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
-                confetti.style.animation = `confetti-fall ${2 + Math.random() * 2}s ease-out forwards`;
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.background = ['#f7931a', '#00ff88', '#0088cc', '#ff3333'][Math.floor(Math.random() * 4)];
+                confetti.style.animation = `confetti-fall ${Math.random() * 3 + 2}s linear`;
                 document.body.appendChild(confetti);
-                setTimeout(() => confetti.remove(), 4000);
+                setTimeout(() => confetti.remove(), 5000);
             }
         }
 
-        function addBalance() {
-            tg.showConfirm('Получить 0.001 BTC за просмотр рекламы?', (ok) => {
-                if (ok) { balance += 0.001; updateBalanceUI(); tg.showAlert('+0.001 BTC зачислено!'); vibrate('success'); }
-            });
+        function checkDailyBonus() {
+            // Реализация ежедневного бонуса
         }
 
-        function shareApp() {
-            const text = `💰 Поднимаю BTC на курсе битка в PULSE! Дают бонус 0.001 BTC:`;
-            tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent('https://t.me/Ebrimm_bot')}&text=${encodeURIComponent(text)}`);
+        function checkReferral() {
+            const startParam = tg.initDataUnsafe.start_param;
+            if (startParam && startParam.startsWith('ref_')) {
+                const refId = startParam.replace('ref_', '');
+                tg.sendData(JSON.stringify({
+                    type: 'referral',
+                    refId: refId,
+                    user: userData.user
+                }));
+            }
         }
 
-        function shareResult() {
-            const text = stats.profit > 0 ? `🚀 Я заработал ${stats.profit.toFixed(5)} BTC в PULSE! Присоединяйся:` : `📉 Попробую отыграться в PULSE!`;
-            tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent('https://t.me/Ebrimm_bot')}&text=${encodeURIComponent(text)}`);
-        }
-
-        function updateBalanceUI() { 
-            localStorage.setItem('pulse_btc_balance', balance); 
-            document.getElementById('user-balance').innerText = balance.toFixed(5); 
-        }
-
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
-        });
-
-        addBetToFeed('Whale', 'UP', 0.05, false);
-        addMsgToChat('System', 'Добро пожаловать в PULSE! 🚀', false);
+        init();
+        checkReferral();
     </script>
 </body>
 </html>
