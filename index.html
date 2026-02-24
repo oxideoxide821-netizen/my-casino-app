@@ -5,16 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Military Case Opener</title>
     <style>
-        body { margin: 0; background: radial-gradient(circle, #1a1a1a 0%, #000 100%); overflow: hidden; touch-action: none; font-family: sans-serif; }
+        body { margin: 0; background: #000; overflow: hidden; touch-action: none; font-family: sans-serif; }
         #ui { position: absolute; width: 100%; text-align: center; color: #0ff; font-weight: bold; top: 10%; pointer-events: none; text-shadow: 0 0 10px #0ff; font-size: 24px; z-index: 10; }
-        #error-log { position: absolute; bottom: 5%; width: 100%; text-align: center; color: red; font-size: 12px; pointer-events: none; }
-        #openBtn { position: absolute; bottom: 15%; left: 50%; transform: translateX(-50%); padding: 15px 40px; background: #0ff; border: none; border-radius: 5px; font-weight: bold; font-size: 18px; cursor: pointer; box-shadow: 0 0 20px #0ff; z-index: 20; }
-        #openBtn:disabled { background: #555; box-shadow: none; color: #888; }
+        #openBtn { position: absolute; bottom: 15%; left: 50%; transform: translateX(-50%); padding: 15px 40px; background: #0ff; border: none; border-radius: 5px; font-weight: bold; font-size: 18px; cursor: pointer; box-shadow: 0 0 20px #0ff; z-index: 20; transition: 0.2s; }
+        #openBtn:disabled { background: #333; box-shadow: none; color: #666; }
     </style>
 </head>
 <body>
     <div id="ui">ИСПЫТАЙ УДАЧУ!</div>
-    <div id="error-log"></div>
     <button id="openBtn">ОТКРЫТЬ КЕЙС</button>
 
     <script type="importmap">
@@ -27,65 +25,75 @@
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.outputColorSpace = THREE.SRGBColorSpace;
         document.body.appendChild(renderer.domElement);
 
-        // Свет (усиленный для мобилок)
-        const light = new THREE.DirectionalLight(0xffffff, 4);
-        light.position.set(5, 5, 5);
+        // МОЩНЫЙ СВЕТ СО ВСЕХ СТОРОН
         const ambient = new THREE.AmbientLight(0xffffff, 2);
-        const insideLight = new THREE.PointLight(0x00ffff, 0, 10);
-        scene.add(light, ambient, insideLight);
+        const sun = new THREE.DirectionalLight(0xffffff, 3);
+        sun.position.set(5, 10, 7);
+        const point = new THREE.PointLight(0x00ffff, 0, 20); // Свет внутри кейса
+        scene.add(ambient, sun, point);
 
         let caseModel, weaponPack, mixer, openAction, isOpening = false;
         const loader = new GLTFLoader();
-        const log = (msg) => document.getElementById('error-log').innerText += msg + " | ";
 
-        // 1. ЗАГРУЗКА КЕЙСА
+        // 1. ЗАГРУЗКА КЕЙСА (Ammo Can)
         loader.load('case.glb', (gltf) => {
             caseModel = gltf.scene;
             scene.add(caseModel);
-            caseModel.position.y = -1;
-            caseModel.scale.set(1.5, 1.5, 1.5);
             
+            // Автоматический подбор размера и центрирование
+            const box = new THREE.Box3().setFromObject(caseModel);
+            const size = box.getSize(new THREE.Vector3()).length();
+            const center = box.getCenter(new THREE.Vector3());
+            caseModel.position.x += (caseModel.position.x - center.x);
+            caseModel.position.y += (caseModel.position.y - center.y) - 0.5;
+            caseModel.position.z += (caseModel.position.z - center.z);
+            caseModel.scale.setScalar(3 / size); // Масштабируем до удобного размера
+
             mixer = new THREE.AnimationMixer(caseModel);
             if(gltf.animations.length > 0) {
-                openAction = mixer.clipAction(gltf.animations[0]); // Берем первую анимацию крышки [3]
+                openAction = mixer.clipAction(gltf.animations[0]); // Первая анимация крышки
                 openAction.setLoop(THREE.LoopOnce);
                 openAction.clampWhenFinished = true;
             }
-        }, undefined, (e) => log("Ошибка кейса: " + e.message));
+        });
 
         // 2. ЗАГРУЗКА ОРУЖИЯ
         loader.load('weapon.glb', (gltf) => {
             weaponPack = gltf.scene;
             weaponPack.visible = false;
             scene.add(weaponPack);
-            weaponPack.traverse(child => { if(child.isMesh) child.visible = false; });
-        }, undefined, (e) => log("Ошибка оружия: " + e.message));
+            weaponPack.traverse(c => { if(c.isMesh) c.visible = false; });
+        });
 
-        camera.position.set(0, 1, 5);
+        camera.position.set(0, 1.5, 6);
 
         function showPrize() {
             if (!weaponPack) return;
             weaponPack.visible = true;
-            const items = weaponPack.children;
+            const items = weaponPack.children.filter(c => c.type === "Group" || c.type === "Mesh");
             const prize = items[Math.floor(Math.random() * items.length)];
             
             items.forEach(c => c.visible = false);
             prize.visible = true;
             prize.position.set(0, 0, 0);
-            prize.scale.set(0.1, 0.1, 0.1);
+            prize.scale.setScalar(0.1);
             
             let start = Date.now();
             const anim = setInterval(() => {
-                let prog = (Date.now() - start) / 1000;
-                prize.position.y = prog * 2;
+                let prog = (Date.now() - start) / 1500;
+                prize.position.y = prog * 2.5; // Вылетает выше
                 prize.rotation.y += 0.05;
-                prize.scale.set(prog * 2, prog * 2, prog * 2);
-                if (prog >= 1) { clearInterval(anim); prize.position.y = 1.5; prize.scale.set(2, 2, 2); }
+                prize.scale.setScalar(prog * 1.5);
+                if (prog >= 1) { 
+                    clearInterval(anim); 
+                    prize.position.y = 2; 
+                    prize.scale.setScalar(1.5); 
+                }
             }, 16);
         }
 
@@ -93,17 +101,21 @@
             if (isOpening || !caseModel) return;
             isOpening = true;
             document.getElementById('openBtn').disabled = true;
-            document.getElementById('ui').innerText = "ОТКРЫВАЕМ...";
+            document.getElementById('ui').innerText = "УДАЧИ...";
 
+            // Эффект тряски
             let start = Date.now();
             const shake = setInterval(() => {
-                caseModel.position.x = Math.sin(Date.now() * 0.1) * 0.05;
-                if (Date.now() - start > 1200) {
+                caseModel.position.x = Math.sin(Date.now() * 0.1) * 0.1;
+                if (Date.now() - start > 1500) {
                     clearInterval(shake);
                     caseModel.position.x = 0;
-                    if (openAction) openAction.play(); // Запуск анимации [3]
-                    insideLight.intensity = 50;
-                    setTimeout(() => { showPrize(); document.getElementById('ui').innerText = "LEGENDARY!"; }, 500);
+                    if (openAction) openAction.play();
+                    point.intensity = 100; // Вспышка внутри
+                    setTimeout(() => { 
+                        showPrize(); 
+                        document.getElementById('ui').innerText = "ВЫПАЛ ПРЕДМЕТ!"; 
+                    }, 800);
                 }
             }, 16);
         };
