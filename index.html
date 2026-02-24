@@ -3,571 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Loot Clicker: ULTRA HD</title>
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+    <title>Military Case Opener</title>
     <style>
-        body { margin: 0; background: #000; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        canvas { image-rendering: pixelated; image-rendering: crisp-edges; }
+        body { margin: 0; background: radial-gradient(circle, #1a1a1a 0%, #000 100%); overflow: hidden; touch-action: none; font-family: sans-serif; }
+        #ui { position: absolute; width: 100%; text-align: center; color: #0ff; font-weight: bold; top: 10%; pointer-events: none; text-shadow: 0 0 10px #0ff; font-size: 24px; }
+        #openBtn { position: absolute; bottom: 15%; left: 50%; transform: translateX(-50%); padding: 15px 40px; background: #0ff; border: none; border-radius: 5px; font-weight: bold; font-size: 18px; cursor: pointer; box-shadow: 0 0 20px #0ff; transition: 0.2s; }
+        #openBtn:active { transform: translateX(-50%) scale(0.9); }
+        #openBtn:disabled { background: #555; box-shadow: none; color: #888; }
     </style>
 </head>
 <body>
-<script>
-// === ОДНА СЦЕНА (надежнее) ===
-class GameScene extends Phaser.Scene {
-    constructor() {
-        super({ key: 'GameScene' });
-    }
+    <div id="ui">ИСПЫТАЙ УДАЧУ!</div>
+    <button id="openBtn">ОТКРЫТЬ КЕЙС</button>
 
-    preload() {
-        this.load.spritesheet('icons', 'icons.png', { frameWidth: 64, frameHeight: 64 });
-    }
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com", "three/addons/": "https://unpkg.com" } }
+    </script>
 
-    create() {
-        // === ЗАГРУЗОЧНЫЙ ЭКРАН ===
-        let loadBg = this.add.rectangle(300, 450, 600, 900, 0x0a0a0a);
-        
-        // Вращающаяся монета
-        let loadCoin = this.add.image(300, 400, 'icons', 131);
-        loadCoin.setScale(5);
-        
-        this.tweens.add({
-            targets: loadCoin,
-            scaleX: 0.3,
-            duration: 400,
-            yoyo: true,
-            repeat: 3,
-            ease: 'Sine.easeInOut',
-            onYoyo: () => {
-                loadCoin.setFrame(loadCoin.frame.name === 131 ? 43 : 131);
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        document.body.appendChild(renderer.domElement);
+
+        const light = new THREE.PointLight(0xffffff, 20);
+        light.position.set(2, 3, 4);
+        const ambient = new THREE.AmbientLight(0xffffff, 1.5);
+        const insideLight = new THREE.PointLight(0x00ffff, 0, 10); // Свет внутри кейса
+        insideLight.position.set(0, 0, 0);
+        scene.add(light, ambient, insideLight);
+
+        let caseModel, weaponPack, mixer, openAction, isOpening = false;
+        const loader = new GLTFLoader();
+
+        // 1. ЗАГРУЗКА КЕЙСА
+        loader.load('case.glb', (gltf) => {
+            caseModel = gltf.scene;
+            scene.add(caseModel);
+            caseModel.position.y = -1;
+            caseModel.scale.set(1.5, 1.5, 1.5);
+
+            mixer = new THREE.AnimationMixer(caseModel);
+            if(gltf.animations.length > 0) {
+                openAction = mixer.clipAction(gltf.animations[0]);
+                openAction.setLoop(THREE.LoopOnce);
+                openAction.clampWhenFinished = true;
             }
         });
-        
-        // Текст загрузки
-        let loadText = this.add.text(300, 500, 'ЗАГРУЗКА...', {
-            fontSize: '40px',
-            fontStyle: 'bold',
-            fill: '#ffd700'
-        }).setOrigin(0.5);
-        
-        // Полоса загрузки
-        let barBg = this.add.rectangle(300, 560, 400, 25, 0x333333);
-        let bar = this.add.rectangle(100, 560, 0, 25, 0xffd700).setOrigin(0, 0.5);
-        
-        // Анимация загрузки и старт игры
-        this.tweens.add({
-            targets: bar,
-            width: 400,
-            duration: 2500,
-            ease: 'Power2',
-            onComplete: () => {
-                // Убираем загрузку
-                this.tweens.add({
-                    targets: [loadBg, loadCoin, loadText, barBg, bar],
-                    alpha: 0,
-                    duration: 500,
-                    onComplete: () => {
-                        loadBg.destroy();
-                        loadCoin.destroy();
-                        loadText.destroy();
-                        barBg.destroy();
-                        bar.destroy();
-                        this.startGame();
-                    }
-                });
-            }
-        });
-    }
 
-    startGame() {
-        // === HD ПОДЗЕМЕЛЬЕ 600x900 ===
-        let bg = this.add.graphics();
-        
-        // Мраморный пол
-        bg.fillGradientStyle(0x1a1a2e, 0x16213e, 0x0f0f23, 0x0a0a1a, 1);
-        bg.fillRect(0, 0, 600, 900);
-        
-        // Вены
-        for(let i=0; i<10; i++) {
-            let x = Math.random() * 600;
-            bg.lineStyle(3, 0x2a2a4e, 0.3);
-            bg.beginPath();
-            bg.moveTo(x, 0);
-            for(let y=0; y<900; y+=30) {
-                bg.lineTo(x + Math.sin(y*0.015)*40, y);
-            }
-            bg.strokePath();
-        }
-        
-        // Ковер
-        bg.fillStyle(0x4a0404, 0.7);
-        bg.beginPath();
-        bg.moveTo(180, 0);
-        bg.lineTo(420, 0);
-        bg.lineTo(480, 900);
-        bg.lineTo(120, 900);
-        bg.closePath();
-        bg.fillPath();
-        
-        bg.lineStyle(4, 0xb8860b, 0.9);
-        bg.beginPath();
-        bg.moveTo(180, 0);
-        bg.lineTo(120, 900);
-        bg.strokePath();
-        bg.beginPath();
-        bg.moveTo(420, 0);
-        bg.lineTo(480, 900);
-        bg.strokePath();
-        
-        // Колонны
-        for(let x of [45, 555]) {
-            bg.fillStyle(0x2c2c2c, 1);
-            bg.fillRect(x-35, 0, 70, 900);
-            for(let y=120; y<900; y+=180) {
-                bg.fillStyle(0xb8860b, 0.9);
-                bg.fillRect(x-40, y, 80, 10);
-            }
-            bg.fillStyle(0x3d3d3d, 1);
-            bg.fillRect(x-45, 0, 90, 50);
-            bg.fillStyle(0xb8860b, 1);
-            bg.fillRect(x-50, 45, 100, 12);
-        }
-        
-        // Свечи с PNG иконками
-        let candles = [[45, 60], [555, 60], [45, 840], [555, 840]];
-        candles.forEach((pos, i) => {
-            let holder = this.add.image(pos[0], pos[1]+30, 'icons', 108);
-            holder.setScale(1.5);
-            holder.setTint(0xb8860b);
-            
-            let candle = this.add.image(pos[0], pos[1], 'icons', 109);
-            candle.setScale(1.2);
-            
-            let flame = this.add.image(pos[0], pos[1]-25, 'icons', 110 + (i%3));
-            flame.setScale(1.3);
-            flame.setTint(0xffaa00);
-            flame.setBlendMode('ADD');
-            
-            this.tweens.add({
-                targets: flame,
-                scale: 1.5,
-                y: pos[1]-30,
-                duration: 150,
-                yoyo: true,
-                repeat: -1
-            });
+        // 2. ЗАГРУЗКА ПАКА ОРУЖИЯ
+        loader.load('weapon.glb', (gltf) => {
+            weaponPack = gltf.scene;
+            weaponPack.visible = false;
+            scene.add(weaponPack);
+            // Скрываем все детали оружия внутри пака изначально
+            weaponPack.traverse(child => { if(child.isMesh) child.visible = false; });
         });
-        
-        // Туман
-        for(let i=0; i<8; i++) {
-            let mist = this.add.image(300 + (Math.random()-0.5)*300, 750, 'icons', 0);
-            mist.setScale(8, 4);
-            mist.setAlpha(0.06);
-            mist.setTint(0xb8860b);
-            mist.setBlendMode('ADD');
-            this.tweens.add({
-                targets: mist,
-                x: '+=100',
-                y: '-=80',
-                alpha: 0,
-                duration: 10000,
-                repeat: -1,
-                delay: i * 1200
-            });
-        }
-        
-        // Виньетка
-        let vignette = this.add.graphics();
-        for(let i=0; i<25; i++) {
-            vignette.lineStyle(i*4, 0x0a0500, i*0.03);
-            vignette.strokeRect(0, 0, 600, 900);
-        }
 
-        this.items = this.physics.add.group();
-        
-        // === HD UI ===
-        let book = this.add.rectangle(150, 60, 260, 90, 0x4a0404);
-        book.setStrokeStyle(5, 0xb8860b);
-        book.setDepth(10);
-        
-        this.coinIcon = this.add.image(50, 60, 'icons', 131);
-        this.coinIcon.setScale(2);
-        this.coinIcon.setDepth(15);
-        
-        this.tweens.add({
-            targets: this.coinIcon,
-            scaleX: 0.3,
-            duration: 500,
-            yoyo: true,
-            repeat: -1,
-            onYoyo: () => {
-                this.coinIcon.setFrame(this.coinIcon.frame.name === 131 ? 43 : 131);
-            }
-        });
-        
-        this.scoreShadows = [];
-        for(let i=4; i>0; i--) {
-            let t = this.add.text(165 + i*3, 62 + i*3, '0', {
-                fontSize: '52px',
-                fontStyle: 'bold',
-                fill: '#000000'
-            }).setOrigin(0.5).setDepth(13).setAlpha(0.4);
-            this.scoreShadows.push(t);
-        }
-        
-        this.scoreText = this.add.text(165, 60, '0', {
-            fontSize: '52px',
-            fontStyle: 'bold',
-            fill: '#ffd700',
-            stroke: '#8b6914',
-            strokeThickness: 3
-        }).setOrigin(0.5).setDepth(14);
-        
-        this.shield = this.add.ellipse(300, 150, 160, 110, 0x2c2c2c, 0.95);
-        this.shield.setStrokeStyle(4, 0xb8860b);
-        this.shield.setDepth(19);
-        this.shield.setAlpha(0);
-        
-        this.comboShadow = this.add.text(302, 152, '', {
-            fontSize: '48px',
-            fontStyle: 'bold',
-            fill: '#000000'
-        }).setOrigin(0.5).setAlpha(0).setDepth(20);
-        
-        this.comboText = this.add.text(300, 150, '', {
-            fontSize: '48px',
-            fontStyle: 'bold',
-            fill: '#ffffff',
-            stroke: '#000000',
-            strokeThickness: 4
-        }).setOrigin(0.5).setAlpha(0).setDepth(21);
-        
-        this.createAltar(100, 800, 'СИЛА', 'p1', 131, 0xc41e3a);
-        this.createAltar(300, 800, 'СКОР', 'p2', 43, 0x0f52ba);
-        this.createAltar(500, 800, 'УДАЧА', 'p3', 88, 0x50c878);
-        
-        this.time.addEvent({ delay: 1200, callback: this.spawn, callbackScope: this, loop: true });
-        
-        this.score = 0;
-        this.combo = 0;
-        this.missedItems = 0;
-        this.lastClickTime = 0;
-        this.shop = { click: 10, speed: 1200, prices: { p1: 100, p2: 300, p3: 1000 } };
-    }
+        camera.position.set(0, 1, 5);
 
-    createAltar(x, y, txt, type, iconFrame, color) {
-        let container = this.add.container(x, y);
-        container.setDepth(100);
-        
-        let shadow = this.add.ellipse(8, 20, 140, 100, 0x000000, 0.5);
-        let base = this.add.ellipse(0, 15, 140, 100, 0x2a2a3e);
-        base.setStrokeStyle(3, 0x4a4a5e);
-        let top = this.add.ellipse(0, 0, 140, 100, 0x4a0404);
-        top.setStrokeStyle(4, 0xb8860b);
-        top.setInteractive();
-        
-        let icon = this.add.image(0, -20, 'icons', iconFrame);
-        icon.setScale(1.8);
-        
-        this.tweens.add({
-            targets: icon,
-            y: -25,
-            duration: 1500,
-            yoyo: true,
-            repeat: -1,
-            ease: 'Sine.easeInOut'
-        });
-        
-        let label = this.add.text(0, 25, txt, {
-            fontSize: '18px',
-            fill: '#b8860b',
-            fontStyle: 'bold'
-        }).setOrigin(0.5);
-        
-        let priceShadow = this.add.text(2, 47, this.shop.prices[type], {
-            fontSize: '22px',
-            fill: '#000000'
-        }).setOrigin(0.5);
-        
-        let price = this.add.text(0, 45, this.shop.prices[type], {
-            fontSize: '22px',
-            fill: '#ffd700',
-            stroke: '#4a0404',
-            strokeThickness: 3
-        }).setOrigin(0.5);
-        
-        container.add([shadow, base, top, icon, label, priceShadow, price]);
-        
-        top.on('pointerover', () => {
-            this.tweens.add({ targets: container, y: y - 5, duration: 100 });
-            top.setFillStyle(0x5a0505);
-        });
-        
-        top.on('pointerout', () => {
-            this.tweens.add({ targets: container, y: y, duration: 100 });
-            top.setFillStyle(0x4a0404);
-        });
-        
-        top.on('pointerdown', () => {
-            this.tweens.add({
-                targets: container,
-                y: y + 3,
-                duration: 50,
-                yoyo: true,
-                onComplete: () => {
-                    if (this.score >= this.shop.prices[type]) {
-                        this.score -= this.shop.prices[type];
-                        if(type === 'p1') this.shop.click += 10;
-                        if(type === 'p2') this.shop.speed = Math.max(200, this.shop.speed - 150);
-                        if(type === 'p3') {}
-                        this.shop.prices[type] = Math.floor(this.shop.prices[type] * 1.8);
-                        price.setText(this.shop.prices[type]);
-                        priceShadow.setText(this.shop.prices[type]);
-                        this.updateScore();
-                        
-                        for(let i=0; i<15; i++) {
-                            let p = this.add.image(x, y, 'icons', 131);
-                            p.setScale(0.8);
-                            p.setTint(0xffd700);
-                            this.tweens.add({
-                                targets: p,
-                                x: x + (Math.random()-0.5)*150,
-                                y: y - 150 - Math.random()*100,
-                                scale: 0,
-                                duration: 800,
-                                onComplete: () => p.destroy()
-                            });
-                        }
-                    } else {
-                        this.cameras.main.shake(150, 0.015);
-                    }
-                }
-            });
-        });
-    }
-
-    spawn() {
-        let x = Phaser.Math.Between(150, 450);
-        const lootFrames = [131, 43, 88, 91, 13, 127, 50, 55, 60];
-        let frame = Phaser.Utils.Array.GetRandom(lootFrames);
-        
-        let item = this.items.create(x, -80, 'icons', frame);
-        item.setInteractive();
-        item.setScale(0);
-        item.setVelocityY(Phaser.Math.Between(150, 280));
-        item.setDepth(50);
-        
-        let shadow = this.add.ellipse(x, -50, 50, 18, 0x000000, 0.3);
-        shadow.setDepth(49);
-        item.shadow = shadow;
-        
-        this.tweens.add({
-            targets: item,
-            scale: 2.5,
-            duration: 500,
-            ease: 'Back.out',
-            onUpdate: () => {
-                if(item.active && shadow.active) {
-                    shadow.x = item.x;
-                    shadow.y = item.y + 45;
-                    shadow.scaleX = item.scaleX * 0.5;
-                    shadow.alpha = 0.3 * (item.scaleX / 2.5);
-                }
-            }
-        });
-        
-        this.tweens.add({
-            targets: item,
-            x: '+=8',
-            duration: 2500,
-            yoyo: true,
-            repeat: -1,
-            ease: 'Sine.easeInOut'
-        });
-        
-        item.on('pointerdown', () => {
-            this.collect(item);
-        });
-    }
-
-    collect(item) {
-        let now = Date.now();
-        let comboMult = (now - this.lastClickTime < 600) ? Math.min(5, Math.floor(++this.combo/2) + 1) : 1;
-        this.lastClickTime = now;
-        this.missedItems = 0;
-        
-        let gain = this.shop.click * comboMult;
-        this.score += gain;
-        
-        if (item.shadow) {
-            this.tweens.add({
-                targets: item.shadow,
-                alpha: 0,
-                duration: 200,
-                onComplete: () => item.shadow.destroy()
-            });
-        }
-        
-        for(let i=0; i<16; i++) {
-            let shard = this.add.image(item.x, item.y, 'icons', item.frame.name);
-            shard.setScale(1);
-            let angle = (Math.PI * 2 / 16) * i;
-            let dist = 80 + Math.random() * 60;
+        // 3. ФУНКЦИЯ ВЫБОРА ЛУТА
+        function showPrize() {
+            if (!weaponPack) return;
             
-            this.tweens.add({
-                targets: shard,
-                x: item.x + Math.cos(angle) * dist,
-                y: item.y + Math.sin(angle) * dist - 50,
-                scale: 0,
-                rotation: Math.random() * 6,
-                duration: 700,
-                ease: 'Power2',
-                onComplete: () => shard.destroy()
-            });
-        }
-        
-        let ring = this.add.ellipse(item.x, item.y, 40, 15, 0xffd700, 0.5);
-        ring.setStrokeStyle(3, 0xffffff);
-        this.tweens.add({
-            targets: ring,
-            scaleX: 6,
-            scaleY: 6,
-            alpha: 0,
-            duration: 600,
-            onComplete: () => ring.destroy()
-        });
-        
-        this.updateScore();
-        
-        if (comboMult > 1) {
-            let colors = ['#ff0000', '#ff8800', '#ffff00', '#00ff00', '#00ffff'];
-            this.comboText.setFill(colors[comboMult-2]);
-            this.comboText.setText('x' + comboMult);
-            this.comboShadow.setText('x' + comboMult);
+            weaponPack.visible = true;
+            const items = weaponPack.children;
+            const randomIdx = Math.floor(Math.random() * items.length);
             
-            this.shield.setAlpha(1);
-            this.comboText.setAlpha(1);
-            this.comboShadow.setAlpha(1);
-            this.comboText.setScale(1.5);
-            this.comboShadow.setScale(1.5);
+            // Скрываем всё старое, показываем новое
+            items.forEach(child => child.visible = false);
+            const prize = items[randomIdx];
+            prize.visible = true;
             
-            this.tweens.add({
-                targets: [this.comboText, this.comboShadow],
-                scale: 1,
-                duration: 200,
-                ease: 'Back.out'
-            });
+            // Анимация вылета пушки
+            prize.position.set(0, 0, 0);
+            prize.scale.set(0.1, 0.1, 0.1);
             
-            if (this.comboTimer) clearTimeout(this.comboTimer);
-            this.comboTimer = setTimeout(() => {
-                this.tweens.add({
-                    targets: [this.shield, this.comboText, this.comboShadow],
-                    alpha: 0,
-                    duration: 300
-                });
-                this.combo = 0;
-            }, 1800);
-        }
-        
-        for(let i=4; i>=0; i--) {
-            let t = this.add.text(item.x + i*2, item.y + i*2, '+' + gain, {
-                fontSize: '42px',
-                fontStyle: 'bold',
-                fill: i === 0 ? '#ffd700' : '#000000',
-                stroke: i === 0 ? '#000000' : null,
-                strokeThickness: i === 0 ? 5 : 0
-            }).setOrigin(0.5).setDepth(80-i).setAlpha(i===0?1:0.5);
-            
-            this.tweens.add({
-                targets: t,
-                y: item.y - 180,
-                alpha: 0,
-                duration: 1000,
-                onComplete: () => t.destroy()
-            });
-        }
-        
-        this.tweens.add({
-            targets: item,
-            scaleX: 0.1,
-            scaleY: 3,
-            alpha: 0,
-            duration: 250,
-            onComplete: () => item.destroy()
-        });
-    }
-
-    updateScore() {
-        this.scoreText.setText(this.score);
-        this.scoreShadows.forEach(t => t.setText(this.score));
-        
-        this.tweens.add({
-            targets: [this.scoreText, ...this.scoreShadows],
-            scale: 1.15,
-            duration: 100,
-            yoyo: true
-        });
-    }
-
-    update() {
-        this.items.children.iterate(i => {
-            if (i) {
-                if (i.shadow && i.shadow.active) {
-                    i.shadow.x += (i.x - i.shadow.x) * 0.1;
-                    i.shadow.y = i.y + 45;
-                }
+            let start = Date.now();
+            const animLoot = setInterval(() => {
+                let prog = (Date.now() - start) / 1000;
+                prize.position.y = prog * 2; // Летит вверх
+                prize.rotation.y += 0.05;    // Крутится
+                prize.scale.set(prog * 2, prog * 2, prog * 2);
                 
-                if (i.y > 950) {
-                    this.missedItems++;
-                    let penalty = Math.min(this.score, Math.floor(this.shop.click * this.missedItems * 2));
-                    this.score -= penalty;
-                    
-                    if (penalty > 0) {
-                        let blood = this.add.text(i.x, 870, '-' + penalty, {
-                            fontSize: '36px',
-                            fontStyle: 'bold',
-                            fill: '#8b0000',
-                            stroke: '#000000',
-                            strokeThickness: 4
-                        }).setOrigin(0.5);
-                        
-                        this.tweens.add({
-                            targets: blood,
-                            y: 700,
-                            alpha: 0,
-                            duration: 1000,
-                            onComplete: () => blood.destroy()
-                        });
-                        
-                        this.updateScore();
-                    }
-                    
-                    if (i.shadow) i.shadow.destroy();
-                    i.destroy();
-                    this.combo = 0;
-                    this.shield.setAlpha(0);
-                    this.comboText.setAlpha(0);
-                    this.comboShadow.setAlpha(0);
+                if (prog >= 1) {
+                    clearInterval(animLoot);
+                    prize.position.y = 1.5;
+                    prize.scale.set(2, 2, 2);
                 }
-            }
-        });
-    }
-}
+            }, 16);
+        }
 
-const gameConfig = {
-    type: Phaser.AUTO,
-    width: 600,
-    height: 900,
-    backgroundColor: '#0a0a0a',
-    pixelArt: true,
-    physics: { default: 'arcade' },
-    scene: GameScene,
-    scale: {
-        mode: Phaser.Scale.FIT,
-        autoCenter: Phaser.Scale.CENTER_BOTH
-    }
-};
+        // 4. ЛОГИКА КЛИКА
+        document.getElementById('openBtn').onclick = () => {
+            if (isOpening || !openAction) return;
+            isOpening = true;
+            document.getElementById('openBtn').disabled = true;
+            document.getElementById('ui').innerText = "ОТКРЫВАЕМ...";
 
-const game = new Phaser.Game(gameConfig);
-</script>
+            // Эффект тряски
+            let start = Date.now();
+            const shake = setInterval(() => {
+                caseModel.position.x = Math.sin(Date.now() * 0.1) * 0.05;
+                if (Date.now() - start > 1200) {
+                    clearInterval(shake);
+                    caseModel.position.x = 0;
+                    
+                    // Запуск анимации крышки
+                    openAction.play();
+                    insideLight.intensity = 50; // Вспышка внутри
+                    
+                    setTimeout(() => {
+                        showPrize();
+                        document.getElementById('ui').innerText = "ВЫ ВЫИГРАЛИ ПРЕДМЕТ!";
+                    }, 500);
+                }
+            }, 16);
+        };
+
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+            if (mixer) mixer.update(delta);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.onresize = () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        };
+    </script>
 </body>
 </html>
