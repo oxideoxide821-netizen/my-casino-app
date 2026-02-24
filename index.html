@@ -2,232 +2,647 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>BTC MULTIPLAYER TERMINAL</title>
-    <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Loot Clicker: Dark Fantasy</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
     <style>
-        :root { --bg: #0b0e11; --surf: #1e2329; --prim: #f0b90b; --up: #0ecb81; --down: #f6465d; --text: #eaecef; }
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        
-        /* AUTH */
-        #auth { position: fixed; inset: 0; background: var(--bg); z-index: 100; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        .box { background: var(--surf); padding: 30px; border-radius: 12px; width: 300px; border: 1px solid #333; text-align: center; box-shadow: 0 0 30px rgba(240,185,11,0.1); }
-        input { width: 100%; padding: 12px; margin: 10px 0; background: #2b3139; border: 1px solid #444; color: white; border-radius: 4px; box-sizing: border-box; outline: none; transition: all 0.3s; }
-        input:focus { border-color: var(--prim); box-shadow: 0 0 10px rgba(240,185,11,0.2); }
-        
-        /* BUTTONS WITH ANIMATION */
-        .btn { 
-            width: 100%; padding: 12px; background: var(--prim); border: none; border-radius: 4px; 
-            font-weight: bold; cursor: pointer; margin-top: 10px; color: #000;
-            transition: all 0.2s; position: relative; overflow: hidden;
-        }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(240,185,11,0.4); }
-        .btn:active { transform: scale(0.95); }
-        
-        /* RIPPLE EFFECT */
-        .ripple {
-            position: absolute; border-radius: 50%; background: rgba(255,255,255,0.4);
-            transform: scale(0); animation: ripple 0.6s linear; pointer-events: none;
-        }
-        @keyframes ripple { to { transform: scale(4); opacity: 0; } }
-        
-        /* TRADE BUTTONS SPECIAL */
-        .btn-trade {
-            position: relative; overflow: hidden;
-            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .btn-trade::after {
-            content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.2);
-            opacity: 0; transition: opacity 0.2s;
-        }
-        .btn-trade:active::after { opacity: 1; }
-        .btn-trade:active { transform: scale(0.92); }
-        .btn-buy { background: var(--up); color: white; }
-        .btn-buy:hover { box-shadow: 0 4px 20px rgba(14,203,129,0.4); }
-        .btn-sell { background: var(--down); color: white; }
-        .btn-sell:hover { box-shadow: 0 4px 20px rgba(246,70,93,0.4); }
-        
-        /* APP LAYOUT */
-        .app { display: none; grid-template-columns: 1fr 300px; grid-template-rows: 60px 1fr 150px; height: 100vh; }
-        header { grid-column: 1/3; background: var(--surf); display: flex; align-items: center; padding: 0 20px; justify-content: space-between; border-bottom: 1px solid #333; }
-        #chart { grid-column: 1/2; grid-row: 2/3; position: relative; border-right: 1px solid #333; }
-        #side { grid-column: 2/3; grid-row: 2/4; background: var(--surf); display: flex; flex-direction: column; }
-        #chat { flex: 1; overflow-y: auto; padding: 10px; font-size: 13px; background: #161a1e; }
-        footer { grid-column: 1/2; grid-row: 3/4; background: var(--surf); padding: 20px; display: flex; align-items: center; gap: 20px; border-top: 1px solid #333; }
-        .msg { margin-bottom: 5px; border-bottom: 1px solid #2b3139; padding: 3px; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
-        .trade-msg { color: var(--prim); font-weight: bold; background: rgba(240,185,11,0.1); padding: 5px; border-radius: 4px; border-left: 3px solid var(--prim); }
-        #price { position: absolute; top: 20px; left: 20px; z-index: 10; font-size: 32px; font-weight: bold; font-family: 'Courier New', monospace; text-shadow: 0 0 20px currentColor; transition: all 0.3s; }
-        
-        /* CLICK FEEDBACK */
-        .click-feedback { animation: clickPulse 0.3s; }
-        @keyframes clickPulse { 0% { transform: scale(1); } 50% { transform: scale(0.95); } 100% { transform: scale(1); } }
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap');
+        body { margin: 0; background: #050505; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
     </style>
 </head>
 <body>
-
-<div id="auth">
-    <div class="box">
-        <h2 style="color:var(--prim); margin-bottom: 20px;">⚡ BTC LOGIN</h2>
-        <input type="email" id="email" placeholder="Email">
-        <input type="password" id="pass" placeholder="Пароль">
-        <button class="btn" onclick="handleAuth(this)">ВОЙТИ / РЕГИСТРАЦИЯ</button>
-        <p id="err" style="color:var(--down); font-size:12px; margin-top: 10px;"></p>
-    </div>
-</div>
-
-<div class="app" id="app">
-    <header>
-        <div style="font-weight:bold; color:var(--prim); font-size: 18px;">⚡ TERMINAL v1.0</div>
-        <div style="font-size: 14px;">Баланс: <b id="bal" style="color:var(--up); font-size: 16px;">10000</b> USDT | Игрок: <b id="nick" style="color:var(--prim);">...</b></div>
-        <button class="btn" onclick="location.reload()" style="width: auto; padding: 8px 16px; margin: 0; font-size: 12px;">Выход</button>
-    </header>
-    <div id="chart"><div id="price">0.00</div></div>
-    <aside id="side">
-        <div style="padding:10px; font-size:11px; color:var(--prim); font-weight: bold; border-bottom: 1px solid #333;">🏆 ТОП ТРЕЙДЕРОВ</div>
-        <div id="leaderboard" style="padding:10px; background:#161a1e; font-size:12px; max-height: 150px; overflow-y: auto;"></div>
-        <div style="padding:10px; font-size:11px; color:#888; border-bottom: 1px solid #333; border-top: 1px solid #333;">💬 ОБЩИЙ ЧАТ</div>
-        <div id="chat"></div>
-        <div style="padding:10px; border-top: 1px solid #333;">
-            <input type="text" id="chat-in" placeholder="Сообщение..." style="margin:0; width: 100%;">
-        </div>
-    </aside>
-    <footer>
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="color: #888; font-size: 12px;">Объем:</span>
-            <input type="number" id="vol" value="0.1" step="0.01" style="width:100px; margin: 0;">
-            <span style="color: var(--prim); font-weight: bold;">BTC</span>
-        </div>
-        <button class="btn btn-trade btn-buy" style="flex: 1; margin: 0; padding: 15px; font-size: 14px;" onclick="doTrade('BUY', this)">
-            <span style="font-size: 18px; margin-right: 5px;">📈</span> BUY / LONG
-        </button>
-        <button class="btn btn-trade btn-sell" style="flex: 1; margin: 0; padding: 15px; font-size: 14px;" onclick="doTrade('SELL', this)">
-            <span style="font-size: 18px; margin-right: 5px;">📉</span> SELL / SHORT
-        </button>
-    </footer>
-</div>
-
 <script>
-const SB_URL = "https://ederonvgyvzugahjvxdm.supabase.co";
-const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkZXJvbnZneXZ6dWdhaGp2eGRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4MjQ2NzQsImV4cCI6MjA4NzQwMDY3NH0.VjcFQyCBgYcIQq9QE3s4dRCIFZc_Rnrk99b7ZAN6oNg";
-const sb = supabase.createClient(SB_URL, SB_KEY);
-let user, btcPrice = 0, balance = 10000, nick = "";
-
-// RIPPLE EFFECT
-function createRipple(e, btn) {
-    const ripple = document.createElement('span');
-    ripple.className = 'ripple';
-    const rect = btn.getBoundingClientRect();
-    const size = Math.max(rect.width, rect.height);
-    ripple.style.width = ripple.style.height = size + 'px';
-    ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
-    ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
-    btn.appendChild(ripple);
-    setTimeout(() => ripple.remove(), 600);
-}
-
-async function handleAuth(btn) {
-    createRipple(event, btn);
-    const e = document.getElementById('email').value, p = document.getElementById('pass').value;
-    if (!e || !p) return document.getElementById('err').innerText = "Введите email и пароль";
-    
-    let { data, error } = await sb.auth.signInWithPassword({ email: e, password: p });
-    if (error) {
-        let reg = await sb.auth.signUp({ email: e, password: p });
-        if (reg.error) return document.getElementById('err').innerText = reg.error.message;
-        data = reg.data;
-        await sb.from('profiles').insert([{ id: data.user.id, username: e.split('@')[0], balance: 10000 }]);
-    }
-    user = data.user;
-    init();
-}
-
-async function init() {
-    document.getElementById('auth').style.display = 'none';
-    document.getElementById('app').style.display = 'grid';
-    const { data: p } = await sb.from('profiles').select('*').eq('id', user.id).single();
-    if (p) { balance = p.balance; nick = p.username; document.getElementById('nick').innerText = nick; updateUI(); }
-    
-    const chart = LightweightCharts.createChart(document.getElementById('chart'), { 
-        layout: { background: { color: '#0b0e11' }, textColor: '#d1d4dc' },
-        grid: { vertLines: { color: '#1e2329' }, horzLines: { color: '#1e2329' } }
-    });
-    const candles = chart.addCandlestickSeries({ upColor: '#0ecb81', downColor: '#f6465d', borderVisible: false });
-    
-    const ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@kline_1m');
-    ws.onmessage = (e) => {
-        const k = JSON.parse(e.data).k; 
-        btcPrice = parseFloat(k.c);
-        candles.update({ time: k.t/1000, open: parseFloat(k.o), high: parseFloat(k.h), low: parseFloat(k.l), close: btcPrice });
-        
-        const priceEl = document.getElementById('price');
-        const oldColor = priceEl.style.color;
-        priceEl.innerText = btcPrice.toFixed(2);
-        priceEl.style.color = btcPrice >= parseFloat(k.o) ? 'var(--up)' : 'var(--down)';
-        
-        // Flash effect on price change
-        priceEl.style.transform = 'scale(1.1)';
-        setTimeout(() => priceEl.style.transform = 'scale(1)', 150);
-    };
-
-    sb.channel('msgs').on('postgres_changes', {event:'INSERT', schema:'public', table:'messages'}, r => addMsg(r.new)).subscribe();
-    loadData(); setInterval(loadData, 10000);
-}
-
-async function doTrade(t, btn) {
-    createRipple(event, btn);
-    btn.classList.add('click-feedback');
-    setTimeout(() => btn.classList.remove('click-feedback'), 300);
-    
-    const v = parseFloat(document.getElementById('vol').value);
-    if (!v || v <= 0) return alert("Введите объем!");
-    
-    const c = v * btcPrice;
-    if (t === 'BUY' && c > balance) return alert("Мало денег!");
-    
-    balance = t === 'BUY' ? balance - c : balance + c;
-    updateUI();
-    await sb.from('profiles').update({ balance }).eq('id', user.id);
-    await sb.from('messages').insert([{ username: nick, text: `${t==='BUY'?'🟢 LONG':'🔴 SHORT'} ${v} BTC по ${btcPrice.toFixed(2)}`, is_trade: true }]);
-    
-    // Visual feedback
-    const notif = document.createElement('div');
-    notif.style.cssText = `position:fixed; top:80px; left:50%; transform:translateX(-50%); background:${t==='BUY'?'var(--up)':'var(--down)'}; color:white; padding:15px 30px; border-radius:8px; font-weight:bold; z-index:1000; animation:slideDown 0.3s;`;
-    notif.innerHTML = `${t==='BUY'?'✅ Лонг открыт':'✅ Шорт открыт'} ${v} BTC`;
-    document.body.appendChild(notif);
-    setTimeout(() => notif.remove(), 2000);
-}
-
-async function loadData() {
-    const { data: l } = await sb.from('profiles').select('username, balance').order('balance', {ascending: false}).limit(5);
-    if (l) document.getElementById('leaderboard').innerHTML = l.map((x, i) => `<div style="padding:5px 0; ${x.username===nick?'color:var(--prim); font-weight:bold;':''}">${i+1}. ${x.username} - $${x.balance.toFixed(0)}</div>`).join('');
-    const { data: m } = await sb.from('messages').select('*').order('created_at', {ascending: false}).limit(20);
-    if (m) { document.getElementById('chat').innerHTML = ''; m.reverse().forEach(addMsg); }
-}
-
-function addMsg(m) {
-    const ch = document.getElementById('chat');
-    const div = document.createElement('div');
-    div.className = 'msg ' + (m.is_trade ? 'trade-msg' : '');
-    div.innerHTML = `<b style="color:${m.is_trade?'var(--prim)':'#888'}">${m.username}:</b> ${m.text}`;
-    ch.appendChild(div);
-    ch.scrollTop = ch.scrollHeight;
-}
-
-function updateUI() { document.getElementById('bal').innerText = balance.toFixed(2); }
-
-document.getElementById('chat-in').onkeypress = async (e) => {
-    if (e.key === 'Enter' && e.target.value) {
-        await sb.from('messages').insert([{ username: nick, text: e.target.value }]);
-        e.target.value = '';
-    }
+const config = {
+    type: Phaser.AUTO,
+    width: 400,
+    height: 600,
+    backgroundColor: '#0a0a0a',
+    physics: { default: 'arcade' },
+    scene: { preload: preload, create: create, update: update }
 };
 
-// Add slideDown animation
-const style = document.createElement('style');
-style.innerHTML = `@keyframes slideDown { from { opacity:0; transform:translateX(-50%) translateY(-20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }`;
-document.head.appendChild(style);
+const game = new Phaser.Game(config);
+
+let score = 0;
+let scoreText, scoreBack;
+let items;
+let combo = 0;
+let comboText, comboBack;
+let comboTimer;
+let lastClickTime = 0;
+let missedItems = 0;
+let shop = { click: 10, speed: 1200, magnet: 0, prices: { p1: 100, p2: 300, p3: 1000 } };
+
+// Цвета комбо — драгоценные камни
+const COMBO_GEMS = [
+    0xc41e3a, // Рубин x2
+    0xff8c00, // Янтарь x3
+    0xffd700, // Золото x4
+    0x50c878, // Изумруд x5
+    0x0f52ba, // Сапфир x6
+    0x9966cc, // Аметист x7
+    0xe5e4e2, // Платина x8
+    0xff1493  // Розовый бриллиант x9+
+];
+
+function preload() {
+    this.load.spritesheet('icons', 'icons.png', { frameWidth: 64, frameHeight: 64 });
+}
+
+function create() {
+    // === ГОТИЧЕСКОЕ ПОДЗЕМЕЛЬЕ ===
+    let bg = this.add.graphics();
+    
+    // Мраморный пол с венами
+    bg.fillGradientStyle(0x1a1a2e, 0x16213e, 0x0f0f23, 0x0a0a1a, 1);
+    bg.fillRect(0, 0, 400, 600);
+    
+    // Вены мрамора
+    for(let i=0; i<8; i++) {
+        let x = Math.random() * 400;
+        bg.lineStyle(2 + Math.random()*3, 0x2a2a3e, 0.4);
+        bg.beginPath();
+        bg.moveTo(x, 0);
+        for(let y=0; y<600; y+=20) {
+            bg.lineTo(x + Math.sin(y*0.02)*30 + (Math.random()-0.5)*10, y);
+        }
+        bg.strokePath();
+    }
+    
+    // Ковер посередине (красный бархат)
+    bg.fillStyle(0x4a0404, 0.6);
+    bg.beginPath();
+    bg.moveTo(120, 0);
+    bg.lineTo(280, 0);
+    bg.lineTo(320, 600);
+    bg.lineTo(80, 600);
+    bg.closePath();
+    bg.fillPath();
+    
+    // Золотая кайма ковра
+    bg.lineStyle(3, 0xb8860b, 0.8);
+    bg.beginPath();
+    bg.moveTo(120, 0);
+    bg.lineTo(80, 600);
+    bg.strokePath();
+    bg.beginPath();
+    bg.moveTo(280, 0);
+    bg.lineTo(320, 600);
+    bg.strokePath();
+    
+    // Колонны по бокам
+    for(let x of [30, 370]) {
+        // Основание
+        bg.fillStyle(0x2c2c2c, 1);
+        bg.fillRect(x-25, 0, 50, 600);
+        
+        // Золотые кольца на колоннах
+        for(let y=100; y<600; y+=150) {
+            bg.fillStyle(0xb8860b, 0.9);
+            bg.fillRect(x-28, y, 56, 8);
+            // Тень под кольцом
+            bg.fillStyle(0x000000, 0.5);
+            bg.fillRect(x-25, y+8, 50, 4);
+        }
+        
+        // Капитель (верх колонны)
+        bg.fillStyle(0x3d3d3d, 1);
+        bg.fillRect(x-35, 0, 70, 40);
+        bg.fillStyle(0xb8860b, 1);
+        bg.fillRect(x-40, 35, 80, 10);
+    }
+    
+    // === СВЕЧИ ВМЕСТО ФАКЕЛОВ ===
+    let candlePos = [[35, 50], [365, 50], [35, 550], [365, 550]];
+    candlePos.forEach((pos, i) => {
+        // Подсвечник
+        let holder = this.add.rectangle(pos[0], pos[1]+25, 20, 30, 0xb8860b);
+        holder.setDepth(2);
+        
+        // Свеча
+        let candle = this.add.rectangle(pos[0], pos[1], 12, 40, 0xf5f5dc);
+        candle.setDepth(1);
+        
+        // Пламя (мягкое, желтое)
+        let flame = this.add.ellipse(pos[0], pos[1]-25, 16, 24, 0xffaa00, 0.9);
+        flame.setBlendMode('ADD');
+        flame.setDepth(3);
+        
+        // Свечение
+        let glow = this.add.circle(pos[0], pos[1]-20, 60, 0xff6600, 0.15);
+        glow.setBlendMode('ADD');
+        glow.setDepth(0);
+        
+        // Анимация пламени
+        this.tweens.add({
+            targets: flame,
+            scaleY: 1.2,
+            scaleX: 0.9,
+            y: pos[1]-28,
+            duration: 150 + Math.random()*50,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+        });
+        
+        this.tweens.add({
+            targets: glow,
+            alpha: 0.25,
+            scale: 1.1,
+            duration: 200,
+            yoyo: true,
+            repeat: -1,
+            delay: i*50
+        });
+    });
+    
+    // === ТУМАН (легкий, золотистый) ===
+    for(let i=0; i<6; i++) {
+        let mist = this.add.image(200 + (Math.random()-0.5)*200, 500, 'icons', 0);
+        mist.setScale(6, 3);
+        mist.setAlpha(0.08);
+        mist.setTint(0xb8860b);
+        mist.setBlendMode('ADD');
+        
+        this.tweens.add({
+            targets: mist,
+            x: '+=80',
+            y: '-=50',
+            alpha: 0,
+            duration: 8000,
+            repeat: -1,
+            delay: i * 1000
+        });
+    }
+    
+    // === ВИНЬЕТКА (мягкая, золотистая) ===
+    let vignette = this.add.graphics();
+    for(let i=0; i<20; i++) {
+        let alpha = i * 0.025;
+        vignette.lineStyle(i*3, 0x1a0f00, alpha);
+        vignette.strokeRect(0, 0, 400, 600);
+    }
+
+    items = this.physics.add.group();
+
+    // === КНИГА УЧЕТА (UI золота) ===
+    // Обложка
+    let book = this.add.rectangle(110, 45, 200, 70, 0x4a0404);
+    book.setStrokeStyle(4, 0xb8860b);
+    book.setDepth(10);
+    
+    // Золотые уголки
+    let corners = [[15,15], [185,15], [15,55], [185,55]];
+    corners.forEach(c => {
+        let corner = this.add.rectangle(110-100+c[0], 45-35+c[1], 15, 15, 0xb8860b);
+        corner.setDepth(11);
+    });
+    
+    // Подложка для текста (пергамент)
+    let parchment = this.add.rectangle(110, 45, 180, 50, 0xf5f5dc, 0.9);
+    parchment.setDepth(12);
+    
+    // Монета (золотая, без вращения — статусная)
+    let coin = this.add.image(35, 45, 'icons', 131);
+    coin.setScale(1.3);
+    coin.setDepth(15);
+    coin.preFX.addGlow(0xffd700, 4, 0, false, 0.3, 10);
+    
+    // Объемный текст золота (тиснение)
+    scoreBack = this.add.text(125, 47, '0', { 
+        fontFamily: 'Cinzel',
+        fontSize: '38px', 
+        fontStyle: 'bold', 
+        fill: '#8b6914'
+    }).setOrigin(0.5).setDepth(13);
+    
+    scoreText = this.add.text(122, 45, '0', { 
+        fontFamily: 'Cinzel',
+        fontSize: '38px', 
+        fontStyle: 'bold', 
+        fill: '#b8860b',
+        stroke: '#4a0404',
+        strokeThickness: 2
+    }).setOrigin(0.5).setDepth(14);
+
+    // === ГЕРБ COMBO ===
+    let shield = this.add.ellipse(200, 110, 120, 80, 0x2c2c2c, 0.9);
+    shield.setStrokeStyle(3, 0xb8860b);
+    shield.setDepth(19);
+    shield.setAlpha(0);
+    
+    comboBack = this.add.text(202, 112, '', { 
+        fontFamily: 'Cinzel',
+        fontSize: '32px', 
+        fontStyle: 'bold',
+        fill: '#4a0404'
+    }).setOrigin(0.5).setAlpha(0).setDepth(20);
+    
+    comboText = this.add.text(200, 110, '', { 
+        fontFamily: 'Cinzel',
+        fontSize: '32px', 
+        fontStyle: 'bold',
+        fill: '#ffffff',
+        stroke: '#000000',
+        strokeThickness: 3
+    }).setOrigin(0.5).setAlpha(0).setDepth(21);
+    
+    // Свечение герба
+    let shieldGlow = this.add.ellipse(200, 110, 140, 100, 0xffd700, 0);
+    shieldGlow.setBlendMode('ADD');
+    shieldGlow.setDepth(18);
+    
+    // Сохраняем ссылки
+    this.shield = shield;
+    this.shieldGlow = shieldGlow;
+
+    // === АЛТАРЬ МАГАЗИНА ===
+    createAltarBtn(this, 70, 530, 'СИЛА', 'p1', 131, 0xc41e3a);
+    createAltarBtn(this, 200, 530, 'СКОР', 'p2', 43, 0x0f52ba);
+    createAltarBtn(this, 330, 530, 'УДАЧА', 'p3', 88, 0x50c878);
+
+    this.time.addEvent({ delay: shop.speed, callback: spawn, callbackScope: this, loop: true });
+}
+
+function createAltarBtn(scene, x, y, txt, type, iconFrame, gemColor) {
+    let container = scene.add.container(x, y);
+    container.setDepth(100);
+    
+    // Тень алтаря
+    let shadow = scene.add.ellipse(5, 15, 100, 70, 0x000000, 0.6);
+    
+    // Основание (мрамор)
+    let base = scene.add.ellipse(0, 10, 100, 70, 0x2a2a3e);
+    base.setStrokeStyle(2, 0x4a4a5e);
+    
+    // Столешница (дерево с инкрустацией)
+    let top = scene.add.ellipse(0, 0, 100, 70, 0x4a0404);
+    top.setStrokeStyle(3, 0xb8860b);
+    top.setInteractive();
+    
+    // Драгоценный камень в центре
+    let gem = scene.add.ellipse(0, 5, 30, 20, gemColor, 0.8);
+    gem.setBlendMode('ADD');
+    
+    // Иконка (над камнем)
+    let icon = scene.add.image(0, -15, 'icons', iconFrame);
+    icon.setScale(0.8);
+    
+    // Пульсация камня
+    scene.tweens.add({
+        targets: gem,
+        alpha: 0.4,
+        scaleX: 1.1,
+        scaleY: 1.1,
+        duration: 1000,
+        yoyo: true,
+        repeat: -1
+    });
+    
+    // Название (руны)
+    let label = scene.add.text(0, 18, txt, { 
+        fontFamily: 'Cinzel',
+        fontSize: '12px', 
+        fill: '#b8860b',
+        fontStyle: 'bold'
+    }).setOrigin(0.5);
+    
+    // Цена (высечена в "металле")
+    let priceBack = scene.add.text(1, 31, shop.prices[type], { 
+        fontFamily: 'Cinzel',
+        fontSize: '16px', 
+        fill: '#000000'
+    }).setOrigin(0.5);
+    
+    let price = scene.add.text(0, 30, shop.prices[type], { 
+        fontFamily: 'Cinzel',
+        fontSize: '16px', 
+        fill: '#ffd700',
+        stroke: '#4a0404',
+        strokeThickness: 2
+    }).setOrigin(0.5);
+    
+    container.add([shadow, base, top, gem, icon, label, priceBack, price]);
+    container.priceText = price;
+    container.priceBack = priceBack;
+    container.gem = gem;
+
+    top.on('pointerover', () => {
+        scene.tweens.add({ targets: container, y: y - 3, duration: 100 });
+        top.setFillStyle(0x5a0505);
+        gem.setAlpha(1);
+    });
+    
+    top.on('pointerout', () => {
+        scene.tweens.add({ targets: container, y: y, duration: 100 });
+        top.setFillStyle(0x4a0404);
+        gem.setAlpha(0.8);
+    });
+
+    top.on('pointerdown', () => {
+        scene.tweens.add({ 
+            targets: container, 
+            y: y + 2,
+            duration: 50,
+            yoyo: true,
+            onComplete: () => {
+                if (score >= shop.prices[type]) {
+                    score -= shop.prices[type];
+                    if(type === 'p1') shop.click += 10;
+                    if(type === 'p2') shop.speed = Math.max(200, shop.speed - 150);
+                    if(type === 'p3') shop.magnet += 1;
+                    shop.prices[type] = Math.floor(shop.prices[type] * 1.8);
+                    
+                    price.setText(shop.prices[type]);
+                    priceBack.setText(shop.prices[type]);
+                    updateScoreDisplay(scene);
+                    
+                    // Вспышка света
+                    let flash = scene.add.circle(x, y, 80, 0xffffff, 0.8);
+                    flash.setBlendMode('ADD');
+                    scene.tweens.add({ targets: flash, alpha: 0, scale: 2, duration: 400, onComplete: () => flash.destroy() });
+                    
+                    // Частицы благословения (золотые)
+                    for(let i=0; i<12; i++) {
+                        let p = scene.add.image(x, y, 'icons', 131);
+                        p.setScale(0.3);
+                        p.setTint(0xffd700);
+                        
+                        scene.tweens.add({
+                            targets: p,
+                            x: x + (Math.random()-0.5)*120,
+                            y: y - 100 - Math.random()*80,
+                            scale: 0,
+                            rotation: Math.random()*3,
+                            duration: 800,
+                            ease: 'Power2',
+                            onComplete: () => p.destroy()
+                        });
+                    }
+                    
+                } else {
+                    // Проклятие — красное мерцание
+                    let curse = scene.add.rectangle(x, y, 100, 80, 0x8b0000, 0.6);
+                    scene.tweens.add({ targets: curse, alpha: 0, duration: 400, onComplete: () => curse.destroy() });
+                    scene.cameras.main.shake(150, 0.015);
+                }
+            }
+        });
+    });
+}
+
+function updateScoreDisplay(scene) {
+    scoreText.setText(score);
+    scoreBack.setText(score);
+    
+    // Золотое мерцание
+    let glow = scene.add.circle(110, 45, 60, 0xffd700, 0.3);
+    glow.setBlendMode('ADD');
+    scene.tweens.add({ targets: glow, alpha: 0, scale: 1.5, duration: 400, onComplete: () => glow.destroy() });
+    
+    scene.tweens.add({
+        targets: [scoreText, scoreBack],
+        scale: 1.1,
+        duration: 100,
+        yoyo: true
+    });
+}
+
+function spawn() {
+    let x = Phaser.Math.Between(100, 300);
+    const frames = [131, 43, 88, 91, 13, 127]; 
+    let frame = Phaser.Utils.Array.GetRandom(frames);
+    
+    let item = items.create(x, -50, 'icons', frame);
+    item.setInteractive();
+    item.setScale(0);
+    item.setVelocityY(Phaser.Math.Between(120, 250));
+    item.setDepth(50);
+    
+    // Тень на ковре
+    let shadow = this.add.ellipse(x, -20, 35, 12, 0x000000, 0.3);
+    shadow.setDepth(49);
+    item.shadow = shadow;
+    
+    // Появление с эффектом "материализации"
+    this.tweens.add({ 
+        targets: item, 
+        scale: 2, 
+        duration: 600, 
+        ease: 'Power2',
+        onUpdate: () => {
+            if(item.active && shadow.active) {
+                shadow.x = item.x;
+                shadow.y = item.y + 35;
+                shadow.scaleX = item.scaleX * 0.4;
+                shadow.alpha = 0.3 * (item.scaleX / 2);
+            }
+        }
+    });
+    
+    // Легкое покачивание
+    this.tweens.add({
+        targets: item,
+        x: '+=5',
+        duration: 2000,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
+    });
+
+    item.on('pointerdown', () => {
+        combo++;
+        missedItems = 0;
+        let now = Date.now();
+        let bonus = (now - lastClickTime < 600) ? Math.min(9, Math.floor(combo/2) + 1) : 1;
+        lastClickTime = now;
+        
+        let gain = shop.click * bonus;
+        score += gain;
+        
+        if (item.shadow) {
+            this.tweens.add({
+                targets: item.shadow,
+                alpha: 0,
+                duration: 200,
+                onComplete: () => item.shadow.destroy()
+            });
+        }
+        
+        // РАСПАД НА ЗОЛОТУЮ ПЫЛЬ
+        let dustColor = bonus > 1 ? COMBO_GEMS[Math.min(bonus-2, 7)] : 0xffd700;
+        
+        for(let i=0; i<24; i++) {
+            let angle = (Math.PI * 2 / 24) * i + Math.random()*0.2;
+            let dist = 50 + Math.random() * 60;
+            let dust = this.add.ellipse(item.x, item.y, 8, 8, dustColor, 0.9);
+            dust.setBlendMode('ADD');
+            dust.setDepth(60);
+            
+            this.tweens.add({
+                targets: dust,
+                x: item.x + Math.cos(angle) * dist,
+                y: item.y + Math.sin(angle) * dist - 40,
+                scale: 0,
+                alpha: 0,
+                duration: 800 + Math.random()*200,
+                ease: 'Power2',
+                onComplete: () => dust.destroy()
+            });
+        }
+        
+        // Кольцо магии
+        let ring = this.add.ellipse(item.x, item.y, 30, 10, dustColor, 0.6);
+        ring.setStrokeStyle(2, 0xffffff, 0.8);
+        ring.setBlendMode('ADD');
+        ring.setDepth(55);
+        this.tweens.add({
+            targets: ring,
+            scaleX: 5,
+            scaleY: 5,
+            alpha: 0,
+            duration: 700,
+            onComplete: () => ring.destroy()
+        });
+
+        updateScoreDisplay(this);
+        
+        // === ГЕРАЛЬДИЧЕСКИЙ COMBO ===
+        if (bonus > 1) {
+            let gemColor = COMBO_GEMS[Math.min(bonus-2, 7)];
+            let colorHex = '#' + gemColor.toString(16).padStart(6, '0');
+            
+            this.shield.setAlpha(1);
+            comboText.setFill(colorHex);
+            comboText.setText('x' + bonus);
+            comboBack.setText('x' + bonus);
+            
+            comboText.setAlpha(1);
+            comboBack.setAlpha(1);
+            
+            // Свечение герба цветом камня
+            this.shieldGlow.setFillStyle(gemColor, 0.5);
+            this.tweens.add({
+                targets: this.shieldGlow,
+                alpha: 0,
+                scale: 1.5,
+                duration: 600
+            });
+            
+            // Появление герба
+            this.tweens.add({
+                targets: [this.shield, comboText, comboBack],
+                scale: 1.2,
+                duration: 200,
+                ease: 'Back.out',
+                onComplete: () => {
+                    this.tweens.add({
+                        targets: [this.shield, comboText, comboBack],
+                        scale: 1,
+                        duration: 300
+                    });
+                }
+            });
+            
+            if (comboTimer) clearTimeout(comboTimer);
+            comboTimer = setTimeout(() => {
+                this.tweens.add({
+                    targets: [this.shield, comboText, comboBack],
+                    alpha: 0,
+                    duration: 300
+                });
+                combo = 0;
+            }, 1800);
+        }
+        
+        // ТЕКСТ ЗОЛОТА (золотое тиснение)
+        for(let i=3; i>=0; i--) {
+            let offset = i * 2;
+            let isMain = i === 0;
+            let color = bonus > 1 ? ('#' + COMBO_GEMS[Math.min(bonus-2, 7)].toString(16).padStart(6, '0')) : '#ffd700';
+            
+            let t = this.add.text(item.x + offset, item.y + offset, '+' + gain, { 
+                fontFamily: 'Cinzel',
+                fontSize: '36px',
+                fontStyle: 'bold', 
+                fill: isMain ? color : '#000000',
+                stroke: isMain ? '#4a0404' : null,
+                strokeThickness: isMain ? 4 : 0
+            }).setOrigin(0.5).setDepth(80 - i).setAlpha(isMain ? 1 : 0.4);
+            
+            this.tweens.add({ 
+                targets: t, 
+                y: item.y - 140, 
+                x: item.x + (Math.random()-0.5)*20,
+                scale: isMain ? 1.3 : 1,
+                alpha: 0, 
+                duration: 1000, 
+                ease: 'Power2',
+                onComplete: () => t.destroy()
+            });
+        }
+        
+        // Исчезновение добычи
+        this.tweens.add({
+            targets: item,
+            alpha: 0,
+            scale: 2.5,
+            duration: 300,
+            onComplete: () => item.destroy()
+        });
+    });
+}
+
+function update() {
+    items.children.iterate(i => {
+        if (i) {
+            if (i.shadow && i.shadow.active) {
+                i.shadow.x += (i.x - i.shadow.x) * 0.1;
+                i.shadow.y = i.y + 35;
+            }
+            
+            if (i.y > 650) {
+                // ПРОКЛЯТИЕ ЗА ПРОПУСК
+                missedItems++;
+                let penalty = Math.min(score, Math.floor(shop.click * missedItems * 1.5));
+                score -= penalty;
+                
+                if (penalty > 0) {
+                    // Кровавый текст
+                    let blood = this.add.text(i.x, 580, '-' + penalty, {
+                        fontFamily: 'Cinzel',
+                        fontSize: '28px',
+                        fontStyle: 'bold',
+                        fill: '#8b0000',
+                        stroke: '#000000',
+                        strokeThickness: 3
+                    }).setOrigin(0.5).setDepth(100);
+                    
+                    this.tweens.add({
+                        targets: blood,
+                        y: 450,
+                        alpha: 0,
+                        duration: 1000,
+                        onComplete: () => blood.destroy()
+                    });
+                    
+                    // Красное мерцание
+                    let red = this.add.rectangle(200, 300, 400, 600, 0x4a0000, 0.2);
+                    this.tweens.add({ targets: red, alpha: 0, duration: 400, onComplete: () => red.destroy() });
+                    
+                    updateScoreDisplay(this);
+                }
+                
+                if (i.shadow) i.shadow.destroy();
+                i.destroy();
+                combo = 0;
+                this.shield.setAlpha(0);
+                comboText.setAlpha(0);
+                comboBack.setAlpha(0);
+            }
+        }
+    });
+}
 </script>
 </body>
 </html>
