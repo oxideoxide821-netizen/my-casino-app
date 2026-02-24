@@ -12,74 +12,73 @@
 </head>
 <body>
 <script>
-// === ЗАГРУЗОЧНАЯ СЦЕНА ===
-class BootScene extends Phaser.Scene {
+// === ОДНА СЦЕНА (надежнее) ===
+class GameScene extends Phaser.Scene {
     constructor() {
-        super({ key: 'BootScene' });
+        super({ key: 'GameScene' });
     }
-    
+
     preload() {
         this.load.spritesheet('icons', 'icons.png', { frameWidth: 64, frameHeight: 64 });
     }
-    
+
     create() {
-        // Фон загрузки
-        this.cameras.main.setBackgroundColor('#0a0a0a');
-        
-        // Анимация загрузки
-        let centerX = this.cameras.main.centerX;
-        let centerY = this.cameras.main.centerY;
+        // === ЗАГРУЗОЧНЫЙ ЭКРАН ===
+        let loadBg = this.add.rectangle(300, 450, 600, 900, 0x0a0a0a);
         
         // Вращающаяся монета
-        let coin = this.add.image(centerX, centerY - 50, 'icons', 131);
-        coin.setScale(4);
+        let loadCoin = this.add.image(300, 400, 'icons', 131);
+        loadCoin.setScale(5);
         
         this.tweens.add({
-            targets: coin,
-            scaleX: 0.2,
+            targets: loadCoin,
+            scaleX: 0.3,
             duration: 400,
             yoyo: true,
-            repeat: -1,
+            repeat: 3,
             ease: 'Sine.easeInOut',
             onYoyo: () => {
-                coin.setFrame(coin.frame.name === 131 ? 43 : 131);
+                loadCoin.setFrame(loadCoin.frame.name === 131 ? 43 : 131);
             }
         });
         
         // Текст загрузки
-        let text = this.add.text(centerX, centerY + 50, 'ЗАГРУЗКА...', {
-            fontSize: '32px',
+        let loadText = this.add.text(300, 500, 'ЗАГРУЗКА...', {
+            fontSize: '40px',
             fontStyle: 'bold',
             fill: '#ffd700'
         }).setOrigin(0.5);
         
         // Полоса загрузки
-        let barBg = this.add.rectangle(centerX, centerY + 100, 300, 20, 0x333333);
-        let bar = this.add.rectangle(centerX - 150, centerY + 100, 0, 20, 0xffd700).setOrigin(0, 0.5);
+        let barBg = this.add.rectangle(300, 560, 400, 25, 0x333333);
+        let bar = this.add.rectangle(100, 560, 0, 25, 0xffd700).setOrigin(0, 0.5);
         
-        // Имитация загрузки
+        // Анимация загрузки и старт игры
         this.tweens.add({
             targets: bar,
-            width: 300,
-            duration: 2000,
+            width: 400,
+            duration: 2500,
             ease: 'Power2',
             onComplete: () => {
-                this.cameras.main.fade(500, 0, 0, 0);
-                this.time.delayedCall(500, () => {
-                    this.scene.start('GameScene');
+                // Убираем загрузку
+                this.tweens.add({
+                    targets: [loadBg, loadCoin, loadText, barBg, bar],
+                    alpha: 0,
+                    duration: 500,
+                    onComplete: () => {
+                        loadBg.destroy();
+                        loadCoin.destroy();
+                        loadText.destroy();
+                        barBg.destroy();
+                        bar.destroy();
+                        this.startGame();
+                    }
                 });
             }
         });
     }
-}
 
-// === ИГРОВАЯ СЦЕНА ===
-class GameScene extends Phaser.Scene {
-    constructor() {
-        super({ key: 'GameScene' });
-    }
-    
-    create() {
+    startGame() {
         // === HD ПОДЗЕМЕЛЬЕ 600x900 ===
         let bg = this.add.graphics();
         
@@ -136,16 +135,13 @@ class GameScene extends Phaser.Scene {
         // Свечи с PNG иконками
         let candles = [[45, 60], [555, 60], [45, 840], [555, 840]];
         candles.forEach((pos, i) => {
-            // Подсвечник из спрайта
             let holder = this.add.image(pos[0], pos[1]+30, 'icons', 108);
             holder.setScale(1.5);
             holder.setTint(0xb8860b);
             
-            // Свеча
             let candle = this.add.image(pos[0], pos[1], 'icons', 109);
             candle.setScale(1.2);
             
-            // Пламя (анимация)
             let flame = this.add.image(pos[0], pos[1]-25, 'icons', 110 + (i%3));
             flame.setScale(1.3);
             flame.setTint(0xffaa00);
@@ -189,12 +185,10 @@ class GameScene extends Phaser.Scene {
         this.items = this.physics.add.group();
         
         // === HD UI ===
-        // Книга золота
         let book = this.add.rectangle(150, 60, 260, 90, 0x4a0404);
         book.setStrokeStyle(5, 0xb8860b);
         book.setDepth(10);
         
-        // Монета PNG
         this.coinIcon = this.add.image(50, 60, 'icons', 131);
         this.coinIcon.setScale(2);
         this.coinIcon.setDepth(15);
@@ -210,7 +204,6 @@ class GameScene extends Phaser.Scene {
             }
         });
         
-        // Объемный текст (5 слоев)
         this.scoreShadows = [];
         for(let i=4; i>0; i--) {
             let t = this.add.text(165 + i*3, 62 + i*3, '0', {
@@ -229,7 +222,6 @@ class GameScene extends Phaser.Scene {
             strokeThickness: 3
         }).setOrigin(0.5).setDepth(14);
         
-        // Герб комбо
         this.shield = this.add.ellipse(300, 150, 160, 110, 0x2c2c2c, 0.95);
         this.shield.setStrokeStyle(4, 0xb8860b);
         this.shield.setDepth(19);
@@ -249,12 +241,10 @@ class GameScene extends Phaser.Scene {
             strokeThickness: 4
         }).setOrigin(0.5).setAlpha(0).setDepth(21);
         
-        // Алтари магазина
         this.createAltar(100, 800, 'СИЛА', 'p1', 131, 0xc41e3a);
         this.createAltar(300, 800, 'СКОР', 'p2', 43, 0x0f52ba);
         this.createAltar(500, 800, 'УДАЧА', 'p3', 88, 0x50c878);
         
-        // Спавнер
         this.time.addEvent({ delay: 1200, callback: this.spawn, callbackScope: this, loop: true });
         
         this.score = 0;
@@ -263,28 +253,21 @@ class GameScene extends Phaser.Scene {
         this.lastClickTime = 0;
         this.shop = { click: 10, speed: 1200, prices: { p1: 100, p2: 300, p3: 1000 } };
     }
-    
+
     createAltar(x, y, txt, type, iconFrame, color) {
         let container = this.add.container(x, y);
         container.setDepth(100);
         
-        // Тень
         let shadow = this.add.ellipse(8, 20, 140, 100, 0x000000, 0.5);
-        
-        // Основание
         let base = this.add.ellipse(0, 15, 140, 100, 0x2a2a3e);
         base.setStrokeStyle(3, 0x4a4a5e);
-        
-        // Стол
         let top = this.add.ellipse(0, 0, 140, 100, 0x4a0404);
         top.setStrokeStyle(4, 0xb8860b);
         top.setInteractive();
         
-        // PNG иконка предмета
         let icon = this.add.image(0, -20, 'icons', iconFrame);
         icon.setScale(1.8);
         
-        // Анимация иконки
         this.tweens.add({
             targets: icon,
             y: -25,
@@ -294,14 +277,12 @@ class GameScene extends Phaser.Scene {
             ease: 'Sine.easeInOut'
         });
         
-        // Название
         let label = this.add.text(0, 25, txt, {
             fontSize: '18px',
             fill: '#b8860b',
             fontStyle: 'bold'
         }).setOrigin(0.5);
         
-        // Цена (объемная)
         let priceShadow = this.add.text(2, 47, this.shop.prices[type], {
             fontSize: '22px',
             fill: '#000000'
@@ -343,7 +324,6 @@ class GameScene extends Phaser.Scene {
                         priceShadow.setText(this.shop.prices[type]);
                         this.updateScore();
                         
-                        // Частицы
                         for(let i=0; i<15; i++) {
                             let p = this.add.image(x, y, 'icons', 131);
                             p.setScale(0.8);
@@ -364,10 +344,9 @@ class GameScene extends Phaser.Scene {
             });
         });
     }
-    
+
     spawn() {
         let x = Phaser.Math.Between(150, 450);
-        // Разные PNG иконки для лута
         const lootFrames = [131, 43, 88, 91, 13, 127, 50, 55, 60];
         let frame = Phaser.Utils.Array.GetRandom(lootFrames);
         
@@ -377,12 +356,10 @@ class GameScene extends Phaser.Scene {
         item.setVelocityY(Phaser.Math.Between(150, 280));
         item.setDepth(50);
         
-        // Тень
         let shadow = this.add.ellipse(x, -50, 50, 18, 0x000000, 0.3);
         shadow.setDepth(49);
         item.shadow = shadow;
         
-        // Появление
         this.tweens.add({
             targets: item,
             scale: 2.5,
@@ -398,7 +375,6 @@ class GameScene extends Phaser.Scene {
             }
         });
         
-        // Покачивание
         this.tweens.add({
             targets: item,
             x: '+=8',
@@ -412,7 +388,7 @@ class GameScene extends Phaser.Scene {
             this.collect(item);
         });
     }
-    
+
     collect(item) {
         let now = Date.now();
         let comboMult = (now - this.lastClickTime < 600) ? Math.min(5, Math.floor(++this.combo/2) + 1) : 1;
@@ -431,7 +407,6 @@ class GameScene extends Phaser.Scene {
             });
         }
         
-        // Взрыв PNG осколков
         for(let i=0; i<16; i++) {
             let shard = this.add.image(item.x, item.y, 'icons', item.frame.name);
             shard.setScale(1);
@@ -450,7 +425,6 @@ class GameScene extends Phaser.Scene {
             });
         }
         
-        // Кольцо
         let ring = this.add.ellipse(item.x, item.y, 40, 15, 0xffd700, 0.5);
         ring.setStrokeStyle(3, 0xffffff);
         this.tweens.add({
@@ -464,7 +438,6 @@ class GameScene extends Phaser.Scene {
         
         this.updateScore();
         
-        // Комбо UI
         if (comboMult > 1) {
             let colors = ['#ff0000', '#ff8800', '#ffff00', '#00ff00', '#00ffff'];
             this.comboText.setFill(colors[comboMult-2]);
@@ -495,7 +468,6 @@ class GameScene extends Phaser.Scene {
             }, 1800);
         }
         
-        // Текст золота (5 слоев)
         for(let i=4; i>=0; i--) {
             let t = this.add.text(item.x + i*2, item.y + i*2, '+' + gain, {
                 fontSize: '42px',
@@ -523,7 +495,7 @@ class GameScene extends Phaser.Scene {
             onComplete: () => item.destroy()
         });
     }
-    
+
     updateScore() {
         this.scoreText.setText(this.score);
         this.scoreShadows.forEach(t => t.setText(this.score));
@@ -535,7 +507,7 @@ class GameScene extends Phaser.Scene {
             yoyo: true
         });
     }
-    
+
     update() {
         this.items.children.iterate(i => {
             if (i) {
@@ -581,15 +553,14 @@ class GameScene extends Phaser.Scene {
     }
 }
 
-// === КОНФИГ ===
 const gameConfig = {
     type: Phaser.AUTO,
     width: 600,
     height: 900,
     backgroundColor: '#0a0a0a',
-    pixelArt: true, // ЧЕТКИЕ ПИКСЕЛИ
+    pixelArt: true,
     physics: { default: 'arcade' },
-    scene: [BootScene, GameScene],
+    scene: GameScene,
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
