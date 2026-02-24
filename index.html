@@ -5,14 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Military Case Opener</title>
     <style>
-        body { margin: 0; background: #000; overflow: hidden; touch-action: none; font-family: sans-serif; }
-        #ui { position: absolute; width: 100%; text-align: center; color: #0ff; font-weight: bold; top: 10%; pointer-events: none; text-shadow: 0 0 10px #0ff; font-size: 24px; z-index: 10; }
-        #openBtn { position: absolute; bottom: 15%; left: 50%; transform: translateX(-50%); padding: 15px 40px; background: #0ff; border: none; border-radius: 5px; font-weight: bold; font-size: 18px; cursor: pointer; box-shadow: 0 0 20px #0ff; z-index: 20; transition: 0.2s; }
-        #openBtn:disabled { background: #333; box-shadow: none; color: #666; }
+        /* Черный фон обязателен, чтобы видеть модель */
+        body { margin: 0; background-color: #000 !important; overflow: hidden; touch-action: none; font-family: sans-serif; }
+        #ui { position: absolute; width: 100%; text-align: center; color: #0ff; font-weight: bold; top: 10%; pointer-events: none; text-shadow: 0 0 10px #0ff; font-size: 24px; z-index: 100; }
+        #openBtn { position: absolute; bottom: 15%; left: 50%; transform: translateX(-50%); padding: 15px 40px; background: #0ff; border: none; border-radius: 5px; font-weight: bold; font-size: 18px; cursor: pointer; box-shadow: 0 0 20px #0ff; z-index: 100; }
+        #debug { position: absolute; top: 20%; width: 100%; text-align: center; color: red; font-size: 14px; z-index: 100; pointer-events: none; }
     </style>
 </head>
 <body>
     <div id="ui">ИСПЫТАЙ УДАЧУ!</div>
+    <div id="debug">Инициализация...</div>
     <button id="openBtn">ОТКРЫТЬ КЕЙС</button>
 
     <script type="importmap">
@@ -23,99 +25,81 @@
         import * as THREE from 'three';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
+        const debug = document.getElementById('debug');
+        const log = (msg) => { debug.innerText = msg; console.log(msg); };
+
         const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x000000); // Принудительно черный фон 3D
         const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.outputColorSpace = THREE.SRGBColorSpace;
         document.body.appendChild(renderer.domElement);
 
-        // МОЩНЫЙ СВЕТ СО ВСЕХ СТОРОН
         const ambient = new THREE.AmbientLight(0xffffff, 2);
         const sun = new THREE.DirectionalLight(0xffffff, 3);
         sun.position.set(5, 10, 7);
-        const point = new THREE.PointLight(0x00ffff, 0, 20); // Свет внутри кейса
-        scene.add(ambient, sun, point);
+        scene.add(ambient, sun);
 
         let caseModel, weaponPack, mixer, openAction, isOpening = false;
         const loader = new GLTFLoader();
 
-        // 1. ЗАГРУЗКА КЕЙСА (Ammo Can)
-        loader.load('case.glb', (gltf) => {
+        // ЗАГРУЗКА КЕЙСА
+        loader.load('./case.glb', (gltf) => {
+            log("Кейс загружен!");
             caseModel = gltf.scene;
             scene.add(caseModel);
             
-            // Автоматический подбор размера и центрирование
+            // Центрируем модель
             const box = new THREE.Box3().setFromObject(caseModel);
             const size = box.getSize(new THREE.Vector3()).length();
-            const center = box.getCenter(new THREE.Vector3());
-            caseModel.position.x += (caseModel.position.x - center.x);
-            caseModel.position.y += (caseModel.position.y - center.y) - 0.5;
-            caseModel.position.z += (caseModel.position.z - center.z);
-            caseModel.scale.setScalar(3 / size); // Масштабируем до удобного размера
+            caseModel.scale.setScalar(4 / size);
+            caseModel.position.y = -1;
 
             mixer = new THREE.AnimationMixer(caseModel);
             if(gltf.animations.length > 0) {
-                openAction = mixer.clipAction(gltf.animations[0]); // Первая анимация крышки
+                openAction = mixer.clipAction(gltf.animations[0]);
                 openAction.setLoop(THREE.LoopOnce);
                 openAction.clampWhenFinished = true;
             }
-        });
+        }, undefined, (err) => log("ОШИБКА КЕЙСА: " + err.message));
 
-        // 2. ЗАГРУЗКА ОРУЖИЯ
-        loader.load('weapon.glb', (gltf) => {
+        // ЗАГРУЗКА ОРУЖИЯ
+        loader.load('./weapon.glb', (gltf) => {
+            log("Оружие готово!");
             weaponPack = gltf.scene;
             weaponPack.visible = false;
             scene.add(weaponPack);
             weaponPack.traverse(c => { if(c.isMesh) c.visible = false; });
-        });
+        }, undefined, (err) => log("ОШИБКА ОРУЖИЯ: " + err.message));
 
-        camera.position.set(0, 1.5, 6);
+        camera.position.set(0, 2, 8);
 
         function showPrize() {
             if (!weaponPack) return;
-            weaponPack.visible = true;
-            const items = weaponPack.children.filter(c => c.type === "Group" || c.type === "Mesh");
+            const items = weaponPack.children;
             const prize = items[Math.floor(Math.random() * items.length)];
-            
             items.forEach(c => c.visible = false);
             prize.visible = true;
-            prize.position.set(0, 0, 0);
-            prize.scale.setScalar(0.1);
-            
-            let start = Date.now();
-            const anim = setInterval(() => {
-                let prog = (Date.now() - start) / 1500;
-                prize.position.y = prog * 2.5; // Вылетает выше
-                prize.rotation.y += 0.05;
-                prize.scale.setScalar(prog * 1.5);
-                if (prog >= 1) { 
-                    clearInterval(anim); 
-                    prize.position.y = 2; 
-                    prize.scale.setScalar(1.5); 
-                }
-            }, 16);
+            weaponPack.visible = true;
+            prize.position.set(0, 2, 0);
+            prize.scale.setScalar(2);
+            log("ВЫПАЛ ПРЕДМЕТ!");
         }
 
         document.getElementById('openBtn').onclick = () => {
             if (isOpening || !caseModel) return;
             isOpening = true;
-            document.getElementById('openBtn').disabled = true;
-            document.getElementById('ui').innerText = "УДАЧИ...";
-
-            // Эффект тряски
+            log("Тряска...");
+            
             let start = Date.now();
             const shake = setInterval(() => {
                 caseModel.position.x = Math.sin(Date.now() * 0.1) * 0.1;
-                if (Date.now() - start > 1500) {
+                if (Date.now() - start > 1000) {
                     clearInterval(shake);
                     caseModel.position.x = 0;
                     if (openAction) openAction.play();
-                    point.intensity = 100; // Вспышка внутри
-                    setTimeout(() => { 
-                        showPrize(); 
-                        document.getElementById('ui').innerText = "ВЫПАЛ ПРЕДМЕТ!"; 
-                    }, 800);
+                    setTimeout(() => showPrize(), 800);
                 }
             }, 16);
         };
@@ -127,12 +111,6 @@
             renderer.render(scene, camera);
         }
         animate();
-
-        window.onresize = () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        };
     </script>
 </body>
 </html>
