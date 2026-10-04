@@ -1,116 +1,343 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Military Case Opener</title>
-    <style>
-        /* Черный фон обязателен, чтобы видеть модель */
-        body { margin: 0; background-color: #000 !important; overflow: hidden; touch-action: none; font-family: sans-serif; }
-        #ui { position: absolute; width: 100%; text-align: center; color: #0ff; font-weight: bold; top: 10%; pointer-events: none; text-shadow: 0 0 10px #0ff; font-size: 24px; z-index: 100; }
-        #openBtn { position: absolute; bottom: 15%; left: 50%; transform: translateX(-50%); padding: 15px 40px; background: #0ff; border: none; border-radius: 5px; font-weight: bold; font-size: 18px; cursor: pointer; box-shadow: 0 0 20px #0ff; z-index: 100; }
-        #debug { position: absolute; top: 20%; width: 100%; text-align: center; color: red; font-size: 14px; z-index: 100; pointer-events: none; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#eef2f8">
+<title>Подик Тапалка</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(160deg, #f5f7fa, #e2e9f4);
+    height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    color: #1a1f2e; user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    overflow: hidden;
+  }
+  .level-name {
+    font-size: 26px; font-weight: bold;
+    background: linear-gradient(90deg, #ef476f, #f78c6b);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .puffs {
+    font-size: 40px; font-weight: bold; margin: 6px 0 2px;
+    transition: transform .1s;
+  }
+  .puffs.bump { transform: scale(1.15); }
+  .per-tap { font-size: 16px; opacity: .7; margin-bottom: 14px; }
+
+  /* ===== Рамка-обрезка под фото ===== */
+  .vape-frame {
+    width: min(260px, 68vw); height: min(260px, 68vw);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; cursor: pointer;
+  }
+  .vape-img {
+    width: 100%; height: 100%;
+    object-fit: contain; object-position: center;
+    transform: scale(1.35);            /* обрезаем пустые поля по краям */
+    mix-blend-mode: multiply;          /* белый фото-фон становится прозрачным */
+    transition: transform .07s;
+    filter: drop-shadow(0 12px 16px rgba(0,0,0,.15));
+  }
+  .vape-frame:active .vape-img { transform: scale(1.18) rotate(-3deg); }
+  .vape-emoji {
+    font-size: 120px; cursor: pointer; line-height: 1;
+    transition: transform .07s;
+  }
+  .vape-emoji:active { transform: scale(.88); }
+
+  .bonus {
+    position: fixed; font-size: 26px; font-weight: bold;
+    color: #ef476f; pointer-events: none;
+    animation: float 1s forwards; z-index: 50;
+  }
+  @keyframes float { to { transform: translateY(-90px); opacity: 0; } }
+
+  .progress {
+    width: 240px; height: 6px; background: #1a1f2e15;
+    border-radius: 3px; margin-top: 16px; overflow: hidden;
+  }
+  .progress div {
+    height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, #06d6a0, #ef476f);
+    transition: width .3s;
+  }
+
+  /* ===== Кнопка магазина ===== */
+  .shop-btn {
+    position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+    padding: 14px 28px; border: none; border-radius: 16px;
+    background: linear-gradient(90deg, #ef476f, #f78c6b);
+    color: #fff; font-size: 17px; font-weight: bold; cursor: pointer;
+    box-shadow: 0 6px 18px rgba(239,71,111,.35);
+    z-index: 10;
+  }
+
+  /* ===== Шторка-магазин ===== */
+  .backdrop {
+    position: fixed; inset: 0; background: rgba(10,14,25,.45);
+    opacity: 0; pointer-events: none; transition: opacity .25s; z-index: 20;
+  }
+  .backdrop.open { opacity: 1; pointer-events: auto; }
+  .sheet {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    max-height: 72vh; z-index: 21;
+    background: #fff; border-radius: 22px 22px 0 0;
+    transform: translateY(105%); transition: transform .3s cubic-bezier(.2,.8,.2,1);
+    display: flex; flex-direction: column;
+    box-shadow: 0 -10px 40px rgba(0,0,0,.2);
+  }
+  .sheet.open { transform: translateY(0); }
+  .sheet-handle {
+    width: 44px; height: 5px; border-radius: 3px;
+    background: #1a1f2e22; margin: 10px auto 4px;
+  }
+  .sheet-title {
+    font-size: 19px; font-weight: bold; text-align: center;
+    padding: 8px 0 12px;
+  }
+  .shop-list { overflow-y: auto; padding: 0 14px 14px; flex: 1; }
+  .shop-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 14px; margin-bottom: 8px;
+    background: #f2f5fa;
+  }
+  .shop-item.current { background: linear-gradient(90deg, #ef476f18, #f78c6b18); outline: 2px solid #ef476f55; }
+  .shop-item.locked { opacity: .55; }
+  .shop-thumb {
+    width: 52px; height: 52px; border-radius: 12px;
+    background: #fff; display: flex; align-items: center; justify-content: center;
+    overflow: hidden; flex-shrink: 0;
+    font-size: 30px;
+  }
+  .shop-thumb img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+  .shop-info { flex: 1; min-width: 0; }
+  .shop-name { font-weight: bold; font-size: 15px; }
+  .shop-sub { font-size: 13px; opacity: .65; }
+  .buy-btn {
+    border: none; border-radius: 12px; padding: 10px 14px;
+    background: linear-gradient(90deg, #ef476f, #f78c6b);
+    color: #fff; font-weight: bold; font-size: 13px; cursor: pointer;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .buy-btn:disabled { opacity: .35; cursor: default; }
+  .badge {
+    font-size: 13px; font-weight: bold; color: #06a87a;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .sheet-footer { padding: 10px 14px 18px; border-top: 1px solid #1a1f2e10; }
+  .reset-btn {
+    width: 100%; padding: 12px; border: none; border-radius: 12px;
+    background: #1a1f2e12; color: #1a1f2e; font-weight: bold; cursor: pointer;
+  }
+</style>
 </head>
 <body>
-    <div id="ui">ИСПЫТАЙ УДАЧУ!</div>
-    <div id="debug">Инициализация...</div>
-    <button id="openBtn">ОТКРЫТЬ КЕЙС</button>
 
-    <script type="importmap">
-        { "imports": { "three": "https://unpkg.com", "three/addons/": "https://unpkg.com" } }
-    </script>
+<div class="level-name" id="levelName"></div>
+<div class="puffs" id="puffs">0</div>
+<div class="per-tap">💨 +<span id="perTap">1</span> за тап</div>
 
-    <script type="module">
-        import * as THREE from 'three';
-        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+<div class="vape-frame" id="vapeBox"></div>
+<div class="progress"><div id="bar" style="width:0%"></div></div>
 
-        const debug = document.getElementById('debug');
-        const log = (msg) => { debug.innerText = msg; console.log(msg); };
+<button class="shop-btn" id="shopBtn">🛒 Магазин подиков</button>
 
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x000000); // Принудительно черный фон 3D
-        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.outputColorSpace = THREE.SRGBColorSpace;
-        document.body.appendChild(renderer.domElement);
+<div class="backdrop" id="backdrop"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">Магазин подиков</div>
+  <div class="shop-list" id="shopList"></div>
+  <div class="sheet-footer">
+    <button class="reset-btn" id="reset">🔄 Сброс прогресса</button>
+  </div>
+</div>
 
-        const ambient = new THREE.AmbientLight(0xffffff, 2);
-        const sun = new THREE.DirectionalLight(0xffffff, 3);
-        sun.position.set(5, 10, 7);
-        scene.add(ambient, sun);
+<script>
+// ====== 11 УРОВНЕЙ ПОДИКОВ (по одному девайсу на фото!) ======
+const LEVELS = [
+  { name: 'Одноразка Elf Bar', emoji: '💨',
+    img: 'https://kimi-web-img.kimi.ai/img/www.vapour.com/2cbdfa4c24d4fa33a1c6c06b525c9fc4ed36cdbc.png',
+    income: 1,    cost: 100 },
 
-        let caseModel, weaponPack, mixer, openAction, isOpening = false;
-        const loader = new GLTFLoader();
+  { name: 'Vaporesso Zero S', emoji: '🟢',
+    img: 'https://kimi-web-img.kimi.ai/img/store.vaporesso.com/4951828f705209f96abb0da357d02fb1472b8db7.png',
+    income: 2,    cost: 400 },
 
-        // ЗАГРУЗКА КЕЙСА
-        loader.load('./case.glb', (gltf) => {
-            log("Кейс загружен!");
-            caseModel = gltf.scene;
-            scene.add(caseModel);
-            
-            // Центрируем модель
-            const box = new THREE.Box3().setFromObject(caseModel);
-            const size = box.getSize(new THREE.Vector3()).length();
-            caseModel.scale.setScalar(4 / size);
-            caseModel.position.y = -1;
+  { name: 'Charon Baby', emoji: '🟦',
+    img: 'https://kimi-web-img.kimi.ai/img/d2j6dbq0eux0bg.cloudfront.net/99d6e5821a3bfa49162a0a201ad1b991e1690cba.jpg',
+    income: 5,    cost: 1200 },
 
-            mixer = new THREE.AnimationMixer(caseModel);
-            if(gltf.animations.length > 0) {
-                openAction = mixer.clipAction(gltf.animations[0]);
-                openAction.setLoop(THREE.LoopOnce);
-                openAction.clampWhenFinished = true;
-            }
-        }, undefined, (err) => log("ОШИБКА КЕЙСА: " + err.message));
+  { name: 'Caliburn G4 Mini', emoji: '🔷',
+    img: 'https://kimi-web-img.kimi.ai/img/www.supavapes.com/7941e49acf9cc0bbcb081ad1fd5fce7070dcc4cf.png',
+    income: 10,   cost: 3500 },
 
-        // ЗАГРУЗКА ОРУЖИЯ
-        loader.load('./weapon.glb', (gltf) => {
-            log("Оружие готово!");
-            weaponPack = gltf.scene;
-            weaponPack.visible = false;
-            scene.add(weaponPack);
-            weaponPack.traverse(c => { if(c.isMesh) c.visible = false; });
-        }, undefined, (err) => log("ОШИБКА ОРУЖИЯ: " + err.message));
+  { name: 'SMOK Novo', emoji: '⬛',
+    img: 'https://kimi-web-img.kimi.ai/img/www.ecigwizard.com/ff60848c2ae9a9597002cd51e1bc727c6594a5b4.png',
+    income: 20,   cost: 9000 },
 
-        camera.position.set(0, 2, 8);
+  { name: 'Geekvape Wenax Q', emoji: '🟧',
+    img: 'https://kimi-web-img.kimi.ai/img/www.vaporshopdirect.com/300934981c1cf680ac381c1d16565342188d3a8d.png',
+    income: 40,   cost: 20000 },
 
-        function showPrize() {
-            if (!weaponPack) return;
-            const items = weaponPack.children;
-            const prize = items[Math.floor(Math.random() * items.length)];
-            items.forEach(c => c.visible = false);
-            prize.visible = true;
-            weaponPack.visible = true;
-            prize.position.set(0, 2, 0);
-            prize.scale.setScalar(2);
-            log("ВЫПАЛ ПРЕДМЕТ!");
+  { name: 'Jellybox V3', emoji: '🟨',
+    img: 'https://kimi-web-img.kimi.ai/img/cdn.salla.sa/f21ec17cf33d03dd47f6c25e238e580f0ba72466.jpg',
+    income: 80,   cost: 45000 },
+
+  { name: 'Voopoo Argus P1', emoji: '🟥',
+    img: 'https://kimi-web-img.kimi.ai/img/vape360.co.uk/d226b2fb6738ed04bf4f1c1b65fb3fdaa9612adf.png',
+    income: 160,  cost: 100000 },
+
+  { name: 'Vaporesso XROS 5', emoji: '⬜',
+    img: 'https://kimi-web-img.kimi.ai/img/media.vaping360.com/d131ea91dee349629e81c4dcd127381b384336ea.webp',
+    income: 320,  cost: 220000 },
+
+  { name: 'Pasito 2', emoji: '🟪',
+    img: 'https://kimi-web-img.kimi.ai/img/www.sourcemore.com/bf748325ae845d42a2ee95aba4cc07bc2c7401bc.jpg',
+    income: 650,  cost: 500000 },
+
+  { name: 'Pasito 3', emoji: '👑',
+    img: 'https://kimi-web-img.kimi.ai/img/cdn.shopify.com/d3889e59279267e22282273db539bd23215215b1.webp',
+    income: 1500, cost: null }
+];
+
+let puffs = +(localStorage.puffs || 0);
+let level = +(localStorage.level || 0);
+
+const levelName = document.getElementById('levelName');
+const puffsEl = document.getElementById('puffs');
+const perTapEl = document.getElementById('perTap');
+const bar = document.getElementById('bar');
+const vapeBox = document.getElementById('vapeBox');
+const sheet = document.getElementById('sheet');
+const backdrop = document.getElementById('backdrop');
+const shopList = document.getElementById('shopList');
+
+function save() {
+  localStorage.puffs = puffs;
+  localStorage.level = level;
+}
+
+function render() {
+  const L = LEVELS[level];
+  levelName.textContent = 'Lv.' + (level + 1) + ' · ' + L.name;
+  puffsEl.textContent = puffs.toLocaleString('ru-RU');
+  perTapEl.textContent = L.income;
+  bar.style.width = (level / (LEVELS.length - 1) * 100) + '%';
+
+  vapeBox.innerHTML = '';
+  const img = document.createElement('img');
+  img.className = 'vape-img';
+  img.src = L.img;
+  img.onerror = () => {
+    vapeBox.innerHTML = '<div class="vape-emoji">' + L.emoji + '</div>';
+  };
+  vapeBox.appendChild(img);
+
+  renderShop();
+  save();
+}
+
+function renderShop() {
+  shopList.innerHTML = '';
+  LEVELS.forEach((L, i) => {
+    const item = document.createElement('div');
+    const isCurrent = i === level;
+    const isNext = i === level + 1;
+    const isMax = L.cost === null;
+    item.className = 'shop-item' + (isCurrent ? ' current' : '') + (!isCurrent && !isNext ? ' locked' : '');
+
+    const thumb = document.createElement('div');
+    thumb.className = 'shop-thumb';
+    const timg = document.createElement('img');
+    timg.src = L.img;
+    timg.onerror = () => { thumb.textContent = L.emoji; };
+    thumb.appendChild(timg);
+
+    const info = document.createElement('div');
+    info.className = 'shop-info';
+    info.innerHTML = '<div class="shop-name">' + L.name + '</div>' +
+      '<div class="shop-sub">+' + L.income + ' за тап' + (isMax ? ' · 👑 максимум' : ' · ' + L.cost.toLocaleString('ru-RU') + '💨') + '</div>';
+
+    item.appendChild(thumb);
+    item.appendChild(info);
+
+    if (isCurrent) {
+      const badge = document.createElement('div');
+      badge.className = 'badge';
+      badge.textContent = '✓ Текущий';
+      item.appendChild(badge);
+    } else if (isMax) {
+      const badge = document.createElement('div');
+      badge.className = 'badge';
+      badge.textContent = '👑';
+      item.appendChild(badge);
+    } else if (isNext) {
+      const btn = document.createElement('button');
+      btn.className = 'buy-btn';
+      btn.textContent = 'Купить';
+      btn.disabled = puffs < L.cost;
+      btn.addEventListener('click', () => {
+        if (puffs >= L.cost) {
+          puffs -= L.cost;
+          level = i;
+          render();
         }
+      });
+      item.appendChild(btn);
+    } else {
+      const badge = document.createElement('div');
+      badge.className = 'badge';
+      badge.style.color = '#8a90a3';
+      badge.textContent = '🔒';
+      item.appendChild(badge);
+    }
 
-        document.getElementById('openBtn').onclick = () => {
-            if (isOpening || !caseModel) return;
-            isOpening = true;
-            log("Тряска...");
-            
-            let start = Date.now();
-            const shake = setInterval(() => {
-                caseModel.position.x = Math.sin(Date.now() * 0.1) * 0.1;
-                if (Date.now() - start > 1000) {
-                    clearInterval(shake);
-                    caseModel.position.x = 0;
-                    if (openAction) openAction.play();
-                    setTimeout(() => showPrize(), 800);
-                }
-            }, 16);
-        };
+    shopList.appendChild(item);
+  });
+}
 
-        const clock = new THREE.Clock();
-        function animate() {
-            requestAnimationFrame(animate);
-            if (mixer) mixer.update(clock.getDelta());
-            renderer.render(scene, camera);
-        }
-        animate();
-    </script>
+// ===== Тап по вейпу =====
+vapeBox.addEventListener('pointerdown', e => {
+  const L = LEVELS[level];
+  puffs += L.income;
+  puffsEl.textContent = puffs.toLocaleString('ru-RU');
+  puffsEl.classList.add('bump');
+  setTimeout(() => puffsEl.classList.remove('bump'), 100);
+
+  const b = document.createElement('div');
+  b.className = 'bonus';
+  b.textContent = '+' + L.income + '💨';
+  b.style.left = e.clientX + 'px';
+  b.style.top = e.clientY + 'px';
+  document.body.appendChild(b);
+  setTimeout(() => b.remove(), 1000);
+
+  renderShop();
+  save();
+});
+
+// ===== Открытие/закрытие магазина =====
+function toggleShop(open) {
+  sheet.classList.toggle('open', open);
+  backdrop.classList.toggle('open', open);
+}
+document.getElementById('shopBtn').addEventListener('click', () => toggleShop(true));
+backdrop.addEventListener('click', () => toggleShop(false));
+
+document.getElementById('reset').addEventListener('click', () => {
+  if (confirm('Точно сбросить весь прогресс?')) {
+    puffs = 0; level = 0;
+    render();
+  }
+});
+
+render();
+</script>
 </body>
 </html>
